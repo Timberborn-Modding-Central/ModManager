@@ -9,7 +9,7 @@ namespace ModManager.ModIoSystem
 
         public ModIo()
         {
-            Client = new Client(Client.ModioApiUrl, new Credentials("APIKEY"));
+            Client = new Client(Client.ModioApiUrl, new Credentials(ModIoSecret.ApiKey));
         }
 
         public static ModIo Instance => _instance ??= new ModIo();
