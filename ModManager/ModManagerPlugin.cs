@@ -1,9 +1,10 @@
 ﻿using System.IO;
-using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
+using Modio.Models;
 using ModManager.ModIoSystem;
-using UnityEngine.Networking;
+using ModManager.ModSystem;
+using File = Modio.Models.File;
 
 namespace ModManager
 {
@@ -19,21 +20,34 @@ namespace ModManager
             Paths.LoadPaths();
             LoadDependencies();
 
+            var list = ModIo.Instance.Client.Games[3659].Mods.Search().ToList();
 
+            var service = new ModService();
 
-            var test = ModIo.Instance.Client.Games[3659].Get();
-            test.ConfigureAwait(true).GetAwaiter().OnCompleted(() =>
+            list.ConfigureAwait(true).GetAwaiter().OnCompleted(() =>
             {
-                Log.LogError(test.IsCompleted);
-                Log.LogError(test.IsFaulted);
-                Log.LogError(test.Result.Name);
+                foreach (Mod? file in list.Result)
+                {
+                    service.Subscribe(file);
+                }
             });
 
+            Log.LogFatal(Paths.ModManager.Data);
+
+
+
+            // var test = ModIo.Instance.Client.Games[3659].Mods[2267782].Get();
+            // test.ConfigureAwait(true).GetAwaiter().OnCompleted(() =>
+            // {
+            //     Log.LogError(test.IsCompleted);
+            //     Log.LogError(test.IsFaulted);
+            //     Log.LogError(test.Result);
+            // });
         }
 
         private async void Test()
         {
-            await ModIo.Instance.Client.Download(2448112, 2448112, new FileInfo("Test.zip"));
+            await ModIo.Instance.Client.Download(3659, 2410139, new FileInfo("Test.zip"));
         }
 
         private void LoadDependencies()
