@@ -1,4 +1,5 @@
-﻿using Modio;
+﻿using System;
+using Modio;
 
 namespace ModManager.ModIoSystem
 {
@@ -8,7 +9,7 @@ namespace ModManager.ModIoSystem
 
         public ModIo()
         {
-            Client = new Client(new Credentials("API KEY"));
+            Client = new Client(Client.ModioApiUrl, new Credentials("APIKEY"));
         }
 
         public static ModIo Instance => _instance ??= new ModIo();

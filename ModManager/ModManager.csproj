@@ -18,13 +18,15 @@
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
         <PackageReference Include="BepInEx.Core" Version="5.4.19" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+        <PackageReference Include="System.Buffers" Version="4.5.1" />
+        <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
         <PackageReference Include="UnityEngine.Modules" Version="5.6.0" IncludeAssets="compile" />
 
         <PackageReference Include="GriffinPlus.Lib.FastActivator" Version="1.1.0" />
         <PackageReference Include="Lib.Harmony" Version="2.2.2" NoWarn="NU1701" />
         <PackageReference Include="MonoMod.RuntimeDetour" Version="21.12.13.1" />
         <PackageReference Include="MonoMod.Utils" Version="22.5.1.1" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+<!--        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />-->
         <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
         <PackageReference Include="Unity.InputSystem" Version="1.5.0" />
         <PackageReference Include="UnityEngine.Modules" Version="2022.1.6" />
@@ -60,8 +62,11 @@
     <Target Name="AutomaticCopyToTimberborn" BeforeTargets="AfterBuild" Condition="$(CopyDllToPath) != 'none'">
         <Message Text="### Copy TimberApi common ###" Importance="high" />
         <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(TimberApiPath)" />
-        <Copy SourceFiles="$(ProjectDir)\libs\Microsoft.Bcl.AsyncInterfaces.dll" DestinationFolder="$(TimberApiPath)\libs" />
         <Copy SourceFiles="$(ProjectDir)\libs\Modio.dll" DestinationFolder="$(TimberApiPath)\libs" />
+        <Copy SourceFiles="$(ProjectDir)\libs\Microsoft.Bcl.AsyncInterfaces.dll" DestinationFolder="$(TimberApiPath)\libs" />
+        <Copy SourceFiles="$(ProjectDir)\libs\System.Buffers.dll" DestinationFolder="$(TimberApiPath)\libs" />
+        <Copy SourceFiles="$(ProjectDir)\libs\System.Numerics.Vectors.dll" DestinationFolder="$(TimberApiPath)\libs" />
         <Copy SourceFiles="$(ProjectDir)\libs\System.Text.Json.dll" DestinationFolder="$(TimberApiPath)\libs" />
+        <Copy SourceFiles="$(ProjectDir)\libs\System.Text.Encodings.Web.dll" DestinationFolder="$(TimberApiPath)\libs" />
     </Target>
 </Project>
