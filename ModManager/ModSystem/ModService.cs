@@ -18,11 +18,11 @@ namespace ModManager.ModSystem
 
         public ModService()
         {
-            Dictionary<uint, InstalledMod> installedMods = new();
+            Dictionary<uint, Manifest> installedMods = new();
             ModManagerPlugin.Log.LogFatal(InstalledModsFilePath);
             if (File.Exists(InstalledModsFilePath))
             {
-                JsonConvert.DeserializeObject<List<InstalledMod>>(InstalledModsFilePath);
+                JsonConvert.DeserializeObject<List<Manifest>>(InstalledModsFilePath);
 
                 // installedMods = JsonConvert.DeserializeObject<Dictionary<uint, InstalledMod>>(InstalledModsFilePath)!;
             }

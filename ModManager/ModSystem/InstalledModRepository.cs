@@ -6,14 +6,14 @@ namespace ModManager.ModSystem
 {
     public class InstalledModRepository
     {
-        private readonly Dictionary<uint, InstalledMod> _installedMods;
+        private readonly Dictionary<uint, Manifest> _installedMods;
 
-        public InstalledModRepository(Dictionary<uint, InstalledMod> installedMods)
+        public InstalledModRepository(Dictionary<uint, Manifest> installedMods)
         {
             _installedMods = installedMods;
         }
 
-        public bool TryGet(uint modId, out InstalledMod? mod)
+        public bool TryGet(uint modId, out Manifest? mod)
         {
             mod = null;
 
@@ -26,7 +26,7 @@ namespace ModManager.ModSystem
             return true;
         }
 
-        public InstalledMod Get(uint modId)
+        public Manifest Get(uint modId)
         {
             return _installedMods[modId];
         }
@@ -43,10 +43,10 @@ namespace ModManager.ModSystem
 
         public void Add(Mod mod)
         {
-            _installedMods.Add(mod.Id, InstalledMod.Create(mod));
+            _installedMods.Add(mod.Id, Manifest.Create(mod));
         }
 
-        public IEnumerable<InstalledMod> All()
+        public IEnumerable<Manifest> All()
         {
             return _installedMods.Values;
         }
