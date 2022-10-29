@@ -1,17 +1,17 @@
 ﻿using System.IO;
-using System.Reflection;
+using ModManagerWrapper.StartupSystem;
 
-namespace ModManager
+namespace ModManagerWrapper
 {
-    public static class Paths
+    public class Paths : ILoadable
     {
-        public static void LoadPaths()
+        public void Load(ModManagerStartupOptions startupOptions)
         {
-            ModManagerDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-            GameDirectory = BepInEx.Paths.GameRootPath;
-            ModInstallationFolder = Path.Combine(GameDirectory, "mods");
+            ModManagerRoot = startupOptions.ModManagerPath;
+            GameRoot = startupOptions.GamePath;
+            Mods = startupOptions.ModInstallationPath;
 
-            EnsurePathExists(ModInstallationFolder);
+            EnsurePathExists(Mods);
             EnsurePathExists(ModManager.Data);
             EnsurePathExists(ModManager.Temp);
             EnsurePathExists(ModManager.User);
@@ -25,19 +25,19 @@ namespace ModManager
             }
         }
 
-        public static string GameDirectory { get; private set; } = null!;
+        public static string GameRoot { get; private set; } = null!;
 
-        public static string ModManagerDirectory { get; private set; } = null!;
+        public static string ModManagerRoot { get; private set; } = null!;
 
-        public static string ModInstallationFolder { get; set; } = null!;
+        public static string Mods { get; set; } = null!;
 
         public static class ModManager
         {
-            public static string Data { get; } = Path.Combine(ModManagerDirectory, "data");
+            public static string Data { get; } = Path.Combine(ModManagerRoot, "data");
 
-            public static string User { get; } = Path.Combine(ModManagerDirectory, "user");
+            public static string User { get; } = Path.Combine(ModManagerRoot, "user");
 
-            public static string Temp { get; } = Path.Combine(ModManagerDirectory, "temp");
+            public static string Temp { get; } = Path.Combine(ModManagerRoot, "temp");
         }
     }
 }

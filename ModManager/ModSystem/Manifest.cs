@@ -3,11 +3,11 @@ using System.Linq;
 using Modio.Models;
 using Newtonsoft.Json;
 
-namespace ModManager.ModSystem
+namespace ModManagerWrapper.ModSystem
 {
     public class Manifest
     {
-        public Manifest(string path, string authorName, uint fileId, uint modId, string modName, string summary, string version, string changelogs, List<string> tags, bool removeModOnStartup)
+        public Manifest(string path, string authorName, uint fileId, uint modId, string modName, string summary, string version, string changelogs, List<string> tags, bool removeOnStartup)
         {
             Path = path;
             AuthorName = authorName;
@@ -18,10 +18,11 @@ namespace ModManager.ModSystem
             Version = version;
             Changelogs = changelogs;
             Tags = tags;
-            RemoveModOnStartup = removeModOnStartup;
+            RemoveOnStartup = removeOnStartup;
         }
 
-        [JsonIgnore] public string Path { get; private set; }
+        [JsonIgnore]
+        public string Path { get; }
 
         public string AuthorName { get; private set; }
 
@@ -39,11 +40,11 @@ namespace ModManager.ModSystem
 
         public List<string> Tags { get; private set; }
 
-        public bool RemoveModOnStartup { get; private set; }
+        public bool RemoveOnStartup { get; set; }
 
         public static Manifest Create(Mod mod)
         {
-            string installationPath = System.IO.Path.Combine(Paths.ModInstallationFolder, mod.NameId!);
+            string installationPath = System.IO.Path.Combine(Paths.Mods, mod.NameId!);
 
             return new Manifest(
                 installationPath,
@@ -59,7 +60,7 @@ namespace ModManager.ModSystem
             );
         }
 
-        public void Update(Mod mod)
+        public Manifest Update(Mod mod)
         {
             AuthorName = mod.SubmittedBy!.Username!;
             FileId = mod.Modfile!.Id;
@@ -69,11 +70,8 @@ namespace ModManager.ModSystem
             Version = mod.Modfile.Version!;
             Changelogs = mod.Modfile.Changelog!;
             Tags = mod.Tags.Select(tag => tag.Name!).ToList();
-        }
 
-        public void ShouldRemoveOnNextStartup()
-        {
-            RemoveModOnStartup = true;
+            return this;
         }
     }
 }

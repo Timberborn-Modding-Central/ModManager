@@ -1,23 +1,29 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Modio.Models;
-using Newtonsoft.Json;
+using ModManagerWrapper.StartupSystem;
 
-namespace ModManager.ModSystem
+namespace ModManagerWrapper.ModSystem
 {
-    public class InstalledModRepository
+    public class InstalledModRepository : ILoadable
     {
-        private readonly Dictionary<uint, Manifest> _installedMods;
+        public InstalledModRepository Instance { get; private set; } = null!;
 
-        public InstalledModRepository(Dictionary<uint, Manifest> installedMods)
+        private Dictionary<uint, Manifest> _installedMods;
+
+        private readonly InstalledModLoader _installedModLoader;
+
+        public InstalledModRepository()
         {
-            _installedMods = installedMods;
+            _installedModLoader = new InstalledModLoader();
+            _installedMods = new Dictionary<uint, Manifest>();
         }
 
         public bool TryGet(uint modId, out Manifest? mod)
         {
             mod = null;
 
-            if (!Has(modId))
+            if (!_installedMods.ContainsKey(modId))
             {
                 return false;
             }
@@ -31,19 +37,18 @@ namespace ModManager.ModSystem
             return _installedMods[modId];
         }
 
-        public bool Has(uint modId)
-        {
-            return _installedMods.ContainsKey(modId);
-        }
-
         public void Remove(uint modId)
         {
             _installedMods.Remove(modId);
         }
 
-        public void Add(Mod mod)
+        public Manifest Add(Mod mod)
         {
-            _installedMods.Add(mod.Id, Manifest.Create(mod));
+            var manifest = Manifest.Create(mod);
+
+            _installedMods.Add(mod.Id, manifest);
+
+            return manifest;
         }
 
         public IEnumerable<Manifest> All()
@@ -51,9 +56,10 @@ namespace ModManager.ModSystem
             return _installedMods.Values;
         }
 
-        public string ToJson()
+        public void Load(ModManagerStartupOptions startupOptions)
         {
-            return JsonConvert.SerializeObject(_installedMods);
+            Instance = this;
+            _installedMods = _installedModLoader.GetAllInstalledManifests().ToDictionary(manifest => manifest.ModId);
         }
     }
 }

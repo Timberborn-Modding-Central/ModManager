@@ -2,11 +2,11 @@
 using System.IO;
 using Modio;
 using Modio.Models;
-using ModManager.ModIoSystem;
+using ModManagerWrapper.ModIoSystem;
 using Newtonsoft.Json;
 using File = System.IO.File;
 
-namespace ModManager.ModSystem
+namespace ModManagerWrapper.ModSystem
 {
     public class ModService
     {
@@ -19,21 +19,19 @@ namespace ModManager.ModSystem
         public ModService()
         {
             Dictionary<uint, Manifest> installedMods = new();
-            ModManagerPlugin.Log.LogFatal(InstalledModsFilePath);
             if (File.Exists(InstalledModsFilePath))
             {
                 JsonConvert.DeserializeObject<List<Manifest>>(InstalledModsFilePath);
 
                 // installedMods = JsonConvert.DeserializeObject<Dictionary<uint, InstalledMod>>(InstalledModsFilePath)!;
             }
-            _installedModRepository = new InstalledModRepository(installedMods);
+            // _installedModRepository = new InstalledModRepository(installedMods);
             _modIo = ModIo.Instance.Client;
         }
 
         public void Subscribe(Mod mod)
         {
             _installedModRepository.Add(mod);
-            Save();
         }
 
         public void UnSubscribe()
@@ -49,11 +47,6 @@ namespace ModManager.ModSystem
         public void Disable()
         {
 
-        }
-
-        private void Save()
-        {
-            File.WriteAllText(InstalledModsFilePath, _installedModRepository.ToJson());
         }
     }
 }

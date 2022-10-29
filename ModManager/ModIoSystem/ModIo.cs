@@ -1,7 +1,6 @@
-﻿using System;
-using Modio;
+﻿using Modio;
 
-namespace ModManager.ModIoSystem
+namespace ModManagerWrapper.ModIoSystem
 {
     public class ModIo
     {
