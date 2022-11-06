@@ -110,6 +110,8 @@ namespace Timberborn.ModsSystemUI
 
         private void OpenOptionsPanel()
         {
+
+            Console.WriteLine($"OpenOptionsPanel");
             _panelStack.HideAndPush(this);
         }
 

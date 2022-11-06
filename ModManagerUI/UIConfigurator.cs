@@ -10,6 +10,7 @@ namespace ModManager
         public void Configure(IContainerDefinition containerDefinition)
         {
             containerDefinition.Bind<ModsBox>().AsSingleton();
+            containerDefinition.Bind<IModService>().To<ModService>().AsSingleton();
         }
     }
 }
