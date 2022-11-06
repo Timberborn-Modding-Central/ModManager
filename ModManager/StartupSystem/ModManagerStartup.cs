@@ -1,29 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using Modio;
-using ModManagerWrapper.ModSystem;
+using ModManager.ModIoSystem;
+using ModManager.ModSystem;
 
-namespace ModManagerWrapper.StartupSystem
+namespace ModManager.StartupSystem
 {
     public class ModManagerStartup
     {
-        private static readonly IEnumerable<ILoadable> LoadableClasses = new List<ILoadable>()
+        public static bool IsLoaded;
+
+        private static ModManagerStartup? _instance;
+
+        private static ModManagerStartup Instance => _instance ??= new ModManagerStartup();
+
+        private readonly IEnumerable<ILoadable> _loadableClasses = new List<ILoadable>
         {
-            new Paths(),
-            new InstalledModRepository()
+            Paths.Instance,
+            ModIoGameInfo.Instance,
+            InstalledModRepository.Instance
         };
 
-        public static void Run(Client modIoClient, Action<ModManagerStartupOptions> options)
+        public static void Run(string apiKey, Action<ModManagerStartupOptions> options)
         {
             var modManagerOptions = new ModManagerStartupOptions();
+
             options(modManagerOptions);
 
-            LoadClasses(modManagerOptions);
+            ModIo.InitializeClient(apiKey);
+
+            IsLoaded = true;
+
+            Instance.LoadClasses(modManagerOptions);
         }
 
-        private static void LoadClasses(ModManagerStartupOptions startupOptions)
+        private void LoadClasses(ModManagerStartupOptions startupOptions)
         {
-            foreach (ILoadable loadableClass in LoadableClasses)
+            foreach (ILoadable loadableClass in _loadableClasses)
             {
                 loadableClass.Load(startupOptions);
             }

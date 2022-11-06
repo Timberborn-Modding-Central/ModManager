@@ -1,17 +1,18 @@
-﻿using ModManagerWrapper.StartupSystem;
+﻿using ModManager.SingletonInstanceSystem;
+using ModManager.StartupSystem;
 
-namespace ModManagerWrapper
+namespace ModManager
 {
-    public class ModIoGameInfo : ILoadable
+    public class ModIoGameInfo : Singleton<ModIoGameInfo>, ILoadable
     {
-        public string Url { get; set; }
-        
-        public uint GameId { get; private set; }
+        public static string Url { get; private set; } = null!;
 
+        public static uint GameId { get; private set; }
 
         public void Load(ModManagerStartupOptions startupOptions)
         {
-
+            Url = startupOptions.ModIoGameUrl;
+            GameId = startupOptions.GameId;
         }
     }
 }

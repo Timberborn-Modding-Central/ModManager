@@ -3,75 +3,67 @@ using System.Linq;
 using Modio.Models;
 using Newtonsoft.Json;
 
-namespace ModManagerWrapper.ModSystem
+namespace ModManager.ModSystem
 {
     public class Manifest
     {
-        public Manifest(string path, string authorName, uint fileId, uint modId, string modName, string summary, string version, string changelogs, List<string> tags, bool removeOnStartup)
+        public static readonly string FileName = "manifest.json";
+
+        public Manifest()
         {
-            Path = path;
-            AuthorName = authorName;
-            FileId = fileId;
-            ModId = modId;
-            ModName = modName;
-            Summary = summary;
-            Version = version;
-            Changelogs = changelogs;
-            Tags = tags;
-            RemoveOnStartup = removeOnStartup;
         }
 
-        [JsonIgnore]
-        public string Path { get; }
-
-        public string AuthorName { get; private set; }
-
-        public uint FileId { get; private set; }
-
-        public uint ModId { get; private set; }
-
-        public string ModName { get; private set; }
-
-        public string Summary { get; private set; }
-
-        public string Version { get; private set; }
-
-        public string Changelogs { get; private set; }
-
-        public List<string> Tags { get; private set; }
-
-        public bool RemoveOnStartup { get; set; }
-
-        public static Manifest Create(Mod mod)
+        public Manifest(Mod mod, File file, string installationRootPath)
         {
-            string installationPath = System.IO.Path.Combine(Paths.Mods, mod.NameId!);
-
-            return new Manifest(
-                installationPath,
-                mod.SubmittedBy!.Username!,
-                mod.Modfile!.Id,
-                mod.Id,
-                mod.Name!,
-                mod.Summary!,
-                mod.Modfile.Version!,
-                mod.Modfile.Changelog!,
-                mod.Tags.Select(tag => tag.Name!).ToList(),
-                false
-            );
-        }
-
-        public Manifest Update(Mod mod)
-        {
+            RootPath = installationRootPath;
             AuthorName = mod.SubmittedBy!.Username!;
-            FileId = mod.Modfile!.Id;
+            FileId = file.Id;
             ModId = mod.Id;
             ModName = mod.Name!;
             Summary = mod.Summary!;
-            Version = mod.Modfile.Version!;
-            Changelogs = mod.Modfile.Changelog!;
+            Version = file.Version!;
+            Changelogs = file.Changelog!;
+            Tags = mod.Tags.Select(tag => tag.Name!).ToList();
+        }
+
+        public Manifest Update(Mod mod, File file)
+        {
+            AuthorName = mod.SubmittedBy!.Username!;
+            FileId = file.Id;
+            ModId = mod.Id;
+            ModName = mod.Name!;
+            Summary = mod.Summary!;
+            Version = file.Version!;
+            Changelogs = file.Changelog!;
             Tags = mod.Tags.Select(tag => tag.Name!).ToList();
 
             return this;
         }
+
+        [JsonIgnore]
+        public string RootPath { get; set; } = null!;
+
+        [JsonIgnore]
+        public bool Enabled { get; set; } = true;
+
+        public string AuthorName { get; set; } = null!;
+
+        public uint FileId { get; set; }
+
+        public uint ModId { get; set; }
+
+        public string ModName { get; set; } = null!;
+
+        [JsonProperty(Required = Required.AllowNull)]
+        public string Summary { get; set; }
+
+        [JsonProperty(Required = Required.AllowNull)]
+        public string Version { get; set; }
+
+        [JsonProperty(Required = Required.AllowNull)]
+        public string? Changelogs { get; set; }
+
+        [JsonProperty(Required = Required.AllowNull)]
+        public List<string>? Tags { get; set; }
     }
 }

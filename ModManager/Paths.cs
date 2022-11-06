@@ -1,9 +1,13 @@
-﻿using System.IO;
-using ModManagerWrapper.StartupSystem;
+﻿using System;
+using System.IO;
+using System.Net.Mime;
+using System.Runtime.InteropServices;
+using ModManager.SingletonInstanceSystem;
+using ModManager.StartupSystem;
 
-namespace ModManagerWrapper
+namespace ModManager
 {
-    public class Paths : ILoadable
+    public class Paths : Singleton<Paths>, ILoadable
     {
         public void Load(ModManagerStartupOptions startupOptions)
         {
@@ -25,19 +29,21 @@ namespace ModManagerWrapper
             }
         }
 
-        public static string GameRoot { get; private set; } = null!;
+        public static string GameRoot { get; set; } = null!;
 
-        public static string ModManagerRoot { get; private set; } = null!;
+        public static string ModManagerRoot { get; set; } = null!;
 
         public static string Mods { get; set; } = null!;
 
+        public static readonly string Maps = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Documents", "Timberborn") : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Timberborn");
+
         public static class ModManager
         {
-            public static string Data { get; } = Path.Combine(ModManagerRoot, "data");
+            public static string Data { get; set; } = Path.Combine(ModManagerRoot, "data");
 
-            public static string User { get; } = Path.Combine(ModManagerRoot, "user");
+            public static string User { get; set; } = Path.Combine(ModManagerRoot, "user");
 
-            public static string Temp { get; } = Path.Combine(ModManagerRoot, "temp");
+            public static string Temp { get; set; } = Path.Combine(ModManagerRoot, "temp");
         }
     }
 }

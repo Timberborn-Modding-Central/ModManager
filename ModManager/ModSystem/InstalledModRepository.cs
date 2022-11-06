@@ -1,50 +1,47 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Modio.Models;
-using ModManagerWrapper.StartupSystem;
+using ModManager.ManifestFinderSystem;
+using ModManager.SingletonInstanceSystem;
+using ModManager.StartupSystem;
 
-namespace ModManagerWrapper.ModSystem
+namespace ModManager.ModSystem
 {
-    public class InstalledModRepository : ILoadable
+    public class InstalledModRepository : Singleton<InstalledModRepository>, ILoadable
     {
-        public InstalledModRepository Instance { get; private set; } = null!;
-
         private Dictionary<uint, Manifest> _installedMods;
 
-        private readonly InstalledModLoader _installedModLoader;
+        private readonly ManifestFinderService _manifestFinderService;
 
         public InstalledModRepository()
         {
-            _installedModLoader = new InstalledModLoader();
+            _manifestFinderService = ManifestFinderService.Instance;
             _installedMods = new Dictionary<uint, Manifest>();
         }
 
-        public bool TryGet(uint modId, out Manifest? mod)
+        public bool TryGet(Mod mod, out Manifest manifest)
         {
-            mod = null;
-
-            if (!_installedMods.ContainsKey(modId))
-            {
-                return false;
-            }
-
-            mod = _installedMods[modId];
-            return true;
+            return _installedMods.TryGetValue(mod.Id, out manifest);
         }
 
-        public Manifest Get(uint modId)
+        public Manifest Get(Mod mod)
         {
-            return _installedMods[modId];
+            return _installedMods[mod.Id];
         }
 
-        public void Remove(uint modId)
+        public bool Has(Mod mod)
         {
-            _installedMods.Remove(modId);
+            return _installedMods.ContainsKey(mod.Id);
         }
 
-        public Manifest Add(Mod mod)
+        public void Remove(Mod mod)
         {
-            var manifest = Manifest.Create(mod);
+            _installedMods.Remove(mod.Id);
+        }
+
+        public Manifest Add(Mod mod, File file, string installationPath)
+        {
+            var manifest = new Manifest(mod, file, installationPath);
 
             _installedMods.Add(mod.Id, manifest);
 
@@ -58,8 +55,7 @@ namespace ModManagerWrapper.ModSystem
 
         public void Load(ModManagerStartupOptions startupOptions)
         {
-            Instance = this;
-            _installedMods = _installedModLoader.GetAllInstalledManifests().ToDictionary(manifest => manifest.ModId);
+            _installedMods = _manifestFinderService.FindAll().ToDictionary(manifest => manifest.ModId);
         }
     }
 }

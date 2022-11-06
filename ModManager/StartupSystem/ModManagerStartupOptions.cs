@@ -1,4 +1,4 @@
-﻿namespace ModManagerWrapper.StartupSystem
+﻿namespace ModManager.StartupSystem
 {
     public class ModManagerStartupOptions
     {
