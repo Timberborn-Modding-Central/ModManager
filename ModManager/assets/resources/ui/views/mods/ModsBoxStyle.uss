@@ -1,0 +1,130 @@
+.mods-box {
+    padding: 45px;
+    margin: 45px;
+    flex-grow: 1;
+}
+
+.mods-box__mods .unity-scroll-view__content-container {
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.mods-box__wrapper {
+    flex-direction: row;
+}
+
+.mods-box__navigation {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    width: 250px;
+    margin: 8px 8px 0 0;
+    padding: 8px;
+    flex-shrink: 0;
+}
+
+.mods-box__search {
+    flex-grow: 1;
+    height: 24px;
+}
+
+.mods-box__search > .unity-base-field__input {
+    font-size: 18px;
+}
+
+.mods-box__search-button {
+    height: 24px;
+    width: 24px;
+    margin-left: 8px;
+    background-image: url('/assets/resources/ui/images/mods/search.png');
+}
+
+.mods-box__search-button:enabled:hover {
+    background-image: url('/assets/resources/ui/images/mods/search--hover.png');
+}
+
+.mods-box__tags-label {
+    margin-top: 8px;
+}
+
+.mods-box__tags .unity-radio-button__checkmark-background {
+    background-image: resource('UI/Images/Buttons/circle-off');
+    margin: 4px;
+}
+
+.mods-box__tags .unity-radio-button__input:enabled:hover .unity-radio-button__checkmark-background {
+    background-image: resource('UI/Images/Buttons/circle-hover');
+}
+
+.mods-box__tags .unity-radio-button__input:enabled:checked .unity-radio-button__checkmark-background {
+    background-image: resource('UI/Images/Buttons/circle-on');
+    margin: 4px;
+}
+
+.mods-box__tags .unity-radio-button__text {
+    color: rgb(204, 204, 204);
+    font-size: 14px;
+    white-space: normal;
+}
+
+.mods-box__tags .unity-radio-button__input:enabled:checked .unity-radio-button__text {
+    color: rgb(255, 255, 255);
+}
+
+.mods-box__loading {
+    position: absolute;
+    top: 8px;
+    left: 258px;
+}
+
+.mods-box-item {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    padding: 4px;
+    margin: 8px;
+}
+
+.mods-box-item:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+}
+
+.mods-box-item__header {
+    padding-right: 4px;
+}
+
+.mods-box-item__name {
+    margin-right: auto;
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+}
+
+.mods-box-item__up-icon {
+    height: 14px;
+    width: 16px;
+    margin-right: 4px;
+    background-image: url('/assets/resources/ui/images/mods/thumbs-up.png');
+}
+
+.mods-box-item__down-icon {
+    height: 14px;
+    width: 16px;
+    margin-left: 12px;
+    margin-right: 4px;
+    background-image: url('/assets/resources/ui/images/mods/thumbs-down.png');
+}
+
+.mods-box-item__footer {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding-right: 4px;
+}
+
+.mods-box-item__download-icon {
+    height: 20px;
+    width: 23px;
+    margin-left: auto;
+    margin-right: 4px;
+    background-image: url('/assets/resources/ui/images/mods/download.png');
+}

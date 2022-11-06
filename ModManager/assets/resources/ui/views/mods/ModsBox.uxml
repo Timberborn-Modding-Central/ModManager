@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="ModsBox" class="content-row-centered" picking-mode="Ignore">
+        <Style src="/Assets/Resources/UI/Views/Mods/ModsBoxStyle.uss" />
+        <Timberborn.CoreUI.NineSliceVisualElement class="mods-box sliced-border content-centered">
+            <ui:VisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered">
+                <Timberborn.CoreUI.LocalizableLabel text="Header" name="Header" text-loc-key="Menu.Mods" class="capsule-header__text" />
+            </ui:VisualElement>
+            <ui:VisualElement name="ScrollViewWrapper" class="panel-list-view mods-box__wrapper">
+                <Timberborn.CoreUI.NineSliceVisualElement name="Navigation" class="mods-box__navigation">
+                    <ui:VisualElement name="SearchWrapper" class="content-row-centered--no-grow">
+                        <Timberborn.CoreUI.NineSliceTextField name="Search" class="mods-box__search text-field" />
+                        <ui:Button name="SearchButton" class="mods-box__search-button" />
+                    </ui:VisualElement>
+                    <Timberborn.CoreUI.LocalizableLabel text="Tags:" name="TagsLabel" text-loc-key="Mods.Tags" class="text--big mods-box__tags-label" />
+                    <ui:RadioButtonGroup name="Tags" value="-1" class="mods-box__tags" />
+                </Timberborn.CoreUI.NineSliceVisualElement>
+                <ui:Label text="Error" name="Error" class="text--header mods-box__loading" />
+                <Timberborn.CoreUI.LocalizableLabel text="Loading..." name="Loading" text-loc-key="Mods.Loading" class="text--header mods-box__loading" />
+                <ui:ScrollView name="Mods" class="mods-box__mods scroll--green-decorated" />
+            </ui:VisualElement>
+            <ui:Button name="Close" focusable="false" tabindex="1" class="close-button" />
+        </Timberborn.CoreUI.NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>
