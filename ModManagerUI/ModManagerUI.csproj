@@ -14,6 +14,14 @@
 		<!--   none: don't copy, bepinex: path to game > bepinex > plugins, timberapi: path to game > timberapi     -->
 		<CopyDllToPath>bepinex</CopyDllToPath>
 	</PropertyGroup>
+	
+	<ItemGroup>
+	  <PackageReference Include="TimberApi" Version="0.5.1" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\ModManager\ModManager.csproj" />
+	</ItemGroup>
 
   <ItemGroup>
     <Reference Include="Modio">
