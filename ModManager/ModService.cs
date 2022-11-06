@@ -43,35 +43,5 @@ namespace Timberborn.ModsSystemUI
             texture.LoadImage(byteArray.Result);
             return texture;
         }
-
-        //public async Task<(string location, Mod Mod)> DownloadMod(uint modId)
-        public async Task<(string location, Mod Mod)> DownloadLatestMod(uint modId)
-        {
-            Console.WriteLine($"Get mod info \"{modId}\"");
-            //var file = await _client.Mods[modId].Files.Search().First();
-            var mod = await _client.Games[_timberbornGameId].Mods[modId].Get();
-            Console.WriteLine($"got mod info");
-
-            Console.WriteLine($"Create dir");
-            Directory.CreateDirectory($"{Paths.ModManager}\\temp");
-
-            string tempZipLocation = $"{Paths.ModManager}\\temp\\{modId}_{mod.Modfile.Id}.zip";
-
-            Console.WriteLine($"download");
-            await _client.Download(_timberbornGameId,
-                                     modId,
-                                     mod.Modfile.Id,
-                                     new FileInfo(tempZipLocation));
-            Console.WriteLine($"downloaded");
-            //ModManagerPlugin.Log.LogWarning($"Downloaded zip in {tempZipLocation}");
-
-            //var file = await _modIoClient.Games[_timberbornGameId].Mods[modId].Files[fileId].Get();
-            //mod.Modfile = mod;
-            (string, Mod) result = new(tempZipLocation, mod);
-            return result;
-
-            //return await DownloadMod(modId, file.Id);
-        }
-
     }
 }

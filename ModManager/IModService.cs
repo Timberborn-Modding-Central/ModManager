@@ -14,7 +14,5 @@ namespace Timberborn.ModsSystemUI
         GameTagsClient GetTags();
 
         Texture2D GetImage(Uri uri, int width, int height);
-
-        Task<(string location, Mod Mod)> DownloadLatestMod(uint modId);
     }
 }

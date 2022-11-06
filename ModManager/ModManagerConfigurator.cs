@@ -5,11 +5,11 @@ using Timberborn.ModsSystemUI;
 namespace ModManager
 {
     [Configurator(TimberApi.SceneSystem.SceneEntrypoint.MainMenu)]
-    public class UIConfigurator : IConfigurator
+    internal class ModManagerConfigurator : IConfigurator
     {
         public void Configure(IContainerDefinition containerDefinition)
         {
-            containerDefinition.Bind<ModsBox>().AsSingleton();
+            containerDefinition.Bind<IModService>().To<ModService>().AsSingleton();
         }
     }
 }

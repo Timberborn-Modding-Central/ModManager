@@ -180,17 +180,11 @@ namespace Timberborn.ModsSystemUI
             _loading.ToggleDisplayStyle(false);
             foreach (var mod in mods)
             {
-
                 string assName = "assets/resources/ui/views/mods/modsboxitem.uxml";
-                //Console.WriteLine($"loading asset \"{assName}\"");
-                var ass = _bundle.LoadAsset<VisualTreeAsset>(assName);
-                //Console.WriteLine($"ass: {ass.name}");
-
-                //var item = _visualElementLoader.LoadVisualElement("Mods/ModsBoxItem");
-
-                var item = _visualElementLoader.LoadVisualElement(ass);
+                var asset = _bundle.LoadAsset<VisualTreeAsset>(assName);
+                var item = _visualElementLoader.LoadVisualElement(asset);
                 item.Q<Label>("Name").text = mod.Name;
-                item.Q<Button>("Download").clicked += () => _modService.DownloadLatestMod(mod.Id);
+                //item.Q<Button>("Download").clicked += () => _modService.DownloadLatestMod(mod.Id);
 
                 SetNumbers(mod, item);
                 LoadImage(mod, item.Q<Image>("Logo"));
