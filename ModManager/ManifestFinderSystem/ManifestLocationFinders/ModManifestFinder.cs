@@ -2,22 +2,39 @@
 using System.IO;
 using ModManager.EnableSystem;
 using ModManager.ModSystem;
+using ModManager.PersistenceSystem;
 
 namespace ModManager.ManifestFinderSystem.ManifestLocationFinders
 {
     public class ModManifestFinder : IManifestLocationFinder
     {
-        public IEnumerable<string> Find()
+        private readonly PersistenceService _persistenceService;
+
+        public ModManifestFinder()
         {
-            foreach (string enabledManifests in Directory.GetFiles(Paths.Mods, Manifest.FileName, SearchOption.AllDirectories))
+            _persistenceService = PersistenceService.Instance;
+        }
+
+        public IEnumerable<Manifest> Find()
+        {
+            foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName, SearchOption.AllDirectories))
             {
-                yield return enabledManifests;
+                yield return LoadManifest(enabledManifest);
             }
 
-            foreach (string disabledManifests in Directory.GetFiles(Paths.Mods, Manifest.FileName + ModEnabler.DisabledExtension, SearchOption.AllDirectories))
+            foreach (string disabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + ModEnableService.DisabledExtension, SearchOption.AllDirectories))
             {
-                yield return disabledManifests;
+                yield return LoadManifest(disabledManifest);
             }
+        }
+
+        private Manifest LoadManifest(string manifestPath)
+        {
+            var manifest = _persistenceService.LoadObject<Manifest>(manifestPath);
+
+            manifest.RootPath = Path.GetDirectoryName(manifestPath)!;
+
+            return manifest;
         }
     }
 }

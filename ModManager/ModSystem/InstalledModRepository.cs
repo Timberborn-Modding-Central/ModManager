@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Modio.Models;
 using ModManager.ManifestFinderSystem;
 using ModManager.SingletonInstanceSystem;
 using ModManager.StartupSystem;
@@ -19,33 +18,29 @@ namespace ModManager.ModSystem
             _installedMods = new Dictionary<uint, Manifest>();
         }
 
-        public bool TryGet(Mod mod, out Manifest manifest)
+        public bool TryGet(uint modId, out Manifest manifest)
         {
-            return _installedMods.TryGetValue(mod.Id, out manifest);
+            return _installedMods.TryGetValue(modId, out manifest);
         }
 
-        public Manifest Get(Mod mod)
+        public Manifest Get(uint modId)
         {
-            return _installedMods[mod.Id];
+            return _installedMods[modId];
         }
 
-        public bool Has(Mod mod)
+        public bool Has(uint modId)
         {
-            return _installedMods.ContainsKey(mod.Id);
+            return _installedMods.ContainsKey(modId);
         }
 
-        public void Remove(Mod mod)
+        public void Remove(uint modId)
         {
-            _installedMods.Remove(mod.Id);
+            _installedMods.Remove(modId);
         }
 
-        public Manifest Add(Mod mod, File file, string installationPath)
+        public void Add(Manifest manifest)
         {
-            var manifest = new Manifest(mod, file, installationPath);
-
-            _installedMods.Add(mod.Id, manifest);
-
-            return manifest;
+            _installedMods.Add(manifest.ModId, manifest);
         }
 
         public IEnumerable<Manifest> All()

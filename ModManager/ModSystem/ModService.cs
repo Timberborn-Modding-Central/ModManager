@@ -1,11 +1,9 @@
 ﻿using System;
-using System.IO;
 using Modio;
 using Modio.Models;
 using ModManager.EnableSystem;
 using ModManager.InstallerSystem;
 using ModManager.ModIoSystem;
-using ModManager.PersistenceSystem;
 using ModManager.SingletonInstanceSystem;
 using File = Modio.Models.File;
 
@@ -15,80 +13,65 @@ namespace ModManager.ModSystem
     {
         private readonly InstalledModRepository _installedModRepository;
 
-        private readonly InstallerService _installerService;
+        private readonly ModInstallerService _modInstallerService;
 
-        private readonly PersistenceService _persistenceService;
-
-        private readonly ModEnabler _modEnabler;
+        private readonly ModEnableService _modEnableService;
 
         public ModService()
         {
-            _modEnabler = ModEnabler.Instance;
+            _modEnableService = ModEnableService.Instance;
             _installedModRepository = InstalledModRepository.Instance;
-            _installerService = InstallerService.Instance;
-            _persistenceService = PersistenceService.Instance;
+            _modInstallerService = ModInstallerService.Instance;
         }
 
         public void Install(Mod mod, File file)
         {
-            if(_installedModRepository.Has(mod))
+            if(_installedModRepository.Has(mod.Id))
             {
                 throw new Exception($"{mod.Name} is already installed. Use method `ChangeVersion` to change the version of an installed mod.");
             }
 
-            // string installationPath = _installerService.Install(mod, file);
-
-            string installationPath = @"C:\Program Files (x86)\Steam\steamapps\common\Timberborn\BepInEx\plugins\CategoryButton\plugins";
-
-            Manifest installedModManifest = _installedModRepository.Add(mod, file, installationPath);
-
-            _persistenceService.SaveObject(installedModManifest, Path.Combine(installationPath, Manifest.FileName));
+            _modInstallerService.Install(mod, file);
         }
 
-        public void Uninstall(Mod mod)
+        public void Uninstall(uint modId)
         {
-            if (! _installedModRepository.TryGet(mod, out Manifest manifest))
+            if (! _installedModRepository.TryGet(modId, out Manifest manifest))
             {
-                throw new Exception($"Cannot uninstall {mod.Name}. Mod is not installed.");
+                throw new Exception($"Cannot uninstall modId: {modId}. Mod is not installed.");
             }
 
-            _installerService.Uninstall(mod, manifest);
-
-            _installedModRepository.Remove(mod);
+            _modInstallerService.Uninstall(manifest);
         }
 
         public void ChangeVersion(Mod mod, File file)
         {
-            if (! _installedModRepository.TryGet(mod, out Manifest manifest))
+            if (! _installedModRepository.Has(mod.Id))
             {
                 throw new Exception($"Cannot change version of {mod.Name}. Mod is not installed.");
             }
 
-            string installationPath = _installerService.ChangeVersion(mod, file);
-
-            manifest.Update(mod, file);
-
-            _persistenceService.SaveObject(manifest, installationPath);
+            _modInstallerService.ChangeVersion(mod, file);
         }
 
-        public void Enable(Mod mod)
+        public void Enable(uint modId)
         {
-            if (! _installedModRepository.TryGet(mod, out Manifest manifest))
+            if (! _installedModRepository.TryGet(modId, out Manifest? manifest))
             {
-                throw new Exception($"Cannot enable {mod.Name}. Mod is not installed.");
+                throw new Exception($"Cannot enable modId: {modId}. Mod is not installed.");
             }
 
-            _modEnabler.Enable(manifest);
+            _modEnableService.Enable(manifest);
         }
 
-        public void Disable(Mod mod)
+        public void Disable(uint modId)
         {
-            if (! _installedModRepository.TryGet(mod, out Manifest manifest))
+            if (! _installedModRepository.TryGet(modId, out Manifest manifest))
             {
-                throw new Exception($"Cannot disable {mod.Name}. Mod is not installed.");
+                throw new Exception($"Cannot disable modId: {modId}. Mod is not installed.");
             }
 
-            _modEnabler.Disable(manifest);
+            _modEnableService.Disable(manifest);
         }
 
         public ModsClient GetMods()
