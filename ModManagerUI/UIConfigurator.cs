@@ -1,4 +1,5 @@
 ﻿using Bindito.Core;
+using ModManager.ModIoSystem;
 using TimberApi.ConfiguratorSystem;
 using Timberborn.ModsSystemUI;
 
@@ -11,6 +12,7 @@ namespace ModManager
         {
             containerDefinition.Bind<ModsBox>().AsSingleton();
             containerDefinition.Bind<IModService>().To<ModService>().AsSingleton();
+            containerDefinition.Bind<Extractor>().AsSingleton();
         }
     }
 }

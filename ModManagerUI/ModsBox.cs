@@ -1,5 +1,6 @@
 using Modio.Filters;
 using Modio.Models;
+using ModManager.ModIoSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,7 @@ namespace Timberborn.ModsSystemUI
         private TextField _search;
         private RadioButtonGroup _tags;
         private List<string> _tagOptions;
+        private Extractor _extractor;
 
         private AssetBundle _bundle;
 
@@ -50,7 +52,8 @@ namespace Timberborn.ModsSystemUI
                        PanelStack panelStack,
                        IModService modService,
                        VisualElementInitializer visualElementInitializer,
-                       IResourceAssetLoader resourceAssetLoader)
+                       IResourceAssetLoader resourceAssetLoader,
+                       Extractor extractor)
         {
             _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
@@ -58,6 +61,7 @@ namespace Timberborn.ModsSystemUI
             OpenOptionsDelegate = OpenOptionsPanel;
             _visualElementInitializer = visualElementInitializer;
             _resourceAssetLoader = resourceAssetLoader;
+            _extractor = extractor;
 
             _bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
         }
@@ -187,11 +191,34 @@ namespace Timberborn.ModsSystemUI
                 var item = _visualElementLoader.LoadVisualElement(asset);
                 item.Q<Label>("Name").text = mod.Name;
                 //item.Q<Button>("Download").clicked += () => _modService.DownloadLatestMod(mod.Id);
+                item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod);
 
                 SetNumbers(mod, item);
                 LoadImage(mod, item.Q<Image>("Logo"));
 
                 _mods.Add(item);
+            }
+        }
+
+        private async Task DoDownloadAndExtract(Mod modInfo)
+        {
+            var mod = await _modService.DownloadLatestMod(modInfo.Id);
+
+            var depIds = await _modService.GetDependencies(modInfo.Id);
+            Console.WriteLine($"FOUND {depIds.Count} DEPENDENCIES");
+
+            List<(string location, Mod mod)> dependencies = new();
+            foreach (var dep in depIds)
+            {
+                Console.WriteLine($"\t{dep.ModId}");
+                dependencies.Add(await _modService.DownloadLatestMod(dep.ModId));
+            }
+
+
+            _extractor.Extract(mod.location, mod.Mod);
+            foreach (var foo in dependencies)
+            {
+                _extractor.Extract(foo.location, foo.mod);
             }
         }
 
