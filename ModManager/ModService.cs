@@ -67,7 +67,7 @@ namespace Timberborn.ModsSystemUI
             return result;
         }
 
-        public async Task<List<Dependency>> GetDependencies(uint modid)
+        private async Task<List<Dependency>> GetDependencies(uint modid)
         {
             var deps = await _client.Games[_timberbornGameId].Mods[modid].Dependencies.Get();
             Console.WriteLine($"FOUND {deps.Count} DEPENDENCIES!!!");
@@ -85,22 +85,17 @@ namespace Timberborn.ModsSystemUI
 
         public async Task<List<(string location, Mod Mod)>> DownloadDependencies(Mod mod)
         {
-            var deps = await _client.Games[_timberbornGameId].Mods[mod.Id].Dependencies.Get();
-            Console.WriteLine($"Found {deps.Count} dependencies for {mod.Name}");
+            var depIds = await GetDependencies(mod.Id);
+            Console.WriteLine($"Found {depIds.Count} dependencies for {mod.Name}");
 
-            if (deps.Count > 0)
+            List<(string location, Mod mod)> dependencies = new();
+            foreach (var dep in depIds)
             {
-                return null;
+                Console.WriteLine($"\t{dep.ModId}");
+                dependencies.Add(await DownloadLatestMod(dep.ModId));
             }
 
-            List<(string location, Mod Mod)> results = new();
-
-            foreach (var dep in deps)
-            {
-                results.Add(await DownloadLatestMod(dep.ModId));
-            }
-
-            return results;
+            return dependencies;
         }
 
         public async Task<(string location, Mod Mod)> DownloadMod(uint modId, uint fileId)

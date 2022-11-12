@@ -203,22 +203,12 @@ namespace Timberborn.ModsSystemUI
         private async Task DoDownloadAndExtract(Mod modInfo)
         {
             var mod = await _modService.DownloadLatestMod(modInfo.Id);
-
-            var depIds = await _modService.GetDependencies(modInfo.Id);
-            Console.WriteLine($"FOUND {depIds.Count} DEPENDENCIES");
-
-            List<(string location, Mod mod)> dependencies = new();
-            foreach (var dep in depIds)
-            {
-                Console.WriteLine($"\t{dep.ModId}");
-                dependencies.Add(await _modService.DownloadLatestMod(dep.ModId));
-            }
-
+            var dependencies = await _modService.DownloadDependencies(modInfo);
 
             _extractor.Extract(mod.location, mod.Mod);
             foreach (var foo in dependencies)
             {
-                _extractor.Extract(foo.location, foo.mod);
+                _extractor.Extract(foo.location, foo.Mod);
             }
         }
 

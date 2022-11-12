@@ -19,7 +19,5 @@ namespace Timberborn.ModsSystemUI
         Task<(string location, Mod Mod)> DownloadLatestMod(uint modId);
 
         Task<List<(string location, Mod Mod)>> DownloadDependencies(Mod mod);
-
-        Task<List<Dependency>> GetDependencies(uint modid);
     }
 }
