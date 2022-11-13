@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿using Bindito.Core;
+using HarmonyLib;
+using ModManager.ModIoSystem;
 using System;
 using Timberborn.MainMenuScene;
 using Timberborn.ModsSystemUI;
@@ -18,6 +20,16 @@ namespace ModManagerUI
             button.text = "Mod manager";
             button.clicked += ModsBox.OpenOptionsDelegate;
             root.Insert(7, button);
+        }
+
+
+        [HarmonyPatch(typeof(MainMenuSceneConfigurator), nameof(MainMenuSceneConfigurator.Configure))]
+        [HarmonyPostfix]
+        public static void ConfigurePostfix(IContainerDefinition containerDefinition)
+        {
+            containerDefinition.Bind<ModsBox>().AsSingleton();
+            containerDefinition.Bind<IModService>().To<ModService>().AsSingleton();
+            containerDefinition.Bind<ExtractorService>().AsSingleton();
         }
     }
 }

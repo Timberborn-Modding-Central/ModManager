@@ -14,6 +14,7 @@ namespace ModManagerUI
 
         private void Awake()
         {
+            ModManager.Paths.LoadPaths();
             new Harmony("com.modmanagerui").PatchAll();
         }
     }

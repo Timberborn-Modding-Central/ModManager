@@ -16,7 +16,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="TimberApi" Version="0.5.1" />
+	  <PackageReference Include="Timberborn.GameLibs" Version="0.2.9.1-r.0" />
 	</ItemGroup>
 	
 	<ItemGroup>
