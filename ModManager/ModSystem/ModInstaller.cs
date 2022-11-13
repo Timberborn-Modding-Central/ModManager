@@ -1,20 +1,21 @@
 ﻿using System;
 using Modio.Models;
-using ModManager.InstallerSystem;
+using ModManager.AddonInstallerSystem;
+using ModManager.AddonSystem;
 using ModManager.PersistenceSystem;
 
 namespace ModManager.ModSystem
 {
-    public class ModInstaller : IModInstaller
+    public class ModInstaller : IAddonInstaller
     {
         private readonly PersistenceService _persistenceService;
 
-        private readonly InstalledModRepository _installedModRepository;
+        private readonly InstalledAddonRepository _installedAddonRepository;
 
         public ModInstaller()
         {
             _persistenceService = PersistenceService.Instance;
-            _installedModRepository = InstalledModRepository.Instance;
+            _installedAddonRepository = InstalledAddonRepository.Instance;
         }
 
         public bool Install(Mod mod, File file)
@@ -23,7 +24,7 @@ namespace ModManager.ModSystem
 
             _persistenceService.SaveObject(manifest, Paths.Mods + "/manifest.json");
 
-            _installedModRepository.Add(manifest);
+            _installedAddonRepository.Add(manifest);
 
             //TODO: This is just for testing, Hytones implementation needs to be here
 
@@ -32,7 +33,7 @@ namespace ModManager.ModSystem
 
         public bool Uninstall(Manifest manifest)
         {
-            _installedModRepository.Remove(manifest.ModId);
+            _installedAddonRepository.Remove(manifest.ModId);
 
             return true;
         }

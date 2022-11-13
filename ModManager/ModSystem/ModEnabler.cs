@@ -1,10 +1,11 @@
 ﻿using System.IO;
 using System.Linq;
-using ModManager.EnableSystem;
+using ModManager.AddonEnableSystem;
+using ModManager.AddonSystem;
 
 namespace ModManager.ModSystem
 {
-    public class ModEnabler : IModEnabler
+    public class ModEnabler : IAddonEnabler
     {
         public bool Enable(Manifest manifest)
         {
@@ -26,7 +27,7 @@ namespace ModManager.ModSystem
         {
             string[] filePaths = Directory.GetFiles(manifest.RootPath, "*", SearchOption.AllDirectories);
 
-            string[] filePathsWithoutExcludedExtensions = filePaths.Where(filePath => ! ModEnableService.IgnoreExtensions.Contains(Path.GetExtension(filePath))).ToArray();
+            string[] filePathsWithoutExcludedExtensions = filePaths.Where(filePath => ! AddonEnablerService.IgnoreExtensions.Contains(Path.GetExtension(filePath))).ToArray();
 
             foreach (string filePath in filePathsWithoutExcludedExtensions)
             {

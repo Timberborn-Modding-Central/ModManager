@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ModManager.EnableSystem.Enablers.MapEnablerSystem;
-using ModManager.ManifestFinderSystem;
+using ModManager.AddonSystem;
+using ModManager.ManifestLocationFinderSystem;
 using ModManager.ModSystem;
 using ModManager.PersistenceSystem;
 
@@ -10,7 +10,6 @@ namespace ModManager.MapSystem
     public class MapManifestFinder : IManifestLocationFinder
     {
         private readonly PersistenceService _persistenceService;
-
 
         public MapManifestFinder()
         {
@@ -26,7 +25,19 @@ namespace ModManager.MapSystem
                 return new List<Manifest>();
             }
 
-            return _persistenceService.LoadObject<List<MapManifest>>(manifestPath);
+            List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath);
+
+            SetEnabledStatus(manifests);
+
+            return manifests;
+        }
+
+        private void SetEnabledStatus(List<MapManifest> manifests)
+        {
+            foreach (MapManifest mapManifest in manifests)
+            {
+
+            }
         }
     }
 }

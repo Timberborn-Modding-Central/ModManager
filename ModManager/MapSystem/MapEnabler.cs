@@ -1,11 +1,10 @@
 ﻿using System.IO;
-using ModManager.EnableSystem;
-using ModManager.EnableSystem.Enablers.MapEnablerSystem;
-using ModManager.ModSystem;
+using ModManager.AddonEnableSystem;
+using ModManager.AddonSystem;
 
 namespace ModManager.MapSystem
 {
-    public class MapEnabler : IModEnabler
+    public class MapEnabler : IAddonEnabler
     {
         public bool Enable(Manifest manifest)
         {

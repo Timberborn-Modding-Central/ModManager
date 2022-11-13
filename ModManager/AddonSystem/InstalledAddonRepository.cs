@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ModManager.ManifestFinderSystem;
+using ModManager.ManifestLocationFinderSystem;
 using ModManager.StartupSystem;
 
-namespace ModManager.ModSystem
+namespace ModManager.AddonSystem
 {
-    public class InstalledModRepository : Singleton<InstalledModRepository>, ILoadable
+    public class InstalledAddonRepository : Singleton<InstalledAddonRepository>, ILoadable
     {
         private Dictionary<uint, Manifest> _installedMods;
 
-        private readonly ManifestFinderService _manifestFinderService;
+        private readonly ManifestLocationFinderService _manifestLocationFinderService;
 
-        public InstalledModRepository()
+        public InstalledAddonRepository()
         {
-            _manifestFinderService = ManifestFinderService.Instance;
+            _manifestLocationFinderService = ManifestLocationFinderService.Instance;
             _installedMods = new Dictionary<uint, Manifest>();
         }
 
@@ -49,7 +49,7 @@ namespace ModManager.ModSystem
 
         public void Load(ModManagerStartupOptions startupOptions)
         {
-            _installedMods = _manifestFinderService.FindAll().ToDictionary(manifest => manifest.ModId);
+            _installedMods = _manifestLocationFinderService.FindAll().ToDictionary(manifest => manifest.ModId);
         }
     }
 }

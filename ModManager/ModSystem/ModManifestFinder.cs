@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ModManager.ManifestFinderSystem;
+using ModManager.AddonSystem;
+using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
 
 namespace ModManager.ModSystem

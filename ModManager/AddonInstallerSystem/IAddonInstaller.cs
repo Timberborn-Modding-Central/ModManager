@@ -1,9 +1,9 @@
 ﻿using Modio.Models;
-using ModManager.ModSystem;
+using ModManager.AddonSystem;
 
-namespace ModManager.InstallerSystem
+namespace ModManager.AddonInstallerSystem
 {
-    public interface IModInstaller
+    public interface IAddonInstaller
     {
         public bool Install(Mod mod, File file);
 

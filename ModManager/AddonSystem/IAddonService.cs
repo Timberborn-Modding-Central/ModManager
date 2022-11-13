@@ -1,9 +1,9 @@
 ﻿using Modio;
 using Modio.Models;
 
-namespace ModManager.ModSystem
+namespace ModManager.AddonSystem
 {
-    public interface IModService
+    public interface IAddonService
     {
         void Install(Mod mod, File file);
 

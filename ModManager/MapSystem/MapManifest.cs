@@ -1,7 +1,7 @@
 ﻿using Modio.Models;
-using ModManager.ModSystem;
+using ModManager.AddonSystem;
 
-namespace ModManager.EnableSystem.Enablers.MapEnablerSystem
+namespace ModManager.MapSystem
 {
     public class MapManifest : Manifest
     {

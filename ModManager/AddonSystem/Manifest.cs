@@ -3,7 +3,7 @@ using System.Linq;
 using Modio.Models;
 using Newtonsoft.Json;
 
-namespace ModManager.ModSystem
+namespace ModManager.AddonSystem
 {
     public class Manifest
     {

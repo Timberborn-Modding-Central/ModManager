@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using ModManager.ModSystem;
+using ModManager.AddonSystem;
 
-namespace ModManager.ManifestFinderSystem
+namespace ModManager.ManifestLocationFinderSystem
 {
     public interface IManifestLocationFinder
     {

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using ModManager.AddonEnableSystem;
+using ModManager.AddonSystem;
+using ModManager.MapSystem;
 using ModManager.ModIoSystem;
 using ModManager.ModSystem;
 
@@ -17,7 +20,12 @@ namespace ModManager.StartupSystem
         {
             Paths.Instance,
             ModIoGameInfo.Instance,
-            InstalledModRepository.Instance
+            ModRegisterer.Instance,
+            MapRegisterer.Instance,
+
+
+
+            InstalledAddonRepository.Instance
         };
 
         public static void Run(string apiKey, Action<ModManagerStartupOptions> options)
