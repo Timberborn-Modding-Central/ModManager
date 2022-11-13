@@ -29,14 +29,30 @@ namespace ModManager.ModIoSystem
         private void ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
             ZipFile.ExtractToDirectory(mapZipLocation, MapRepository.CustomMapsDirectory, overWrite);
-            DeleteZipFile(mapZipLocation);
+            System.IO.File.Delete(mapZipLocation);
         }
 
         private void ExtractMod(string modZipLocation, Mod modInfo, bool overWrite = true)
         {
             string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
+            ClearOldModFiles(modInfo, modFolderName);
 
-            string dirs = null;
+            if (modInfo.Name.Equals(_bepInExPackName))
+            {
+                // TODO: Better way to get folders
+                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Timberborn, "BepInEx", "plugins", modFolderName), overWrite);
+            }
+            else
+            {
+                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Timberborn, "mods", modFolderName), overWrite);
+            }
+
+            System.IO.File.Delete(modZipLocation);
+        }
+
+        private bool TryGetExistingModFolder(Mod modInfo, out string dirs)
+        {
+            dirs = null;
             try
             {
                 dirs = Directory.GetDirectories(Path.Combine(Paths.Timberborn, "mods"), $"{modInfo.NameId}_{modInfo.Id}*").SingleOrDefault();
@@ -48,31 +64,27 @@ namespace ModManager.ModIoSystem
             }
             if (dirs != null)
             {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ClearOldModFiles(Mod modInfo, string modFolderName)
+        {
+            if (TryGetExistingModFolder(modInfo, out string dirs))
+            {
                 var dirInfo = new DirectoryInfo(dirs);
                 if (dirInfo.Name.Equals(modFolderName))
                 {
                     return;
                 }
                 dirInfo.MoveTo(Path.Combine(Paths.Data, modFolderName));
-                DeleteOldModFiles(modFolderName);
+                DeleteModFiles(modFolderName);
             }
-
-            if (modInfo.Name.Equals(_bepInExPackName))
-            {
-                // TODO: Better way to get folders
-                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Timberborn, "BepInEx", "plugins", modFolderName), overWrite);
-                Console.WriteLine($"Extracted to {Path.Combine(Paths.Timberborn, "BepInEx", "plugins", modFolderName)}");
-            }
-            else
-            {
-                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Timberborn, "mods", modFolderName), overWrite);
-                Console.WriteLine($"Extracted to {Path.Combine(Paths.Timberborn, "mods", modFolderName)}");
-            }
-
-            DeleteZipFile(modZipLocation);
         }
 
-        private void DeleteOldModFiles(string modFolderName)
+        private void DeleteModFiles(string modFolderName)
         {
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Data, modFolderName));
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
@@ -113,11 +125,6 @@ namespace ModManager.ModIoSystem
             {
                 Console.WriteLine($"\t\texc: {ex.Message}");
             }
-        }
-
-        private void DeleteZipFile(string mapZipLocation)
-        {
-            System.IO.File.Delete(mapZipLocation);
         }
     }
 }
