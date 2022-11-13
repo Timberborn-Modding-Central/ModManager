@@ -1,8 +1,10 @@
 using Modio.Filters;
 using Modio.Models;
+using ModManager;
 using ModManager.ModIoSystem;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Timberborn.AssetSystem;
@@ -19,8 +21,6 @@ namespace Timberborn.ModsSystemUI
 
 
         private VisualElement LoadVisualElement(string elementName) => LoadVisualElement(LoadVisualTreeAsset(elementName));
-
-        //private VisualTreeAsset LoadVisualTreeAsset(string elementName) => _resourceAssetLoader.Load<VisualTreeAsset>($"ModManager/what/{elementName}");
         private VisualTreeAsset LoadVisualTreeAsset(string elementName) => _resourceAssetLoader.Load<VisualTreeAsset>($"{elementName}");
 
         private VisualElement LoadVisualElement(VisualTreeAsset visualTreeAsset)
@@ -44,7 +44,7 @@ namespace Timberborn.ModsSystemUI
         private TextField _search;
         private RadioButtonGroup _tags;
         private List<string> _tagOptions;
-        private Extractor _extractor;
+        private ExtractorService _extractor;
 
         private AssetBundle _bundle;
 
@@ -53,7 +53,7 @@ namespace Timberborn.ModsSystemUI
                        IModService modService,
                        VisualElementInitializer visualElementInitializer,
                        IResourceAssetLoader resourceAssetLoader,
-                       Extractor extractor)
+                       ExtractorService extractor)
         {
             _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
@@ -63,40 +63,16 @@ namespace Timberborn.ModsSystemUI
             _resourceAssetLoader = resourceAssetLoader;
             _extractor = extractor;
 
-            _bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
+            //_bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
+            _bundle = AssetBundle.LoadFromFile($"{Path.Combine(Paths.ModManager, "assets", "what.bundle")}");
         }
 
         public VisualElement GetPanel()
         {
-            //var root = _visualElementLoader.LoadVisualElement("Mods/ModsBox");
+            string assetName = "assets/resources/ui/views/mods/modsbox.uxml";
+            var asset = _bundle.LoadAsset<VisualTreeAsset>(assetName);
+            var root = LoadVisualElement(asset);
 
-            //var root2 = _resourceAssetLoader.Load<GameObject>($"ModManager/what/Cube");
-            //Console.WriteLine($"loaded Cube");
-
-            foreach (var item in _bundle.GetAllAssetNames())
-            {
-                Console.WriteLine($"\titem: {item}");
-                //_bundle.LoadAsset(item);
-            }
-
-            string assName = "assets/resources/ui/views/mods/modsbox.uxml";
-            Console.WriteLine($"loading asset \"{assName}\"");
-            var ass = _bundle.LoadAsset<VisualTreeAsset>(assName);
-            Console.WriteLine($"ass: {ass.name}");
-
-            var root = LoadVisualElement(ass);
-            Console.WriteLine($"root: {root.name}");
-
-            Console.WriteLine("finish bundle");
-
-
-
-            //var root3 = LoadVisualElement("ui/views/mods/newuxmltemplate.uxml");
-
-
-            //var root = LoadVisualElement("ModsBox");
-            //Console.WriteLine($"FOO2");
-            //Console.WriteLine($"root: {root}");
             _mods = root.Q<ScrollView>("Mods");
             _loading = root.Q<Label>("Loading");
             _error = root.Q<Label>("Error");
@@ -114,8 +90,6 @@ namespace Timberborn.ModsSystemUI
 
         private void OpenOptionsPanel()
         {
-
-            Console.WriteLine($"OpenOptionsPanel");
             _panelStack.HideAndPush(this);
         }
 
@@ -186,11 +160,10 @@ namespace Timberborn.ModsSystemUI
             _loading.ToggleDisplayStyle(false);
             foreach (var mod in mods)
             {
-                string assName = "assets/resources/ui/views/mods/modsboxitem.uxml";
-                var asset = _bundle.LoadAsset<VisualTreeAsset>(assName);
+                string assetName = "assets/resources/ui/views/mods/modsboxitem.uxml";
+                var asset = _bundle.LoadAsset<VisualTreeAsset>(assetName);
                 var item = _visualElementLoader.LoadVisualElement(asset);
                 item.Q<Label>("Name").text = mod.Name;
-                //item.Q<Button>("Download").clicked += () => _modService.DownloadLatestMod(mod.Id);
                 item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod);
 
                 SetNumbers(mod, item);
@@ -202,8 +175,8 @@ namespace Timberborn.ModsSystemUI
 
         private async Task DoDownloadAndExtract(Mod modInfo)
         {
-            var mod = await _modService.DownloadLatestMod(modInfo.Id);
-            var dependencies = await _modService.DownloadDependencies(modInfo);
+            (string location, Mod Mod) mod = await _modService.DownloadLatestMod(modInfo.Id);
+            List<(string location, Mod Mod)> dependencies = await _modService.DownloadDependencies(modInfo);
 
             _extractor.Extract(mod.location, mod.Mod);
             foreach (var foo in dependencies)

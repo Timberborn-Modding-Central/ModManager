@@ -12,7 +12,7 @@ namespace ModManager
         {
             containerDefinition.Bind<ModsBox>().AsSingleton();
             containerDefinition.Bind<IModService>().To<ModService>().AsSingleton();
-            containerDefinition.Bind<Extractor>().AsSingleton();
+            containerDefinition.Bind<ExtractorService>().AsSingleton();
         }
     }
 }

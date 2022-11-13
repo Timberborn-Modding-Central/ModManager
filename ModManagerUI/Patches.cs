@@ -13,7 +13,6 @@ namespace ModManagerUI
         [HarmonyPostfix]
         public static void MainMenuPanelPostfix(ref VisualElement __result)
         {
-            Console.WriteLine($"MAIN MENU PATCH");
             VisualElement root = __result.Query("MainMenuPanel");
             Button button = new Button() { classList = { "menu-button" } };
             button.text = "Mod manager";

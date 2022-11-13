@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ModManager.ModIoSystem
 {
-    public class Extractor
+    public class ExtractorService
     {
         private List<string> _foldersToIgnore = new() { "configs" };
 
@@ -29,8 +29,7 @@ namespace ModManager.ModIoSystem
         private void ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
             ZipFile.ExtractToDirectory(mapZipLocation, MapRepository.CustomMapsDirectory, overWrite);
-            Console.WriteLine($"saved map \"{modInfo.Name}\" in: {MapRepository.CustomMapsDirectory}");
-            //DeleteZipFile(mapZipLocation);
+            DeleteZipFile(mapZipLocation);
         }
 
         private void ExtractMod(string modZipLocation, Mod modInfo, bool overWrite = true)
@@ -52,15 +51,10 @@ namespace ModManager.ModIoSystem
                 var dirInfo = new DirectoryInfo(dirs);
                 if (dirInfo.Name.Equals(modFolderName))
                 {
-                    Console.WriteLine($"\tfolder \"{dirInfo.Name}\" already exists, skip.");
                     return;
                 }
-                Console.WriteLine($"\t{dirs}");
-
-                Console.WriteLine($"\tmove to {modFolderName}");
                 dirInfo.MoveTo(Path.Combine(Paths.Data, modFolderName));
-
-                DeleteStuff(modFolderName);
+                DeleteOldModFiles(modFolderName);
             }
 
             if (modInfo.Name.Equals(_bepInExPackName))
@@ -78,16 +72,11 @@ namespace ModManager.ModIoSystem
             DeleteZipFile(modZipLocation);
         }
 
-        private void DeleteStuff(string modFolderName)
+        private void DeleteOldModFiles(string modFolderName)
         {
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Data, modFolderName));
-            Console.WriteLine($"\t{modDirInfo}");
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
                                           .Where(file => !_foldersToIgnore.Contains(file.FullName.Split(Path.DirectorySeparatorChar).Last()));
-            foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
-            {
-                Console.WriteLine($"\t\tfolder: {subDirectory}");
-            }
             foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
@@ -96,15 +85,13 @@ namespace ModManager.ModIoSystem
 
             DeleteFilesFromFolder(modDirInfo);
             TryDeleteFolder(modDirInfo);
-
-            Console.WriteLine($"Deleted everything expect for {_foldersToIgnore.Aggregate((a, b) => $"{a}, {b}")}");
+            //Console.WriteLine($"Deleted everything expect for {_foldersToIgnore.Aggregate((a, b) => $"{a}, {b}")}");
         }
 
         private void DeleteFilesFromFolder(DirectoryInfo dir)
         {
             foreach (FileInfo file in dir.GetFiles())
             {
-                Console.WriteLine($"\t\tdelete file {file}");
                 file.Delete();
             }
         }
@@ -115,7 +102,6 @@ namespace ModManager.ModIoSystem
             {
                 if (dir.EnumerateDirectories().Any() == false && dir.EnumerateFiles().Any() == false)
                 {
-                    Console.WriteLine($"\t\tdelete folder {dir}");
                     dir.Delete();
                 }
             }
@@ -132,7 +118,6 @@ namespace ModManager.ModIoSystem
         private void DeleteZipFile(string mapZipLocation)
         {
             System.IO.File.Delete(mapZipLocation);
-            Console.WriteLine($"Deleted {mapZipLocation}");
         }
     }
 }
