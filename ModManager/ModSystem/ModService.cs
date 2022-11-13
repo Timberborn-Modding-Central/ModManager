@@ -4,7 +4,6 @@ using Modio.Models;
 using ModManager.EnableSystem;
 using ModManager.InstallerSystem;
 using ModManager.ModIoSystem;
-using ModManager.SingletonInstanceSystem;
 using File = Modio.Models.File;
 
 namespace ModManager.ModSystem

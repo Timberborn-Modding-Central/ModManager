@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Modio.Models;
 using ModManager.InstallerSystem.Installers;
 using ModManager.ModSystem;
-using ModManager.SingletonInstanceSystem;
 
 namespace ModManager.InstallerSystem
 {

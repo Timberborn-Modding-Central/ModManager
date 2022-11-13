@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using ModManager.SingletonInstanceSystem;
 using Newtonsoft.Json;
 
 namespace ModManager.PersistenceSystem

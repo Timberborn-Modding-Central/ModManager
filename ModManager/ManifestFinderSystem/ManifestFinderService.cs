@@ -2,7 +2,6 @@
 using System.Linq;
 using ModManager.ManifestFinderSystem.ManifestLocationFinders;
 using ModManager.ModSystem;
-using ModManager.SingletonInstanceSystem;
 
 namespace ModManager.ManifestFinderSystem
 {

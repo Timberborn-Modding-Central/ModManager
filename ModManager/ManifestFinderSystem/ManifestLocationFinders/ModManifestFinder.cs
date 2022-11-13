@@ -22,7 +22,7 @@ namespace ModManager.ManifestFinderSystem.ManifestLocationFinders
                 yield return LoadManifest(enabledManifest);
             }
 
-            foreach (string disabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + ModEnableService.DisabledExtension, SearchOption.AllDirectories))
+            foreach (string disabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Disabled, SearchOption.AllDirectories))
             {
                 yield return LoadManifest(disabledManifest);
             }

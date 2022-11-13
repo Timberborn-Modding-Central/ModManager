@@ -1,5 +1,4 @@
-﻿using ModManager.SingletonInstanceSystem;
-using ModManager.StartupSystem;
+﻿using ModManager.StartupSystem;
 
 namespace ModManager
 {

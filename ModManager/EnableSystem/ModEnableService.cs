@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using ModManager.EnableSystem.Enablers;
 using ModManager.ModSystem;
-using ModManager.SingletonInstanceSystem;
 
 namespace ModManager.EnableSystem
 {
     public class ModEnableService : Singleton<ModEnableService>
     {
-        public static readonly string DisabledExtension = ".disabled";
-
         public static readonly IEnumerable<string> IgnoreExtensions = new[]
         {
-            DisabledExtension,
-            ".delete"
+            Names.Extensions.Disabled,
+            Names.Extensions.Remove
         };
 
         private readonly List<IModEnabler> _enablers = new()

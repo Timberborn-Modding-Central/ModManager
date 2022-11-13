@@ -1,4 +1,4 @@
-﻿namespace ModManager.SingletonInstanceSystem
+﻿namespace ModManager
 {
     public abstract class Singleton<T> where T : class, new()
     {
