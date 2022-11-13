@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using ModManager.EnableSystem.Enablers;
+﻿using System.Collections.Generic;
+using ModManager.MapSystem;
 using ModManager.ModSystem;
 
 namespace ModManager.EnableSystem
@@ -15,7 +14,8 @@ namespace ModManager.EnableSystem
 
         private readonly List<IModEnabler> _enablers = new()
         {
-            new GeneralEnabler()
+            new MapEnabler(),
+            new ModEnabler()
         };
 
         public void Enable(Manifest manifest)
@@ -28,7 +28,7 @@ namespace ModManager.EnableSystem
                 }
             }
 
-            throw new Exception($"{manifest.ModName} could not be enabled by any mod enabler");
+            throw new EnableServiceException($"{manifest.ModName} could not be enabled by any mod enabler");
         }
 
         public void Disable(Manifest manifest)
@@ -41,7 +41,7 @@ namespace ModManager.EnableSystem
                 }
             }
 
-            throw new Exception($"{manifest.ModName} could not be disabled by any mod enabler");
+            throw new EnableServiceException($"{manifest.ModName} could not be disabled by any mod enabler");
         }
 
         public void AddModEnabler(IModEnabler installer)

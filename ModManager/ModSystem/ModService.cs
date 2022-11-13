@@ -27,7 +27,7 @@ namespace ModManager.ModSystem
         {
             if(_installedModRepository.Has(mod.Id))
             {
-                throw new Exception($"{mod.Name} is already installed. Use method `ChangeVersion` to change the version of an installed mod.");
+                throw new ModServiceException($"{mod.Name} is already installed. Use method `{nameof(ChangeVersion)}` to change the version of an installed mod.");
             }
 
             _modInstallerService.Install(mod, file);
@@ -37,7 +37,7 @@ namespace ModManager.ModSystem
         {
             if (! _installedModRepository.TryGet(modId, out Manifest manifest))
             {
-                throw new Exception($"Cannot uninstall modId: {modId}. Mod is not installed.");
+                throw new ModServiceException($"Cannot uninstall modId: {modId}. Mod is not installed.");
             }
 
             _modInstallerService.Uninstall(manifest);
@@ -47,7 +47,7 @@ namespace ModManager.ModSystem
         {
             if (! _installedModRepository.Has(mod.Id))
             {
-                throw new Exception($"Cannot change version of {mod.Name}. Mod is not installed.");
+                throw new ModServiceException($"Cannot change version of {mod.Name}. Mod is not installed.");
             }
 
             _modInstallerService.ChangeVersion(mod, file);
@@ -57,7 +57,7 @@ namespace ModManager.ModSystem
         {
             if (! _installedModRepository.TryGet(modId, out Manifest? manifest))
             {
-                throw new Exception($"Cannot enable modId: {modId}. Mod is not installed.");
+                throw new ModServiceException($"Cannot enable modId: {modId}. Mod is not installed.");
             }
 
             _modEnableService.Enable(manifest);
@@ -67,7 +67,7 @@ namespace ModManager.ModSystem
         {
             if (! _installedModRepository.TryGet(modId, out Manifest manifest))
             {
-                throw new Exception($"Cannot disable modId: {modId}. Mod is not installed.");
+                throw new ModServiceException($"Cannot disable modId: {modId}. Mod is not installed.");
             }
 
             _modEnableService.Disable(manifest);

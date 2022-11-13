@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ModManager.ManifestFinderSystem.ManifestLocationFinders;
+using ModManager.MapSystem;
 using ModManager.ModSystem;
 
 namespace ModManager.ManifestFinderSystem

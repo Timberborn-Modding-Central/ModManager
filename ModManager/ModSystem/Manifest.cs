@@ -7,10 +7,11 @@ namespace ModManager.ModSystem
 {
     public class Manifest
     {
-        public static readonly string FileName = "manifest.json";
+        public const string FileName = "manifest.json";
 
         public Manifest()
         {
+
         }
 
         public Manifest(Mod mod, File file, string installationRootPath)
@@ -26,7 +27,7 @@ namespace ModManager.ModSystem
             Tags = mod.Tags.Select(tag => tag.Name!).ToList();
         }
 
-        public Manifest Update(Mod mod, File file)
+        public virtual Manifest Update(Mod mod, File file)
         {
             AuthorName = mod.SubmittedBy!.Username!;
             FileId = file.Id;
@@ -55,10 +56,10 @@ namespace ModManager.ModSystem
         public string ModName { get; set; } = null!;
 
         [JsonProperty(Required = Required.AllowNull)]
-        public string Summary { get; set; }
+        public string? Summary { get; set; }
 
         [JsonProperty(Required = Required.AllowNull)]
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         [JsonProperty(Required = Required.AllowNull)]
         public string? Changelogs { get; set; }

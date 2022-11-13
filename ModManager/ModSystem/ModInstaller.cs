@@ -1,17 +1,17 @@
 ﻿using System;
 using Modio.Models;
-using ModManager.ModSystem;
+using ModManager.InstallerSystem;
 using ModManager.PersistenceSystem;
 
-namespace ModManager.InstallerSystem.Installers
+namespace ModManager.ModSystem
 {
-    public class GeneralInstaller : IModInstaller
+    public class ModInstaller : IModInstaller
     {
         private readonly PersistenceService _persistenceService;
 
         private readonly InstalledModRepository _installedModRepository;
 
-        public GeneralInstaller()
+        public ModInstaller()
         {
             _persistenceService = PersistenceService.Instance;
             _installedModRepository = InstalledModRepository.Instance;

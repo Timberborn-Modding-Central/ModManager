@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ModManager.EnableSystem;
-using ModManager.ModSystem;
+using ModManager.ManifestFinderSystem;
 using ModManager.PersistenceSystem;
 
-namespace ModManager.ManifestFinderSystem.ManifestLocationFinders
+namespace ModManager.ModSystem
 {
     public class ModManifestFinder : IManifestLocationFinder
     {
@@ -31,6 +30,8 @@ namespace ModManager.ManifestFinderSystem.ManifestLocationFinders
         private Manifest LoadManifest(string manifestPath)
         {
             var manifest = _persistenceService.LoadObject<Manifest>(manifestPath);
+
+            manifest.Enabled = ! Path.GetExtension(manifestPath).Equals(Names.Extensions.Disabled);
 
             manifest.RootPath = Path.GetDirectoryName(manifestPath)!;
 

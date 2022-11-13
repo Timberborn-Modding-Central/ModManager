@@ -34,7 +34,7 @@ namespace ModManager
 
         public static string Mods { get; set; } = null!;
 
-        public static readonly string Maps = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Documents", "Timberborn") : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Timberborn");
+        public static readonly string Maps = Path.Combine(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Documents", "Timberborn") : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Timberborn"), "Maps");
 
         public static class ModManager
         {

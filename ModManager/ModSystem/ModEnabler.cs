@@ -1,10 +1,10 @@
 ﻿using System.IO;
 using System.Linq;
-using ModManager.ModSystem;
+using ModManager.EnableSystem;
 
-namespace ModManager.EnableSystem.Enablers
+namespace ModManager.ModSystem
 {
-    public class GeneralEnabler : IModEnabler
+    public class ModEnabler : IModEnabler
     {
         public bool Enable(Manifest manifest)
         {

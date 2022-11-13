@@ -4,9 +4,11 @@
     {
         public class Extensions
         {
-            public const string Disabled = ".disable";
+            public const string Disabled = ".disabled";
 
             public const string Remove = ".remove";
+
+            public const string TimberbornMap = ".timber";
         }
     }
 }
