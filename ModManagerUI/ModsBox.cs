@@ -179,10 +179,14 @@ namespace Timberborn.ModsSystemUI
             (string location, Mod Mod) mod = await _addonService.DownloadLatestMod(modInfo.Id);
             List<(string location, Mod Mod)> dependencies = await _addonService.DownloadDependencies(modInfo);
 
+
             _extractor.Extract(mod.location, mod.Mod);
+            _addonService.Install(mod.Mod, mod.Mod.Modfile);
+
             foreach (var foo in dependencies)
             {
                 _extractor.Extract(foo.location, foo.Mod);
+                _addonService.Install(foo.Mod, foo.Mod.Modfile);
             }
         }
 
