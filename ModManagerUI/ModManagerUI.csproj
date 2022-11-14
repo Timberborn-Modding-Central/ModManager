@@ -16,6 +16,9 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
+	  <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+	  <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+	  <PackageReference Include="TimberApi" Version="0.5.1" />
 	  <PackageReference Include="Timberborn.GameLibs" Version="0.2.9.1-r.0" />
 	</ItemGroup>
 	
@@ -30,14 +33,6 @@
   </ItemGroup>
 
 	<!--    Import dll's from Timberborn's symlink in solution folder-->
-	<ItemGroup Condition="$(UseLocalTimberbornSource)">
-		<Reference Include="$(SolutionDir)Timberborn\Timberborn_Data\Managed\Timberborn.*.dll">
-			<DestinationSubDirectory>libs/</DestinationSubDirectory>
-		</Reference>
-		<Reference Include="$(SolutionDir)Timberborn\Timberborn_Data\Managed\Bindito.*.dll">
-			<DestinationSubDirectory>libs/</DestinationSubDirectory>
-		</Reference>
-	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="Modio">
