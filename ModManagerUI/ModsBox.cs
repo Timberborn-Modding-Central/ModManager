@@ -156,7 +156,7 @@ namespace Timberborn.ModsSystemUI
             }
         }
 
-        private void FillTheWrapper(IReadOnlyCollection<Mod> mods)
+        private async void FillTheWrapper(IReadOnlyCollection<Mod> mods)
         {
             _loading.ToggleDisplayStyle(false);
             foreach (var mod in mods)
@@ -168,7 +168,7 @@ namespace Timberborn.ModsSystemUI
                 item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod);
 
                 SetNumbers(mod, item);
-                LoadImage(mod, item.Q<Image>("Logo"));
+                await LoadImage(mod, item.Q<Image>("Logo"));
 
                 _mods.Add(item);
             }
