@@ -1,6 +1,7 @@
 using Modio.Filters;
 using Modio.Models;
 using ModManager;
+using ModManager.AddonSystem;
 using ModManager.ModIoSystem;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace Timberborn.ModsSystemUI
         public static Action OpenOptionsDelegate;
         private readonly VisualElementLoader _visualElementLoader;
         private readonly PanelStack _panelStack;
-        private readonly IModService _modService;
+        private readonly IAddonService _addonService;
         private readonly VisualElementInitializer _visualElementInitializer;
         private readonly IResourceAssetLoader _resourceAssetLoader;
         private VisualElement _mods;
@@ -50,21 +51,21 @@ namespace Timberborn.ModsSystemUI
 
         public ModsBox(VisualElementLoader visualElementLoader,
                        PanelStack panelStack,
-                       IModService modService,
+                       IAddonService addonService,
                        VisualElementInitializer visualElementInitializer,
                        IResourceAssetLoader resourceAssetLoader,
                        ExtractorService extractor)
         {
             _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
-            _modService = modService;
+            _addonService = addonService;
             OpenOptionsDelegate = OpenOptionsPanel;
             _visualElementInitializer = visualElementInitializer;
             _resourceAssetLoader = resourceAssetLoader;
             _extractor = extractor;
 
-            //_bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
-            _bundle = AssetBundle.LoadFromFile($"{Path.Combine(Paths.ModManager, "assets", "what.bundle")}");
+            _bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
+            //_bundle = AssetBundle.LoadFromFile($"{Path.Combine(Paths.ModManager.Assets, "what.bundle")}");
         }
 
         public VisualElement GetPanel()
@@ -109,11 +110,11 @@ namespace Timberborn.ModsSystemUI
             _error.ToggleDisplayStyle(false);
             _mods.Clear();
 
-            var getModsTask = _modService.GetMods().Search(_filter).ToList();
+            var getModsTask = _addonService.GetMods().Search(_filter).ToList();
             getModsTask.ConfigureAwait(true).GetAwaiter()
                 .OnCompleted(() => OnModsRetrieved(getModsTask));
 
-            var getTagsTask = _modService.GetTags().Get();
+            var getTagsTask = _addonService.GetTags().Get();
             getTagsTask.ConfigureAwait(true).GetAwaiter()
                 .OnCompleted(() => OnTagsRetrieved(getTagsTask));
         }
@@ -175,8 +176,8 @@ namespace Timberborn.ModsSystemUI
 
         private async Task DoDownloadAndExtract(Mod modInfo)
         {
-            (string location, Mod Mod) mod = await _modService.DownloadLatestMod(modInfo.Id);
-            List<(string location, Mod Mod)> dependencies = await _modService.DownloadDependencies(modInfo);
+            (string location, Mod Mod) mod = await _addonService.DownloadLatestMod(modInfo.Id);
+            List<(string location, Mod Mod)> dependencies = await _addonService.DownloadDependencies(modInfo);
 
             _extractor.Extract(mod.location, mod.Mod);
             foreach (var foo in dependencies)
@@ -195,11 +196,14 @@ namespace Timberborn.ModsSystemUI
             }
         }
 
-        private void LoadImage(Mod mod, Image root)
+        private async Task LoadImage(Mod mod, Image root)
         {
             if (mod.Logo != null)
             {
-                root.image = _modService.GetImage(mod.Logo.Thumb320x180, 320, 180);
+                var byteArray = await _addonService.GetImage(mod.Logo.Thumb320x180);
+                var texture = new Texture2D(320, 180);
+                texture.LoadImage(byteArray);
+                root.image =texture;
             }
         }
 

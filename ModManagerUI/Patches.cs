@@ -1,5 +1,6 @@
 ﻿using Bindito.Core;
 using HarmonyLib;
+using ModManager.AddonSystem;
 using ModManager.ModIoSystem;
 using System;
 using Timberborn.MainMenuScene;
@@ -27,8 +28,8 @@ namespace ModManagerUI
         [HarmonyPostfix]
         public static void ConfigurePostfix(IContainerDefinition containerDefinition)
         {
+            containerDefinition.Bind<IAddonService>().To<AddonService>().AsSingleton();
             containerDefinition.Bind<ModsBox>().AsSingleton();
-            containerDefinition.Bind<IModService>().To<ModService>().AsSingleton();
             containerDefinition.Bind<ExtractorService>().AsSingleton();
         }
     }
