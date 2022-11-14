@@ -4,6 +4,11 @@ using ModManager.AddonEnableSystem;
 using ModManager.AddonInstallerSystem;
 using ModManager.ModIoSystem;
 using ModManager.ModSystem;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 using File = Modio.Models.File;
 
 namespace ModManager.AddonSystem
@@ -81,6 +86,75 @@ namespace ModManager.AddonSystem
         public GameTagsClient GetTags()
         {
             return ModIo.Client.Games[ModIoGameInfo.GameId].Tags;
+        }
+
+        public async Task<(string location, Mod Mod)> DownloadLatestMod(uint modId)
+        {
+            var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
+
+            Directory.CreateDirectory($"{Paths.ModManager.Temp}");
+            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{modId}_{mod.Modfile.Id}.zip");
+
+            await ModIo.Client.Download(ModIoGameInfo.GameId,
+                                        modId,
+                                        new FileInfo(tempZipLocation));
+            (string, Mod) result = new(tempZipLocation, mod);
+            return result;
+        }
+
+        private async Task<List<Dependency>> GetDependencies(uint modid)
+        {
+            var deps = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modid].Dependencies.Get();
+
+            List<Dependency> result = new();
+            result.AddRange(deps);
+
+            foreach (var dep in deps)
+            {
+                result.AddRange(await GetDependencies(dep.ModId));
+            }
+            return result;
+        }
+
+        public async Task<List<(string location, Mod Mod)>> DownloadDependencies(Mod mod)
+        {
+            var depIds = await GetDependencies(mod.Id);
+
+            List<(string location, Mod mod)> dependencies = new();
+            foreach (var dep in depIds)
+            {
+                dependencies.Add(await DownloadLatestMod(dep.ModId));
+            }
+            return dependencies;
+        }
+
+        public async Task<(string location, Mod Mod)> DownloadMod(uint modId, uint fileId)
+        {
+            var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
+            var file = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Files[fileId].Get();
+            mod.Modfile = file;
+
+            Directory.CreateDirectory($"{Paths.ModManager.Temp}");
+            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{modId}_{fileId}.zip");
+
+            await ModIo.Client.Download(ModIoGameInfo.GameId,
+                                   modId,
+                                   fileId,
+                                   new FileInfo(tempZipLocation));
+            (string, Mod) result = new(tempZipLocation, mod);
+            return result;
+        }
+
+        public async Task<byte[]> GetImage(Uri uri)
+        {
+            using var client = new HttpClient();
+            var byteArray = await client.GetByteArrayAsync(uri);
+
+            return byteArray;
+
+            //var texture = new Texture2D(width, height);
+            //texture.LoadImage(byteArray.Result);
+            //return texture;
         }
     }
 }

@@ -1,5 +1,8 @@
 ﻿using Modio;
 using Modio.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ModManager.AddonSystem
 {
@@ -18,5 +21,13 @@ namespace ModManager.AddonSystem
         ModsClient GetMods();
 
         GameTagsClient GetTags();
+
+        Task<(string location, Mod Mod)> DownloadLatestMod(uint modId);
+
+        Task<List<(string location, Mod Mod)>> DownloadDependencies(Mod mod);
+
+        Task<(string location, Mod Mod)> DownloadMod(uint modId, uint fileId);
+
+        Task<byte[]> GetImage(Uri uri);
     }
 }
