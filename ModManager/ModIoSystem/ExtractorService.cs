@@ -4,7 +4,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Text;
-using Timberborn.MapSystem;
 using System.Linq;
 
 namespace ModManager.ModIoSystem
@@ -28,7 +27,7 @@ namespace ModManager.ModIoSystem
 
         private void ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
-            ZipFile.ExtractToDirectory(mapZipLocation, MapRepository.CustomMapsDirectory, overWrite);
+            ZipFile.ExtractToDirectory(mapZipLocation, Paths.Maps, overWrite);
             System.IO.File.Delete(mapZipLocation);
         }
 
@@ -40,11 +39,11 @@ namespace ModManager.ModIoSystem
             if (modInfo.Name.Equals(_bepInExPackName))
             {
                 // TODO: Better way to get folders
-                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Timberborn, "BepInEx", "plugins", modFolderName), overWrite);
+                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.GameRoot, "BepInEx", "plugins", modFolderName), overWrite);
             }
             else
             {
-                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Timberborn, "mods", modFolderName), overWrite);
+                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Mods, modFolderName), overWrite);
             }
 
             System.IO.File.Delete(modZipLocation);
@@ -55,7 +54,7 @@ namespace ModManager.ModIoSystem
             dirs = null;
             try
             {
-                dirs = Directory.GetDirectories(Path.Combine(Paths.Timberborn, "mods"), $"{modInfo.NameId}_{modInfo.Id}*").SingleOrDefault();
+                dirs = Directory.GetDirectories(Paths.Mods, $"{modInfo.NameId}_{modInfo.Id}*").SingleOrDefault();
             }
             catch (Exception ex)
             {
@@ -79,14 +78,14 @@ namespace ModManager.ModIoSystem
                 {
                     return;
                 }
-                dirInfo.MoveTo(Path.Combine(Paths.Data, modFolderName));
+                dirInfo.MoveTo(Path.Combine(Paths.ModManager.Data, modFolderName));
                 DeleteModFiles(modFolderName);
             }
         }
 
         private void DeleteModFiles(string modFolderName)
         {
-            var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Data, modFolderName));
+            var modDirInfo = new DirectoryInfo(Path.Combine(Paths.ModManager.Data, modFolderName));
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
                                           .Where(file => !_foldersToIgnore.Contains(file.FullName.Split(Path.DirectorySeparatorChar).Last()));
             foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
