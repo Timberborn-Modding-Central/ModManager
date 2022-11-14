@@ -1,18 +1,29 @@
-﻿using Modio;
+﻿using System;
+using Modio;
 
 namespace ModManager.ModIoSystem
 {
     public class ModIo
     {
-        private static ModIo? _instance;
+        private static Client _client = null!;
 
-        public ModIo()
+        public static Client Client
         {
-            Client = new Client(new Credentials("API KEY"));
+            get
+            {
+                if (_client == null)
+                {
+                    throw new NullReferenceException("Tried to access ModIo.Client before startup has run.");
+                }
+
+                return _client;
+            }
+            set => _client = value;
         }
 
-        public static ModIo Instance => _instance ??= new ModIo();
-
-        public readonly Client Client;
+        public static void InitializeClient(string apiKey)
+        {
+            Client = new Client(new Credentials(apiKey));
+        }
     }
 }
