@@ -1,6 +1,9 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using ModManager.ModIoSystem;
+using ModManager.StartupSystem;
+using ModManagerUI.LocalizationSystem;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,10 +15,14 @@ namespace ModManagerUI
     {
         public static ManualLogSource Log;
 
-        private void Awake()
+        public void Awake()
         {
-            ModManager.Paths.LoadPaths();
-            new Harmony("com.modmanagerui").PatchAll();
+            Log = Logger;
+            // Add ModManagerStartup.Run() here
+
+            var harmony = new Harmony("com.modmanagerui");
+            harmony.PatchAll();
+            LocalizationPatcher.Patch(harmony);
         }
     }
 }
