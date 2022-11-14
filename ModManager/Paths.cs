@@ -43,6 +43,10 @@ namespace ModManager
             public static string User { get; set; } = Path.Combine(ModManagerRoot, "user");
 
             public static string Temp { get; set; } = Path.Combine(ModManagerRoot, "temp");
+
+            public static string Assets { get; set; } = Path.Combine(ModManagerRoot, "assets");
+
+            public static string Lang { get; set; } = Path.Combine(ModManagerRoot, "lang");
         }
     }
 }
