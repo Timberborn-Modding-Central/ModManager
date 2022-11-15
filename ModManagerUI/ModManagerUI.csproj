@@ -41,6 +41,10 @@
 		</Reference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="assets\lang\" />
+	</ItemGroup>
+
 	<!--    Used for automaticly transfer dll to Timberborn location, make a symlink `Timberborn` in the solution folder -->
 	<PropertyGroup Condition="$(CopyDllToPath) == 'timberapi'">
 		<TimberApiPath>$(SolutionDir)Timberborn\TimberAPI</TimberApiPath>

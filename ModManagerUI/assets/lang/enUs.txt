@@ -1,0 +1,6 @@
+ID,Text,Comment
+Menu.Mods,Custom maps and mods,Button opening a menu that allows downloading mods and custom maps. Keep short.
+Mods.Download,Download,Button to download a mod. Keep short.
+Mods.Info,Info,Button to show more info about a mod. Keep short.
+Mods.Loading,Loading...,Info text shown when mods are loading.
+Mods.Tags,Tags:,Header above available list of tags. Keep short.
