@@ -88,7 +88,7 @@ namespace ModManager.AddonSystem
             return ModIo.Client.Games[ModIoGameInfo.GameId].Tags;
         }
 
-        public async Task<(string location, Mod Mod)> DownloadLatestMod(uint modId)
+        public async Task<(string location, Mod Mod)> DownloadLatest(uint modId)
         {
             var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
 
@@ -123,12 +123,12 @@ namespace ModManager.AddonSystem
             List<(string location, Mod mod)> dependencies = new();
             foreach (var dep in depIds)
             {
-                dependencies.Add(await DownloadLatestMod(dep.ModId));
+                dependencies.Add(await DownloadLatest(dep.ModId));
             }
             return dependencies;
         }
 
-        public async Task<(string location, Mod Mod)> DownloadMod(uint modId, uint fileId)
+        public async Task<(string location, Mod Mod)> Download(uint modId, uint fileId)
         {
             var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
             var file = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Files[fileId].Get();
@@ -151,10 +151,6 @@ namespace ModManager.AddonSystem
             var byteArray = await client.GetByteArrayAsync(uri);
 
             return byteArray;
-
-            //var texture = new Texture2D(width, height);
-            //texture.LoadImage(byteArray.Result);
-            //return texture;
         }
     }
 }

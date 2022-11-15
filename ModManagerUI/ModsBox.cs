@@ -176,7 +176,7 @@ namespace Timberborn.ModsSystemUI
 
         private async Task DoDownloadAndExtract(Mod modInfo)
         {
-            (string location, Mod Mod) mod = await _addonService.DownloadLatestMod(modInfo.Id);
+            (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo.Id);
             List<(string location, Mod Mod)> dependencies = await _addonService.DownloadDependencies(modInfo);
 
 
