@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using Modio.Models;
 using ModManager.AddonInstallerSystem;
 using ModManager.AddonSystem;
+using ModManager.ModIoSystem;
 using ModManager.PersistenceSystem;
 
 namespace ModManager.ModSystem
@@ -12,21 +14,22 @@ namespace ModManager.ModSystem
 
         private readonly InstalledAddonRepository _installedAddonRepository;
 
+        private readonly ExtractorService _extractor;
+
         public ModInstaller()
         {
             _persistenceService = PersistenceService.Instance;
             _installedAddonRepository = InstalledAddonRepository.Instance;
+            _extractor = ExtractorService.Instance;
         }
 
-        public bool Install(Mod mod, File file)
+        public bool Install(Mod mod, string zipLocation)
         {
-            Manifest manifest = new Manifest(mod, file, "");
-
-            _persistenceService.SaveObject(manifest, Paths.Mods + "/manifest.json");
-
+            string installLocation = _extractor.Extract(zipLocation, mod);
+            var manifest = new Manifest(mod, mod.Modfile, installLocation);
+            string modManifestPath = Path.Combine(installLocation, "manifest.json");
+            _persistenceService.SaveObject(manifest, modManifestPath);
             _installedAddonRepository.Add(manifest);
-
-            //TODO: This is just for testing, Hytones implementation needs to be here
 
             return true;
         }
@@ -38,9 +41,9 @@ namespace ModManager.ModSystem
             return true;
         }
 
-        public bool ChangeVersion(Mod mod, File file)
+        public bool ChangeVersion(Mod mod, Modio.Models.File file, string zipLocation)
         {
-            throw new Exception();
+            throw new NotImplementedException();
         }
     }
 }

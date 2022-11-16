@@ -8,11 +8,11 @@ namespace ModManager.AddonSystem
 {
     public interface IAddonService
     {
-        void Install(Mod mod, File file);
+        void Install(Mod mod, string zipLocation);
 
         void Uninstall(uint modId);
 
-        void ChangeVersion(Mod mod, File file);
+        void ChangeVersion(Mod mod, File file, string zipLocation);
 
         void Enable(uint modId);
 

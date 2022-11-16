@@ -7,6 +7,7 @@ using ModManager.ModSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using File = Modio.Models.File;
@@ -28,19 +29,19 @@ namespace ModManager.AddonSystem
             _addonInstallerService = AddonInstallerService.Instance;
         }
 
-        public void Install(Mod mod, File file)
+        public void Install(Mod mod, string zipLocation)
         {
-            if(_installedAddonRepository.Has(mod.Id))
+            if (_installedAddonRepository.Has(mod.Id))
             {
                 throw new AddonException($"{mod.Name} is already installed. Use method `{nameof(ChangeVersion)}` to change the version of an installed mod.");
             }
 
-            _addonInstallerService.Install(mod, file);
+            _addonInstallerService.Install(mod, zipLocation);
         }
 
         public void Uninstall(uint modId)
         {
-            if (! _installedAddonRepository.TryGet(modId, out Manifest manifest))
+            if (!_installedAddonRepository.TryGet(modId, out Manifest manifest))
             {
                 throw new AddonException($"Cannot uninstall modId: {modId}. Mod is not installed.");
             }
@@ -48,19 +49,19 @@ namespace ModManager.AddonSystem
             _addonInstallerService.Uninstall(manifest);
         }
 
-        public void ChangeVersion(Mod mod, File file)
+        public void ChangeVersion(Mod mod, File file, string zipLocation)
         {
-            if (! _installedAddonRepository.Has(mod.Id))
+            if (!_installedAddonRepository.Has(mod.Id))
             {
                 throw new AddonException($"Cannot change version of {mod.Name}. Mod is not installed.");
             }
 
-            _addonInstallerService.ChangeVersion(mod, file);
+            _addonInstallerService.ChangeVersion(mod, file, zipLocation);
         }
 
         public void Enable(uint modId)
         {
-            if (! _installedAddonRepository.TryGet(modId, out Manifest? manifest))
+            if (!_installedAddonRepository.TryGet(modId, out Manifest? manifest))
             {
                 throw new AddonException($"Cannot enable modId: {modId}. Mod is not installed.");
             }
@@ -70,7 +71,7 @@ namespace ModManager.AddonSystem
 
         public void Disable(uint modId)
         {
-            if (! _installedAddonRepository.TryGet(modId, out Manifest manifest))
+            if (!_installedAddonRepository.TryGet(modId, out Manifest manifest))
             {
                 throw new AddonException($"Cannot disable modId: {modId}. Mod is not installed.");
             }
@@ -90,6 +91,11 @@ namespace ModManager.AddonSystem
 
         public async Task<(string location, Mod Mod)> DownloadLatest(uint modId)
         {
+            //if(_installedAddonRepository.All().Any(x => x.Version))
+            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].IsInstalled())
+            {
+                throw new AddonException($"Mod with id {modId} is already installed.");
+            }
             var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
 
             Directory.CreateDirectory($"{Paths.ModManager.Temp}");
@@ -123,15 +129,35 @@ namespace ModManager.AddonSystem
             List<(string location, Mod mod)> dependencies = new();
             foreach (var dep in depIds)
             {
-                dependencies.Add(await DownloadLatest(dep.ModId));
+                try
+                {
+                    dependencies.Add(await DownloadLatest(dep.ModId));
+                }
+                catch (AddonException ex)
+                {
+                    continue;
+                }
             }
             return dependencies;
         }
 
         public async Task<(string location, Mod Mod)> Download(uint modId, uint fileId)
         {
+            File file = new();
+            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].IsInstalled())
+            {
+                if (!_installedAddonRepository.TryGet(modId, out Manifest manifest))
+                {
+                    throw new AddonException($"Couldn't find installed mod'd manifest.");
+                }
+                file = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Files[fileId].Get();
+                if (manifest.Version == file.Version)
+                {
+                    throw new AddonException($"Mod with id {modId} is already installed with version {file.Version}.");
+                }
+            }
+
             var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
-            var file = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Files[fileId].Get();
             mod.Modfile = file;
 
             Directory.CreateDirectory($"{Paths.ModManager.Temp}");
