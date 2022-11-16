@@ -3,6 +3,7 @@ using Modio.Models;
 using ModManager;
 using ModManager.AddonSystem;
 using ModManager.ModIoSystem;
+using ModManagerUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timberborn.AssetSystem;
 using Timberborn.CoreUI;
+using Timberborn.GameExitSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UIElements.Image;
@@ -45,7 +47,8 @@ namespace Timberborn.ModsSystemUI
         private TextField _search;
         private RadioButtonGroup _tags;
         private List<string> _tagOptions;
-        private ExtractorService _extractor;
+
+        private GoodbyeBoxFactory _goodbyeBoxFactory;
 
         private AssetBundle _bundle;
 
@@ -54,7 +57,7 @@ namespace Timberborn.ModsSystemUI
                        IAddonService addonService,
                        VisualElementInitializer visualElementInitializer,
                        IResourceAssetLoader resourceAssetLoader,
-                       ExtractorService extractor)
+                       GoodbyeBoxFactory goodbyeBoxFactory)
         {
             _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
@@ -62,7 +65,8 @@ namespace Timberborn.ModsSystemUI
             OpenOptionsDelegate = OpenOptionsPanel;
             _visualElementInitializer = visualElementInitializer;
             _resourceAssetLoader = resourceAssetLoader;
-            _extractor = extractor;
+            _goodbyeBoxFactory = goodbyeBoxFactory;
+
 
             _bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
             //_bundle = AssetBundle.LoadFromFile($"{Path.Combine(Paths.ModManager.Assets, "what.bundle")}");
@@ -102,6 +106,10 @@ namespace Timberborn.ModsSystemUI
         public void OnUICancelled()
         {
             _panelStack.Pop(this);
+
+
+            var box = _goodbyeBoxFactory.ShowExitToDesktop();
+            _panelStack.HideAndPush(box);
         }
 
         private void ShowModsAndTags()
@@ -176,17 +184,28 @@ namespace Timberborn.ModsSystemUI
 
         private async Task DoDownloadAndExtract(Mod modInfo)
         {
-            (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo.Id);
-            List<(string location, Mod Mod)> dependencies = await _addonService.DownloadDependencies(modInfo);
+            List<(string location, Mod Mod)> dependencies = new();
+            try
+            {
+                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo.Id);
 
-
-            _extractor.Extract(mod.location, mod.Mod);
-            _addonService.Install(mod.Mod, mod.Mod.Modfile);
-
+                dependencies = await _addonService.DownloadDependencies(modInfo);
+                _addonService.Install(mod.Mod, mod.location);
+            }
+            catch (AddonException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
             foreach (var foo in dependencies)
             {
-                _extractor.Extract(foo.location, foo.Mod);
-                _addonService.Install(foo.Mod, foo.Mod.Modfile);
+                try
+                {
+                    _addonService.Install(foo.Mod, foo.location);
+                }
+                catch (AddonException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
             }
         }
 
@@ -207,7 +226,7 @@ namespace Timberborn.ModsSystemUI
                 var byteArray = await _addonService.GetImage(mod.Logo.Thumb320x180);
                 var texture = new Texture2D(320, 180);
                 texture.LoadImage(byteArray);
-                root.image =texture;
+                root.image = texture;
             }
         }
 

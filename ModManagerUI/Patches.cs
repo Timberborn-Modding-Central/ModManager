@@ -3,6 +3,7 @@ using HarmonyLib;
 using ModManager.AddonSystem;
 using ModManager.ModIoSystem;
 using System;
+using Timberborn.GameExitSystem;
 using Timberborn.MainMenuScene;
 using Timberborn.ModsSystemUI;
 using UnityEngine.UIElements;
@@ -28,9 +29,10 @@ namespace ModManagerUI
         [HarmonyPostfix]
         public static void ConfigurePostfix(IContainerDefinition containerDefinition)
         {
-            containerDefinition.Bind<IAddonService>().To<AddonService>().AsSingleton();
+            containerDefinition.Bind<IAddonService>().ToInstance(AddonService.Instance);
             containerDefinition.Bind<ModsBox>().AsSingleton();
-            containerDefinition.Bind<ExtractorService>().AsSingleton();
+            containerDefinition.Bind<ExtractorService>().ToInstance(ExtractorService.Instance);
+            containerDefinition.Bind<GoodbyeBoxFactory>().AsSingleton();
         }
     }
 }
