@@ -173,9 +173,7 @@ namespace ModManager.AddonSystem
         public async Task<byte[]> GetImage(Uri uri)
         {
             using var client = new HttpClient();
-            var byteArray = await client.GetByteArrayAsync(uri);
-
-            return byteArray;
+            return await client.GetByteArrayAsync(uri);
         }
     }
 }
