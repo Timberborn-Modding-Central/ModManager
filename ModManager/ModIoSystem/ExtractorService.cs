@@ -8,45 +8,51 @@ using System.Linq;
 
 namespace ModManager.ModIoSystem
 {
-    public class ExtractorService
+    public class ExtractorService : Singleton<ExtractorService>
     {
         private List<string> _foldersToIgnore = new() { "configs" };
 
         private const string _bepInExPackName = "BepInExPack";
 
-        public void Extract(string mapZipLocation, Mod modInfo, bool overWrite = true)
+        public string Extract(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
             if (modInfo.Tags.Any(x => x.Name.Equals("Map")))
             {
-                ExtractMap(mapZipLocation, modInfo, overWrite);
-                return;
+                return ExtractMap(mapZipLocation, modInfo, overWrite);
             }
 
-            ExtractMod(mapZipLocation, modInfo, overWrite);
+            return ExtractMod(mapZipLocation, modInfo, overWrite);
         }
 
-        private void ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
+        private string ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
-            ZipFile.ExtractToDirectory(mapZipLocation, Paths.Maps, overWrite);
+            var mapsInstallLocation = Paths.Maps;
+            ZipFile.ExtractToDirectory(mapZipLocation, mapsInstallLocation, overWrite);
             System.IO.File.Delete(mapZipLocation);
+
+            return mapsInstallLocation;
         }
 
-        private void ExtractMod(string modZipLocation, Mod modInfo, bool overWrite = true)
+        private string ExtractMod(string modZipLocation, Mod modInfo, bool overWrite = true)
         {
             string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
             ClearOldModFiles(modInfo, modFolderName);
 
+            string fullModPath = "";
             if (modInfo.Name.Equals(_bepInExPackName))
             {
                 // TODO: Better way to get folders
-                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.GameRoot, "BepInEx", "plugins", modFolderName), overWrite);
+                fullModPath = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", modFolderName);
+                ZipFile.ExtractToDirectory(modZipLocation, fullModPath, overWrite);
             }
             else
             {
-                ZipFile.ExtractToDirectory(modZipLocation, Path.Combine(Paths.Mods, modFolderName), overWrite);
+                fullModPath = Path.Combine(Paths.Mods, modFolderName);
+                ZipFile.ExtractToDirectory(modZipLocation, fullModPath, overWrite);
             }
 
             System.IO.File.Delete(modZipLocation);
+            return fullModPath;
         }
 
         private bool TryGetExistingModFolder(Mod modInfo, out string dirs)
