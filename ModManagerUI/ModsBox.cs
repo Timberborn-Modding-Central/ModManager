@@ -184,19 +184,19 @@ namespace Timberborn.ModsSystemUI
 
         private async Task DoDownloadAndExtract(Mod modInfo)
         {
-            List<(string location, Mod Mod)> dependencies = new();
+            IAsyncEnumerable<(string location, Mod Mod)> dependencies;
             try
             {
                 (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo.Id);
 
-                dependencies = await _addonService.DownloadDependencies(modInfo);
+                dependencies = _addonService.DownloadDependencies(modInfo);
                 _addonService.Install(mod.Mod, mod.location);
             }
             catch (AddonException ex)
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
             }
-            foreach (var foo in dependencies)
+            await foreach (var foo in _addonService.DownloadDependencies(modInfo))
             {
                 try
                 {

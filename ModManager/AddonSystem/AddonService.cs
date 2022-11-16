@@ -108,37 +108,36 @@ namespace ModManager.AddonSystem
             return result;
         }
 
-        private async Task<List<Dependency>> GetDependencies(uint modid)
+        private async IAsyncEnumerable<Dependency> GetDependencies(uint modid)
         {
             var deps = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modid].Dependencies.Get();
 
-            List<Dependency> result = new();
-            result.AddRange(deps);
 
             foreach (var dep in deps)
             {
-                result.AddRange(await GetDependencies(dep.ModId));
+                yield return dep;
+                await foreach (var dep2 in GetDependencies(dep.ModId))
+                {
+                    yield return dep2;
+                }
             }
-            return result;
         }
 
-        public async Task<List<(string location, Mod Mod)>> DownloadDependencies(Mod mod)
+        public async IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod)
         {
-            var depIds = await GetDependencies(mod.Id);
-
-            List<(string location, Mod mod)> dependencies = new();
-            foreach (var dep in depIds)
+            await foreach (var dep in GetDependencies(mod.Id))
             {
+                (string location, Mod Mod) returnvalue = new();
                 try
                 {
-                    dependencies.Add(await DownloadLatest(dep.ModId));
+                    returnvalue = await DownloadLatest(dep.ModId);
                 }
                 catch (AddonException ex)
                 {
                     continue;
                 }
+                yield return returnvalue;
             }
-            return dependencies;
         }
 
         public async Task<(string location, Mod Mod)> Download(uint modId, uint fileId)
