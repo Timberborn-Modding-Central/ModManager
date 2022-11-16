@@ -97,7 +97,7 @@ namespace ModManagerUI.LocalizationSystem
         private static List<string> GetLocalizationFilePathsFromDependencies(string localizationKey)
         {
             List<string> localizationFilePaths = new();
-            string pluginLocalizationPath = Paths.ModManager.Lang;
+            string pluginLocalizationPath = UIPaths.ModManagerUI.Lang;
 
             (bool hasLocalization, string localizationName) = LocalizationNameOrDefault(pluginLocalizationPath, localizationKey);
 
