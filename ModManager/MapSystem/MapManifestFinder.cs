@@ -25,7 +25,7 @@ namespace ModManager.MapSystem
                 return new List<Manifest>();
             }
 
-            List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath);
+            List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
 
             SetEnabledStatus(manifests);
 
