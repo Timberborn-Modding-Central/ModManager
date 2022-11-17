@@ -1,0 +1,37 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Timberborn.CoreUI.NineSliceVisualElement name="ModsBoxFullItem" class="sliced-border content-centered mods-box-full-item" picking-mode="Ignore">
+        <Style src="/Assets/Resources/UI/Views/Mods/ModsBoxStyle.uss" />
+        <ui:ScrollView name="Description" class="scroll--green-decorated">
+            <ui:VisualElement name="HeaderWrapper" class="content-row-centered">
+                <ui:Image name="Logo" class="mods-box-full-item__logo" />
+                <ui:VisualElement name="HeaderTextWrapper" class="content-centered">
+                    <ui:Label name="Name" text="Mod name" class="text--header" />
+                    <ui:VisualElement name="AuthorWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
+                        <Timberborn.CoreUI.LocalizableLabel name="Author" text="Author" text-loc-key="Mods.Author" class="text--default mods-box-full-item__label" />
+                        <ui:Label name="AuthorName" text="Mod author" class="text--default" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="VotesWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
+                        <Timberborn.CoreUI.LocalizableLabel name="Votes" text="Votes" text-loc-key="Mods.Votes" class="text--default mods-box-full-item__label" />
+                        <ui:Image name="UpIcon" class="mods-box-item__up-icon" />
+                        <ui:Label name="UpCount" text="0" class="text--default" />
+                        <ui:Image name="DownIcon" class="mods-box-item__down-icon" />
+                        <ui:Label name="DownCount" text="0" class="text--default" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="DownloadWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
+                        <Timberborn.CoreUI.LocalizableLabel name="Downloads" text="Downloads" text-loc-key="Mods.Downloads" class="text--default mods-box-full-item__label" />
+                        <ui:Label name="DownloadCount" text="0" class="text--default" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="TagsWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
+                        <Timberborn.CoreUI.LocalizableLabel name="TagsLabel" text="Tags" text-loc-key="Mods.Tags" class="text--default mods-box-full-item__label" />
+                        <ui:Label name="Tags" text="0" class="text--default" />
+                    </ui:VisualElement>
+                    <Timberborn.CoreUI.LocalizableButton name="Download" text="Download" text-loc-key="Mods.Download" class="menu-button menu-button--medium" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="Description" text="Mod description" class="text--default mods-box-full-item__description" />
+        </ui:ScrollView>
+        <ui:Button name="Close" focusable="false" tabindex="1" class="close-button" />
+    </Timberborn.CoreUI.NineSliceVisualElement>
+</ui:UXML>

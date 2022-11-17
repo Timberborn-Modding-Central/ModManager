@@ -16,9 +16,12 @@
                     <Timberborn.CoreUI.LocalizableLabel text="Tags:" name="TagsLabel" text-loc-key="Mods.Tags" class="text--big mods-box__tags-label" />
                     <ui:RadioButtonGroup name="Tags" value="-1" class="mods-box__tags" />
                 </Timberborn.CoreUI.NineSliceVisualElement>
-                <ui:Label text="Error" name="Error" class="text--header mods-box__loading" />
-                <Timberborn.CoreUI.LocalizableLabel text="Loading..." name="Loading" text-loc-key="Mods.Loading" class="text--header mods-box__loading" />
-                <ui:ScrollView name="Mods" class="mods-box__mods scroll--green-decorated" />
+                <ui:VisualElement name="ModsWrapper">
+                    <ui:Label text="Error" name="Error" class="text--header" />
+                    <ui:ScrollView name="Mods" class="mods-box__mods scroll--green-decorated" />
+                    <Timberborn.CoreUI.LocalizableLabel text="Loading..." name="Loading" text-loc-key="Mods.Loading" class="text--header" />
+                    <Timberborn.CoreUI.LocalizableButton name="ShowMore" text="Show more" text-loc-key="Mods.ShowMore" class="menu-button" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:Button name="Close" focusable="false" tabindex="1" class="close-button" />
         </Timberborn.CoreUI.NineSliceVisualElement>

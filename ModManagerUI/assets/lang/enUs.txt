@@ -4,3 +4,8 @@ Mods.Download,Download,Button to download a mod. Keep short.
 Mods.Info,Info,Button to show more info about a mod. Keep short.
 Mods.Loading,Loading...,Info text shown when mods are loading.
 Mods.Tags,Tags:,Header above available list of tags. Keep short.
+Mods.Author,Author:,Label before the author of mod.
+Mods.Downloads,Downloads:,Label before count of mod downloads.
+Mods.ShowMore,Show more,Button to show more mods. Keep short.
+Mods.Tags.All,All,Tag options to show all mods and maps. Keep short.
+Mods.Votes,Votes:,Label before count of mod likes and dislikes.

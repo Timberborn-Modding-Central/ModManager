@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Timberborn.AssetSystem;
 using Timberborn.CoreUI;
 using Timberborn.GameExitSystem;
+using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UIElements.Image;
@@ -33,11 +34,14 @@ namespace Timberborn.ModsSystemUI
             return visualElement;
         }
 
-
+        private static readonly string AllLocKey = "Mods.Tags.All";
+        private static readonly uint ModsPerPage = 25;
         public static Action OpenOptionsDelegate;
         private readonly VisualElementLoader _visualElementLoader;
         private readonly PanelStack _panelStack;
         private readonly IAddonService _addonService;
+        private readonly ModFullInfoController _modFullInfoController;
+        private readonly ILoc _loc;
         private readonly VisualElementInitializer _visualElementInitializer;
         private readonly IResourceAssetLoader _resourceAssetLoader;
         private VisualElement _mods;
@@ -46,18 +50,23 @@ namespace Timberborn.ModsSystemUI
         private Label _error;
         private TextField _search;
         private RadioButtonGroup _tags;
-        private List<string> _tagOptions;
+        private Button _showMore;
+        private List<string> _tagOptions = new();
+        private uint _page;
 
         private GoodbyeBoxFactory _goodbyeBoxFactory;
 
-        private AssetBundle _bundle;
+        private const string _bundleName = "what.bundle";
+        public static AssetBundle _bundle;
 
         public ModsBox(VisualElementLoader visualElementLoader,
                        PanelStack panelStack,
                        IAddonService addonService,
                        VisualElementInitializer visualElementInitializer,
                        IResourceAssetLoader resourceAssetLoader,
-                       GoodbyeBoxFactory goodbyeBoxFactory)
+                       GoodbyeBoxFactory goodbyeBoxFactory,
+                       ModFullInfoController modFullInfoController,
+                       ILoc loc)
         {
             _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
@@ -66,10 +75,10 @@ namespace Timberborn.ModsSystemUI
             _visualElementInitializer = visualElementInitializer;
             _resourceAssetLoader = resourceAssetLoader;
             _goodbyeBoxFactory = goodbyeBoxFactory;
+            _modFullInfoController = modFullInfoController;
+            _loc = loc;
 
-
-            _bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
-            //_bundle = AssetBundle.LoadFromFile($"{Path.Combine(Paths.ModManager.Assets, "what.bundle")}");
+            _bundle = AssetBundle.LoadFromFile($"{Path.Combine(UIPaths.ModManagerUI.Assets, _bundleName)}");
         }
 
         public VisualElement GetPanel()
@@ -82,11 +91,14 @@ namespace Timberborn.ModsSystemUI
             _loading = root.Q<Label>("Loading");
             _error = root.Q<Label>("Error");
             _tags = root.Q<RadioButtonGroup>("Tags");
+            _showMore = root.Q<Button>("ShowMore");
+            _showMore.ToggleDisplayStyle(false);
 
             ShowModsAndTags();
 
             root.Q<Button>("Close").clicked += OnUICancelled;
             root.Q<Button>("SearchButton").clicked += UpdateMods;
+            _showMore.clicked += ShowMoreMods;
             _search = root.Q<TextField>("Search");
             _search.isDelayed = true;
             _search.RegisterValueChangedCallback(_ => UpdateMods());
@@ -112,19 +124,39 @@ namespace Timberborn.ModsSystemUI
             _panelStack.HideAndPush(box);
         }
 
+        private Filter Filter => _filter.And(Filter.WithLimit(ModsPerPage).Offset(_page * ModsPerPage));
+
         private void ShowModsAndTags()
         {
-            _loading.ToggleDisplayStyle(true);
-            _error.ToggleDisplayStyle(false);
+            //_loading.ToggleDisplayStyle(true);
+            //_error.ToggleDisplayStyle(false);
             _mods.Clear();
+            _page = 0;
 
-            var getModsTask = _addonService.GetMods().Search(_filter).ToList();
-            getModsTask.ConfigureAwait(true).GetAwaiter()
-                .OnCompleted(() => OnModsRetrieved(getModsTask));
+            ShowMods();
+
+            //var getModsTask = _addonService.GetMods().Search(_filter).ToList();
+            //getModsTask.ConfigureAwait(true).GetAwaiter()
+            //    .OnCompleted(() => OnModsRetrieved(getModsTask));
 
             var getTagsTask = _addonService.GetTags().Get();
             getTagsTask.ConfigureAwait(true).GetAwaiter()
                 .OnCompleted(() => OnTagsRetrieved(getTagsTask));
+        }
+
+        private void ShowMoreMods()
+        {
+            _page++;
+            ShowMods();
+        }
+
+        private void ShowMods()
+        {
+            _loading.ToggleDisplayStyle(true);
+            _error.ToggleDisplayStyle(false);
+            var getModsTask = _addonService.GetMods().Search(Filter).FirstPage();
+            getModsTask.ConfigureAwait(true).GetAwaiter()
+                .OnCompleted(() => OnModsRetrieved(getModsTask));
         }
 
         private void UpdateMods()
@@ -136,7 +168,7 @@ namespace Timberborn.ModsSystemUI
                 _filter = _filter.And(ModFilter.FullText.Eq(_search.value));
             }
 
-            if (_tags.value != -1)
+            if (_tags.value > 0)
             {
                 _filter = _filter.And(ModFilter.Tags.Eq(_tagOptions[_tags.value]));
             }
@@ -146,7 +178,9 @@ namespace Timberborn.ModsSystemUI
 
         private void OnTagsRetrieved(Task<IReadOnlyList<TagOption>> task)
         {
-            _tagOptions = task.Result.SelectMany(tagGroup => tagGroup.Tags).ToList();
+            _tagOptions.Clear();
+            _tagOptions.Add(_loc.T(AllLocKey));
+            _tagOptions.AddRange(task.Result.SelectMany(tagGroup => tagGroup.Tags));
             _tags.choices = _tagOptions;
 
             _tags.RegisterValueChangedCallback(_ => UpdateMods());
@@ -157,6 +191,10 @@ namespace Timberborn.ModsSystemUI
             try
             {
                 FillTheWrapper(task.Result);
+                if (task.Result.Count < ModsPerPage)
+                {
+                    _showMore.ToggleDisplayStyle(false);
+                }
             }
             catch (Exception e)
             {
@@ -167,12 +205,14 @@ namespace Timberborn.ModsSystemUI
         private async void FillTheWrapper(IReadOnlyCollection<Mod> mods)
         {
             _loading.ToggleDisplayStyle(false);
+            _showMore.ToggleDisplayStyle(true);
             foreach (var mod in mods)
             {
                 string assetName = "assets/resources/ui/views/mods/modsboxitem.uxml";
                 var asset = _bundle.LoadAsset<VisualTreeAsset>(assetName);
                 var item = _visualElementLoader.LoadVisualElement(asset);
                 item.Q<Label>("Name").text = mod.Name;
+                item.Q<Button>("ModsBoxItem").clicked += () => ShowFullInfo(mod);
                 item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod);
 
                 SetNumbers(mod, item);
@@ -180,6 +220,12 @@ namespace Timberborn.ModsSystemUI
 
                 _mods.Add(item);
             }
+        }
+
+        private void ShowFullInfo(Mod mod)
+        {
+            _panelStack.HideAndPush(_modFullInfoController);
+            _modFullInfoController.SetMod(mod);
         }
 
         private async Task DoDownloadAndExtract(Mod modInfo)
@@ -224,7 +270,7 @@ namespace Timberborn.ModsSystemUI
             if (mod.Logo != null)
             {
                 var byteArray = await _addonService.GetImage(mod.Logo.Thumb320x180);
-                var texture = new Texture2D(320, 180);
+                var texture = new Texture2D(1, 1);
                 texture.LoadImage(byteArray);
                 root.image = texture;
             }

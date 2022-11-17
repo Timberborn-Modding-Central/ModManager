@@ -10,8 +10,6 @@ namespace ModManagerUI.LocalizationSystem
     {
         public static void Patch(Harmony harmony)
         {
-            //var harmony = new Harmony("TimberApi.Localization");
-
             harmony.Patch(AccessTools.TypeByName("Timberborn.Localization.LocalizationRepository")
                                      .GetMethod("GetLocalization"),
                           postfix: new HarmonyMethod(AccessTools.Method(typeof(LocalizationPatcher), 

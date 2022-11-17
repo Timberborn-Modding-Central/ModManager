@@ -4,6 +4,10 @@
     flex-grow: 1;
 }
 
+.mods-box__mods {
+    margin-bottom: 20px;
+}
+
 .mods-box__mods .unity-scroll-view__content-container {
     flex-wrap: wrap;
     flex-direction: row;
@@ -36,11 +40,11 @@
     height: 24px;
     width: 24px;
     margin-left: 8px;
-    background-image: url('/assets/resources/ui/images/mods/search.png');
+    background-image: url('/assets/resources/UI/Images/Mods/search.png');
 }
 
 .mods-box__search-button:enabled:hover {
-    background-image: url('/assets/resources/ui/images/mods/search--hover.png');
+    background-image: url('/assets/resources/UI/Images/Mods/search--hover.png');
 }
 
 .mods-box__tags-label {
@@ -71,18 +75,13 @@
     color: rgb(255, 255, 255);
 }
 
-.mods-box__loading {
-    position: absolute;
-    top: 8px;
-    left: 258px;
-}
-
 .mods-box-item {
     --background-image: resource('UI/Images/Backgrounds/bg-square-1');
     --background-slice-scale: 0.5;
     --background-slice: 10;
     padding: 4px;
     margin: 8px;
+    align-self: center;
 }
 
 .mods-box-item:hover:enabled {
@@ -91,6 +90,7 @@
 
 .mods-box-item__header {
     padding-right: 4px;
+    width: 100%;
 }
 
 .mods-box-item__name {
@@ -103,7 +103,7 @@
     height: 14px;
     width: 16px;
     margin-right: 4px;
-    background-image: url('/assets/resources/ui/images/mods/thumbs-up.png');
+    background-image: url('/assets/resources/UI/Images/Mods/thumbs-up.png');
 }
 
 .mods-box-item__down-icon {
@@ -111,7 +111,12 @@
     width: 16px;
     margin-left: 12px;
     margin-right: 4px;
-    background-image: url('/assets/resources/ui/images/mods/thumbs-down.png');
+    background-image: url('/assets/resources/UI/Images/Mods/thumbs-down.png');
+}
+
+.mods-box-item__logo {
+    width: 320px;
+    height: 180px;
 }
 
 .mods-box-item__footer {
@@ -126,5 +131,36 @@
     width: 23px;
     margin-left: auto;
     margin-right: 4px;
-    background-image: url('/assets/resources/ui/images/mods/download.png');
+    background-image: url('/assets/resources/UI/Images/Mods/download.png');
+}
+
+.mods-box-full-item {
+    padding: 45px;
+    margin: 45px;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.mods-box-full-item__logo {
+    width: 320px;
+    height: 180px;
+    margin-right: 20px;
+}
+
+.mods-box-full-item__header-item-wrapper {
+    width: 300px;
+}
+
+.mods-box-full-item__label {
+    margin-right: auto;
+    -unity-text-align: middle-left;
+}
+
+.mods-box-full-item__description {
+    margin-top: 8px;
+    max-width: 1000px;
+}
+
+.mods-box-full-item__image {
+    margin: 10px;
 }
