@@ -22,11 +22,6 @@ namespace Timberborn.ModsSystemUI
 {
     public class ModsBox : IPanelController
     {
-
-
-        private VisualElement LoadVisualElement(string elementName) => LoadVisualElement(LoadVisualTreeAsset(elementName));
-        private VisualTreeAsset LoadVisualTreeAsset(string elementName) => _resourceAssetLoader.Load<VisualTreeAsset>($"{elementName}");
-
         private VisualElement LoadVisualElement(VisualTreeAsset visualTreeAsset)
         {
             VisualElement visualElement = visualTreeAsset.CloneTree().ElementAt(0);
@@ -43,7 +38,6 @@ namespace Timberborn.ModsSystemUI
         private readonly ModFullInfoController _modFullInfoController;
         private readonly ILoc _loc;
         private readonly VisualElementInitializer _visualElementInitializer;
-        private readonly IResourceAssetLoader _resourceAssetLoader;
         private VisualElement _mods;
         private Filter _filter = ModFilter.Downloads.Desc();
         private Label _loading;
@@ -63,7 +57,6 @@ namespace Timberborn.ModsSystemUI
                        PanelStack panelStack,
                        IAddonService addonService,
                        VisualElementInitializer visualElementInitializer,
-                       IResourceAssetLoader resourceAssetLoader,
                        GoodbyeBoxFactory goodbyeBoxFactory,
                        ModFullInfoController modFullInfoController,
                        ILoc loc)
@@ -73,7 +66,6 @@ namespace Timberborn.ModsSystemUI
             _addonService = addonService;
             OpenOptionsDelegate = OpenOptionsPanel;
             _visualElementInitializer = visualElementInitializer;
-            _resourceAssetLoader = resourceAssetLoader;
             _goodbyeBoxFactory = goodbyeBoxFactory;
             _modFullInfoController = modFullInfoController;
             _loc = loc;
@@ -128,16 +120,10 @@ namespace Timberborn.ModsSystemUI
 
         private void ShowModsAndTags()
         {
-            //_loading.ToggleDisplayStyle(true);
-            //_error.ToggleDisplayStyle(false);
             _mods.Clear();
             _page = 0;
 
             ShowMods();
-
-            //var getModsTask = _addonService.GetMods().Search(_filter).ToList();
-            //getModsTask.ConfigureAwait(true).GetAwaiter()
-            //    .OnCompleted(() => OnModsRetrieved(getModsTask));
 
             var getTagsTask = _addonService.GetTags().Get();
             getTagsTask.ConfigureAwait(true).GetAwaiter()

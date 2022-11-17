@@ -13,10 +13,6 @@ namespace Timberborn.ModsSystemUI
 {
     public class ModFullInfoController : IPanelController
     {
-        private VisualElement LoadVisualElement(string elementName) => LoadVisualElement(LoadVisualTreeAsset(elementName));
-
-        private VisualTreeAsset LoadVisualTreeAsset(string elementName) => _resourceAssetLoader.Load<VisualTreeAsset>($"{elementName}");
-
         private VisualElement LoadVisualElement(VisualTreeAsset visualTreeAsset)
         {
             VisualElement visualElement = visualTreeAsset.CloneTree().ElementAt(0);
@@ -25,29 +21,20 @@ namespace Timberborn.ModsSystemUI
         }
 
         private static readonly string ImageClass = "mods-box-full-item__image";
-        private readonly VisualElementLoader _visualElementLoader;
         private readonly VisualElementInitializer _visualElementInitializer;
-        private readonly IResourceAssetLoader _resourceAssetLoader;
         private readonly PanelStack _panelStack;
         private readonly IAddonService _addonService;
         private readonly VisualElement _item = new();
 
         private AssetBundle _bundle;
 
-        public ModFullInfoController(VisualElementLoader visualElementLoader,
-                                     PanelStack panelStack,
+        public ModFullInfoController(PanelStack panelStack,
                                      IAddonService addonService,
-                                     VisualElementInitializer visualElementInitializer,
-                                     IResourceAssetLoader resourceAssetLoader)
+                                     VisualElementInitializer visualElementInitializer)
         {
-            _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
             _addonService = addonService;
             _visualElementInitializer = visualElementInitializer;
-            _resourceAssetLoader = resourceAssetLoader;
-
-            //_bundle = AssetBundle.LoadFromFile(@"D:\Ohjelmat\Steam\steamapps\common\Timberborn\BepInEx\plugins\ModManager\assets\what.bundle");
-            //_bundle = AssetBundle.LoadFromFile($"{Path.Combine(Paths.ModManager.Assets, "what.bundle")}");
 
         }
 
@@ -97,7 +84,6 @@ namespace Timberborn.ModsSystemUI
                 var texture = new Texture2D(1, 1);
                 texture.LoadImage(byteArray);
                 root.image = texture;
-                //root.image = await _addonService.GetImage(mod.Logo.Thumb320x180);
             }
         }
 
@@ -127,24 +113,9 @@ namespace Timberborn.ModsSystemUI
             }
         }
 
-        private async Task AddImage2(Uri image, VisualElement root)
-        {
-            var byteArray = await _addonService.GetImage(image);
-            var texture = new Texture2D(1, 1);
-            texture.LoadImage(byteArray);
-            //root.image = texture;
-            var imageElement = new Image
-            {
-                image = texture
-                //image = await _addonService.GetImage(image)
-            };
-            imageElement.AddToClassList(ImageClass);
-            root.Add(imageElement);
-        }
 
         private async Task AddImage(Uri image, VisualElement root)
         {
-            //var imageTexture = await _addonService.GetImage(image);
             var byteArray = await _addonService.GetImage(image);
             var texture = new Texture2D(1, 1);
             texture.LoadImage(byteArray);

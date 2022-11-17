@@ -13,6 +13,7 @@ namespace ModManager.ModIoSystem
         private List<string> _foldersToIgnore = new() { "configs" };
 
         private const string _bepInExPackName = "BepInExPack";
+        private const string _timberApiName = "TimberAPI";
 
         public string Extract(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
@@ -24,7 +25,7 @@ namespace ModManager.ModIoSystem
             return ExtractMod(mapZipLocation, modInfo, overWrite);
         }
 
-        private string ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
+        public string ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
             var mapsInstallLocation = Paths.Maps;
             ZipFile.ExtractToDirectory(mapZipLocation, mapsInstallLocation, overWrite);
@@ -33,7 +34,7 @@ namespace ModManager.ModIoSystem
             return mapsInstallLocation;
         }
 
-        private string ExtractMod(string modZipLocation, Mod modInfo, bool overWrite = true)
+        public string ExtractMod(string modZipLocation, Mod modInfo, bool overWrite = true)
         {
             string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
             ClearOldModFiles(modInfo, modFolderName);
@@ -44,6 +45,12 @@ namespace ModManager.ModIoSystem
                 // TODO: Better way to get folders
                 fullModPath = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", modFolderName);
                 ZipFile.ExtractToDirectory(modZipLocation, fullModPath, overWrite);
+            }
+            else if(modInfo.Name.Equals(_timberApiName))
+            {
+                fullModPath = Path.Combine(Paths.Mods, modFolderName);
+                ZipFile.ExtractToDirectory(modZipLocation, Paths.Mods, overWrite);
+                Directory.Move(Path.Combine(Paths.Mods, _timberApiName), fullModPath);
             }
             else
             {
@@ -102,7 +109,6 @@ namespace ModManager.ModIoSystem
 
             DeleteFilesFromFolder(modDirInfo);
             TryDeleteFolder(modDirInfo);
-            //Console.WriteLine($"Deleted everything expect for {_foldersToIgnore.Aggregate((a, b) => $"{a}, {b}")}");
         }
 
         private void DeleteFilesFromFolder(DirectoryInfo dir)

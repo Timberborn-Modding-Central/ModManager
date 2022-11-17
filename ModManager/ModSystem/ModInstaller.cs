@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Modio.Models;
 using ModManager.AddonInstallerSystem;
 using ModManager.AddonSystem;
@@ -25,9 +26,13 @@ namespace ModManager.ModSystem
 
         public bool Install(Mod mod, string zipLocation)
         {
-            string installLocation = _extractor.Extract(zipLocation, mod);
+            if (!mod.Tags.Any(x => x.Name == "Mod"))
+            {
+                return false;
+            }
+            string installLocation = _extractor.ExtractMod(zipLocation, mod);
             var manifest = new Manifest(mod, mod.Modfile, installLocation);
-            string modManifestPath = Path.Combine(installLocation, "manifest.json");
+            string modManifestPath = Path.Combine(installLocation, Manifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
             _installedAddonRepository.Add(manifest);
 

@@ -91,7 +91,6 @@ namespace ModManager.AddonSystem
 
         public async Task<(string location, Mod Mod)> DownloadLatest(uint modId)
         {
-            //if(_installedAddonRepository.All().Any(x => x.Version))
             if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].IsInstalled())
             {
                 throw new AddonException($"Mod with id {modId} is already installed.");
