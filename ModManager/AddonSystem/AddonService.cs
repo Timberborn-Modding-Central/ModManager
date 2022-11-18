@@ -89,33 +89,33 @@ namespace ModManager.AddonSystem
             return ModIo.Client.Games[ModIoGameInfo.GameId].Tags;
         }
 
-        public async Task<(string location, Mod Mod)> DownloadLatest(uint modId)
+        public async Task<(string location, Mod Mod)> DownloadLatest(Mod mod)
         {
-            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].IsInstalled())
+            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].IsInstalled())
             {
-                throw new AddonException($"Mod with id {modId} is already installed.");
+                throw new AddonException($"Mod {mod.Name} is already installed.");
             }
-            var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
 
             Directory.CreateDirectory($"{Paths.ModManager.Temp}");
-            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{modId}_{mod.Modfile.Id}.zip");
+            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{mod.Id}_{mod.Modfile.Id}.zip");
 
             await ModIo.Client.Download(ModIoGameInfo.GameId,
-                                        modId,
+                                        mod.Id,
                                         new FileInfo(tempZipLocation));
             (string, Mod) result = new(tempZipLocation, mod);
             return result;
         }
 
-        private async IAsyncEnumerable<Dependency> GetDependencies(uint modid)
+        private async IAsyncEnumerable<Dependency> GetDependencies(Mod mod)
         {
-            var deps = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modid].Dependencies.Get();
+            var deps = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Dependencies.Get();
 
 
             foreach (var dep in deps)
             {
                 yield return dep;
-                await foreach (var dep2 in GetDependencies(dep.ModId))
+                var depMod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[dep.ModId].Get();
+                await foreach (var dep2 in GetDependencies(depMod))
                 {
                     yield return dep2;
                 }
@@ -124,12 +124,13 @@ namespace ModManager.AddonSystem
 
         public async IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod)
         {
-            await foreach (var dep in GetDependencies(mod.Id))
+            await foreach (var dep in GetDependencies(mod))
             {
+                var depMod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[dep.ModId].Get();
                 (string location, Mod Mod) returnvalue = new();
                 try
                 {
-                    returnvalue = await DownloadLatest(dep.ModId);
+                    returnvalue = await DownloadLatest(depMod);
                 }
                 catch (AddonException ex)
                 {
@@ -139,31 +140,31 @@ namespace ModManager.AddonSystem
             }
         }
 
-        public async Task<(string location, Mod Mod)> Download(uint modId, uint fileId)
+        public async Task<(string location, Mod Mod)> Download(Mod mod, File file)
         {
-            File file = new();
-            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].IsInstalled())
+            //File file = new();
+            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].IsInstalled())
             {
-                if (!_installedAddonRepository.TryGet(modId, out Manifest manifest))
+                if (!_installedAddonRepository.TryGet(mod.Id, out Manifest manifest))
                 {
                     throw new AddonException($"Couldn't find installed mod'd manifest.");
                 }
-                file = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Files[fileId].Get();
+                file = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files[file.Id].Get();
                 if (manifest.Version == file.Version)
                 {
-                    throw new AddonException($"Mod with id {modId} is already installed with version {file.Version}.");
+                    throw new AddonException($"Mod {mod.Name} is already installed with version {file.Version}.");
                 }
             }
 
-            var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
+            //var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
             mod.Modfile = file;
 
             Directory.CreateDirectory($"{Paths.ModManager.Temp}");
-            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{modId}_{fileId}.zip");
+            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{mod.Id}_{file.Version}.zip");
 
             await ModIo.Client.Download(ModIoGameInfo.GameId,
-                                   modId,
-                                   fileId,
+                                   mod.Id,
+                                   file.Id,
                                    new FileInfo(tempZipLocation));
             (string, Mod) result = new(tempZipLocation, mod);
             return result;

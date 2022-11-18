@@ -219,7 +219,7 @@ namespace Timberborn.ModsSystemUI
             IAsyncEnumerable<(string location, Mod Mod)> dependencies;
             try
             {
-                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo.Id);
+                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
 
                 dependencies = _addonService.DownloadDependencies(modInfo);
                 _addonService.Install(mod.Mod, mod.location);

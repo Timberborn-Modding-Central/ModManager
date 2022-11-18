@@ -22,11 +22,11 @@ namespace ModManager.AddonSystem
 
         GameTagsClient GetTags();
 
-        Task<(string location, Mod Mod)> DownloadLatest(uint modId);
+        Task<(string location, Mod Mod)> DownloadLatest(Mod mod);
 
         IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod);
 
-        Task<(string location, Mod Mod)> Download(uint modId, uint fileId);
+        Task<(string location, Mod Mod)> Download(Mod mod, File file);
 
         Task<byte[]> GetImage(Uri uri);
     }
