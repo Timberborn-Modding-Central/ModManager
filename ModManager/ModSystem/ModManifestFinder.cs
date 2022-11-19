@@ -26,11 +26,21 @@ namespace ModManager.ModSystem
             {
                 yield return LoadManifest(disabledManifest);
             }
+            FindRemovable();
+        }
+
+        public IEnumerable<Manifest> FindRemovable()
+        {
+            string removableManifestName = Manifest.FileName + Names.Extensions.Remove;
+            foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, removableManifestName, SearchOption.AllDirectories))
+            {
+                yield return LoadManifest(enabledManifest);
+            }
         }
 
         private Manifest LoadManifest(string manifestPath)
         {
-            var manifest = _persistenceService.LoadObject<Manifest>(manifestPath);
+            var manifest = _persistenceService.LoadObject<Manifest>(manifestPath, false);
 
             manifest.Enabled = ! Path.GetExtension(manifestPath).Equals(Names.Extensions.Disabled);
 
