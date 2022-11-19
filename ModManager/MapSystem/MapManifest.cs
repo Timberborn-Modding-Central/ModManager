@@ -11,9 +11,11 @@ namespace ModManager.MapSystem
         {
         }
 
-        public MapManifest(Mod mod, File file, string installationRootPath) : base(mod, file, installationRootPath)
+        public MapManifest(Mod mod, File file, string installationRootPath, string mapFleName) 
+            : base(mod, file, installationRootPath)
         {
-            MapFileName = $"{mod.NameId!.Trim()}_{file.Id}";
+            //MapFileName = $"{mod.NameId!.Trim()}_{file.Id}";
+            MapFileName = mapFleName;
         }
 
         public override Manifest Update(Mod mod, File file)
