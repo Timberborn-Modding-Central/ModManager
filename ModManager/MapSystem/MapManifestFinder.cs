@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using ModManager.AddonSystem;
 using ModManager.ManifestLocationFinderSystem;
-using ModManager.ModSystem;
 using ModManager.PersistenceSystem;
 
 namespace ModManager.MapSystem
@@ -27,16 +27,21 @@ namespace ModManager.MapSystem
 
             List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
 
-            SetEnabledStatus(manifests);
+            UpdateManifestInfo(manifests);
 
             return manifests;
         }
 
-        private void SetEnabledStatus(List<MapManifest> manifests)
+        public IEnumerable<Manifest> FindRemovable()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UpdateManifestInfo(List<MapManifest> manifests)
         {
             foreach (MapManifest mapManifest in manifests)
             {
-
+                mapManifest.RootPath = Paths.Maps;
             }
         }
     }

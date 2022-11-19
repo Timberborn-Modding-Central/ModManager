@@ -8,6 +8,8 @@ namespace ModManager.MapSystem
     // TODO: Idea is that this validates manifests on startup and removes invalid manifests
     //       Is this needed?
     //       Probably good to have atleast in someone manually deleted maps
+    //
+    //       For whenever maps are deleted we could check this indeed.
     public class MapManifestValidator
     {
         private readonly PersistenceService _persistenceService;

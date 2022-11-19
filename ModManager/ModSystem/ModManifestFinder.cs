@@ -26,16 +26,16 @@ namespace ModManager.ModSystem
             {
                 yield return LoadManifest(disabledManifest);
             }
-            FindRemovable();
+
+            foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Remove, SearchOption.AllDirectories))
+            {
+                yield return LoadManifest(enabledManifest);
+            }
         }
 
         public IEnumerable<Manifest> FindRemovable()
         {
-            string removableManifestName = Manifest.FileName + Names.Extensions.Remove;
-            foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, removableManifestName, SearchOption.AllDirectories))
-            {
-                yield return LoadManifest(enabledManifest);
-            }
+            return new List<Manifest>();
         }
 
         private Manifest LoadManifest(string manifestPath)
