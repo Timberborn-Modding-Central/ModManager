@@ -34,6 +34,7 @@ namespace ModManagerUI
             containerDefinition.Bind<ExtractorService>().ToInstance(ExtractorService.Instance);
             containerDefinition.Bind<GoodbyeBoxFactory>().AsSingleton();
             containerDefinition.Bind<ModFullInfoController>().AsSingleton();
+            containerDefinition.Bind<InstalledAddonRepository>().ToInstance(InstalledAddonRepository.Instance);
         }
     }
 }
