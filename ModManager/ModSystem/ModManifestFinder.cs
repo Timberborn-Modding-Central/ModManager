@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ModManager.AddonSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
@@ -17,6 +18,12 @@ namespace ModManager.ModSystem
 
         public IEnumerable<Manifest> Find()
         {
+            var bepInExManifest = Directory.GetFiles(Paths.GameRoot, Manifest.FileName).FirstOrDefault();
+            if(bepInExManifest != null)
+            {
+                yield return LoadManifest(bepInExManifest);
+            }
+
             foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName, SearchOption.AllDirectories))
             {
                 yield return LoadManifest(enabledManifest);
