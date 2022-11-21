@@ -22,6 +22,8 @@ namespace ModManager.AddonSystem
 
         private readonly AddonEnablerService _addonEnablerService;
 
+        private readonly Dictionary<Uri, byte[]> _imageCache = new();
+
         public AddonService()
         {
             _addonEnablerService = AddonEnablerService.Instance;
@@ -172,8 +174,15 @@ namespace ModManager.AddonSystem
 
         public async Task<byte[]> GetImage(Uri uri)
         {
+            if (_imageCache.ContainsKey(uri))
+            {
+                return _imageCache[uri];
+            }
+
             using var client = new HttpClient();
-            return await client.GetByteArrayAsync(uri);
+            var byteArray =  await client.GetByteArrayAsync(uri);
+            _imageCache[uri] = byteArray;
+            return byteArray;
         }
     }
 }
