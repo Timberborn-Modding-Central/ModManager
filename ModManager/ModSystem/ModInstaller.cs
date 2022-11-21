@@ -52,21 +52,16 @@ namespace ModManager.ModSystem
             }
             _installedAddonRepository.Remove(manifest.ModId);
 
-            MarkDllAndManifestFilesForDeletion(manifest);
-
-
-
-            try
+            var modDirInfo = new DirectoryInfo(Path.Combine(manifest.RootPath));
+            var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories);
+            foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
             {
-                //Directory.Delete(manifest.RootPath, true);
+                DeleteFilesFromFolder(subDirectory);
+                TryDeleteFolder(subDirectory);
             }
-            catch(UnauthorizedAccessException ex)
-            {
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+
+            DeleteFilesFromFolder(modDirInfo);
+            TryDeleteFolder(modDirInfo);
             return true;
         }
 
@@ -75,19 +70,47 @@ namespace ModManager.ModSystem
             throw new NotImplementedException();
         }
 
-        private void MarkDllAndManifestFilesForDeletion(Manifest manifest)
+
+        private void DeleteFilesFromFolder(DirectoryInfo dir)
         {
-            var dirInfo = new DirectoryInfo(manifest.RootPath);
-            var dllFiles = dirInfo.GetFiles("*.dll", SearchOption.AllDirectories);
-            foreach (var dllfile in dllFiles)
+            foreach (FileInfo file in dir.GetFiles())
             {
-                dllfile.MoveTo($"dllfile.Name.{Names.Extensions.Remove}");
+                try
+                {
+                    file.Delete();
+                }
+                catch(UnauthorizedAccessException ex)
+                {
+                    Console.WriteLine($"Move from {file.FullName} to {file.FullName}{Names.Extensions.Remove}");
+                    file.MoveTo($"{file.FullName}{Names.Extensions.Remove}");
+                }
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
             }
-            var manifestFullPath = Path.Combine(manifest.RootPath, Manifest.FileName);
-            var fileInfo = new FileInfo(manifestFullPath);
-            if(fileInfo.Exists)
+        }
+
+        private void TryDeleteFolder(DirectoryInfo dir)
+        {
+            try
             {
-                fileInfo.MoveTo($"{Manifest.FileName}.{Names.Extensions.Remove}");
+                if (dir.EnumerateDirectories().Any() == false && dir.EnumerateFiles().Any() == false)
+                {
+                    dir.Delete();
+                }
+                else
+                {
+                    dir.MoveTo($"{dir.FullName}{Names.Extensions.Remove}");
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"\t\tIO exc: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\t\texc: {ex.Message}");
             }
         }
     }
