@@ -42,9 +42,7 @@ namespace ModManager.ModIoSystem
             string fullModPath = "";
             if (modInfo.Name.Equals(_bepInExPackName))
             {
-                // TODO: Better way to get folders
-                fullModPath = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", modFolderName);
-                ZipFile.ExtractToDirectory(modZipLocation, fullModPath, overWrite);
+                fullModPath = Path.Combine(Paths.GameRoot);
             }
             else if(modInfo.Name.Equals(_timberApiName))
             {
@@ -91,14 +89,14 @@ namespace ModManager.ModIoSystem
                 {
                     return;
                 }
-                dirInfo.MoveTo(Path.Combine(Paths.ModManager.Data, modFolderName));
+                dirInfo.MoveTo(Path.Combine(Paths.Mods, modFolderName));
                 DeleteModFiles(modFolderName);
             }
         }
 
         private void DeleteModFiles(string modFolderName)
         {
-            var modDirInfo = new DirectoryInfo(Path.Combine(Paths.ModManager.Data, modFolderName));
+            var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Mods, modFolderName));
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
                                           .Where(folder => !_foldersToIgnore.Contains(folder.FullName.Split(Path.DirectorySeparatorChar).Last()));
             foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
