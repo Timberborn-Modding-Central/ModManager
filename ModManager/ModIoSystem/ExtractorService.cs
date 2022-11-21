@@ -100,7 +100,7 @@ namespace ModManager.ModIoSystem
         {
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.ModManager.Data, modFolderName));
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
-                                          .Where(file => !_foldersToIgnore.Contains(file.FullName.Split(Path.DirectorySeparatorChar).Last()));
+                                          .Where(folder => !_foldersToIgnore.Contains(folder.FullName.Split(Path.DirectorySeparatorChar).Last()));
             foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
@@ -113,7 +113,7 @@ namespace ModManager.ModIoSystem
 
         private void DeleteFilesFromFolder(DirectoryInfo dir)
         {
-            foreach (FileInfo file in dir.GetFiles())
+            foreach (FileInfo file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
             {
                 file.Delete();
             }
