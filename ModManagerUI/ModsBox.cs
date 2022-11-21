@@ -8,8 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Timberborn.AssetSystem;
+using Timberborn.Core;
 using Timberborn.CoreUI;
 using Timberborn.GameExitSystem;
 using Timberborn.Localization;
@@ -47,8 +49,12 @@ namespace Timberborn.ModsSystemUI
         private Button _showMore;
         private List<string> _tagOptions = new();
         private uint _page;
+        private readonly InstalledAddonRepository _installedAddonRepository;
 
-        private GoodbyeBoxFactory _goodbyeBoxFactory;
+        private bool _modsWereChanged = false;
+
+
+        private readonly DialogBoxShower _dialogBoxShower;
 
         private const string _bundleName = "what.bundle";
         public static AssetBundle _bundle;
@@ -57,20 +63,25 @@ namespace Timberborn.ModsSystemUI
                        PanelStack panelStack,
                        IAddonService addonService,
                        VisualElementInitializer visualElementInitializer,
-                       GoodbyeBoxFactory goodbyeBoxFactory,
                        ModFullInfoController modFullInfoController,
-                       ILoc loc)
+                       ILoc loc,
+                       InstalledAddonRepository installedAddonRepository,
+                       DialogBoxShower dialogBoxShower)
         {
             _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
             _addonService = addonService;
             OpenOptionsDelegate = OpenOptionsPanel;
             _visualElementInitializer = visualElementInitializer;
-            _goodbyeBoxFactory = goodbyeBoxFactory;
             _modFullInfoController = modFullInfoController;
             _loc = loc;
+            _installedAddonRepository = installedAddonRepository;
+            _dialogBoxShower = dialogBoxShower;
 
-            _bundle = AssetBundle.LoadFromFile($"{Path.Combine(UIPaths.ModManagerUI.Assets, _bundleName)}");
+            if (_bundle == null)
+            {
+                _bundle = AssetBundle.LoadFromFile($"{Path.Combine(UIPaths.ModManagerUI.Assets, _bundleName)}");
+            }
         }
 
         public VisualElement GetPanel()
@@ -109,11 +120,16 @@ namespace Timberborn.ModsSystemUI
 
         public void OnUICancelled()
         {
-            _panelStack.Pop(this);
-
-
-            var box = _goodbyeBoxFactory.ShowExitToDesktop();
-            _panelStack.HideAndPush(box);
+            if (_modsWereChanged)
+            {
+                _dialogBoxShower.Show("Restart your game",
+                                      GameQuitter.Quit, "Quit",
+                                      () => _panelStack.Pop(this), "No");
+            }
+            else
+            {
+                _panelStack.Pop(this);
+            }
         }
 
         private Filter Filter => _filter.And(Filter.WithLimit(ModsPerPage).Offset(_page * ModsPerPage));
@@ -199,12 +215,45 @@ namespace Timberborn.ModsSystemUI
                 var item = _visualElementLoader.LoadVisualElement(asset);
                 item.Q<Label>("Name").text = mod.Name;
                 item.Q<Button>("ModsBoxItem").clicked += () => ShowFullInfo(mod);
-                item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod);
 
+                var installedToggle = item.Q<Toggle>("Installed");
+                installedToggle.value = _installedAddonRepository.Has(mod.Id)
+                    ? true
+                    : false;
+
+                var enabledToggle = item.Q<Toggle>("Enabled");
+                bool modIsEnabled = false;
+                if (_installedAddonRepository.TryGet(mod.Id, out Manifest manifest))
+                {
+                    modIsEnabled = manifest.Enabled;
+                }
+                enabledToggle.value = modIsEnabled;
+                enabledToggle.RegisterValueChangedCallback((changeEvent) => ToggleEnabled(changeEvent, mod));
+
+
+                item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod, installedToggle);
+                item.Q<Button>("Uninstall").clicked += () => DoUninstall(mod, installedToggle, enabledToggle);
                 SetNumbers(mod, item);
-                await LoadImage(mod, item.Q<Image>("Logo"));
 
                 _mods.Add(item);
+            }
+
+            foreach (var mod in mods)
+            {
+                await LoadImage(mod, _mods.Children().Where(x => x.Q<Label>("Name").text == mod.Name).First().Q<Image>("Logo"));
+            }
+        }
+
+        private void ToggleEnabled(ChangeEvent<bool> changeEvent, Mod mod)
+        {
+            _modsWereChanged = true;
+            if (changeEvent.newValue == true)
+            {
+                _addonService.Enable(mod.Id);
+            }
+            else
+            {
+                _addonService.Disable(mod.Id);
             }
         }
 
@@ -214,8 +263,18 @@ namespace Timberborn.ModsSystemUI
             _modFullInfoController.SetMod(mod);
         }
 
-        private async Task DoDownloadAndExtract(Mod modInfo)
+        private void DoUninstall(Mod modInfo, Toggle isInstalledToggle, Toggle isEnabledToggle)
         {
+            _modsWereChanged = true;
+            Console.WriteLine($"Try to unistall!");
+            _addonService.Uninstall(modInfo.Id);
+            isInstalledToggle.SetValueWithoutNotify(false);
+            isEnabledToggle.SetValueWithoutNotify(false);
+        }
+
+        private async Task DoDownloadAndExtract(Mod modInfo, Toggle isInstalledToggle)
+        {
+            _modsWereChanged = true;
             IAsyncEnumerable<(string location, Mod Mod)> dependencies;
             try
             {
@@ -223,6 +282,7 @@ namespace Timberborn.ModsSystemUI
 
                 dependencies = _addonService.DownloadDependencies(modInfo);
                 _addonService.Install(mod.Mod, mod.location);
+                isInstalledToggle.value = true;
             }
             catch (AddonException ex)
             {
