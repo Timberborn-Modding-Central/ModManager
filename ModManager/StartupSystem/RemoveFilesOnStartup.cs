@@ -19,6 +19,7 @@ namespace ModManager.StartupSystem
         public void Load(ModManagerStartupOptions startupOptions)
         {
             DeleteRemoveTaggedFiles(Paths.GameRoot);
+            DeleteRemoveTaggedDirectories(Paths.GameRoot);
 
             foreach (Manifest manifest in _addonRepository.All())
             {
@@ -32,6 +33,14 @@ namespace ModManager.StartupSystem
             foreach (string removableFilePaths in Directory.GetFiles(path, $"*{Names.Extensions.Remove}", SearchOption.AllDirectories))
             {
                 _removalService.TryDeleteFile(removableFilePaths);
+            }
+        }
+
+        private void DeleteRemoveTaggedDirectories(string path)
+        {
+            foreach (string removableFilePaths in Directory.GetDirectories(path, $"*{Names.Extensions.Remove}", SearchOption.AllDirectories))
+            {
+                _removalService.TryDeleteEmptyDictionary(removableFilePaths);
             }
         }
     }
