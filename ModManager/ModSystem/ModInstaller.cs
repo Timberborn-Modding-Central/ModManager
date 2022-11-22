@@ -44,10 +44,8 @@ namespace ModManager.ModSystem
 
         public bool Uninstall(Manifest manifest)
         {
-            Console.WriteLine($"inside modinstaller");
             if (manifest is not Manifest && manifest is MapManifest)
             {
-                Console.WriteLine($"\"{manifest.ModName} is not a mod.");
                 return false;
             }
             _installedAddonRepository.Remove(manifest.ModId);
@@ -81,7 +79,6 @@ namespace ModManager.ModSystem
                 }
                 catch(UnauthorizedAccessException ex)
                 {
-                    Console.WriteLine($"Move from {file.FullName} to {file.FullName}{Names.Extensions.Remove}");
                     file.MoveTo($"{file.FullName}{Names.Extensions.Remove}");
                 }
                 catch(Exception ex)

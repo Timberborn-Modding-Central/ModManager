@@ -44,9 +44,7 @@ namespace ModManager.MapSystem
             zipFile.Dispose();
             string installLocation = _extractor.ExtractMap(zipLocation, mod);
 
-            // TODO: manifest handling is probably wrong atm
             var manifest = new MapManifest(mod, mod.Modfile, installLocation, timberFileName);
-
             var manifests = _mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();
             manifests.Add(manifest);
 
@@ -59,10 +57,8 @@ namespace ModManager.MapSystem
 
         public bool Uninstall(Manifest manifest)
         {
-            Console.WriteLine($"inside mapinstaller");
             if (manifest is not MapManifest)
             {
-                Console.WriteLine($"\"{manifest.ModName} is not a map.");
                 return false;
             }
 

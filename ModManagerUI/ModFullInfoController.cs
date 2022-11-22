@@ -50,7 +50,6 @@ namespace Timberborn.ModsSystemUI
             var asset = ModsBox._bundle.LoadAsset<VisualTreeAsset>(assetName);
             var item = LoadVisualElement(asset);
 
-            //var item = _visualElementLoader.LoadVisualElement("Mods/ModsBoxFullItem");
             item.Q<Button>("Close").clicked += OnUICancelled;
             item.Q<Label>("Name").text = mod.Name;
             item.Q<Label>("AuthorName").text = mod.SubmittedBy?.Username;

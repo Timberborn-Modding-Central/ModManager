@@ -14,7 +14,6 @@ namespace ModManager.MapSystem
         public MapManifest(Mod mod, File file, string installationRootPath, string mapFleName) 
             : base(mod, file, installationRootPath)
         {
-            //MapFileName = $"{mod.NameId!.Trim()}_{file.Id}";
             MapFileName = mapFleName;
         }
 

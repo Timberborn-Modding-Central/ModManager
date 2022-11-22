@@ -122,9 +122,9 @@ namespace Timberborn.ModsSystemUI
         {
             if (_modsWereChanged)
             {
-                _dialogBoxShower.Show("Restart your game",
-                                      GameQuitter.Quit, "Quit",
-                                      () => _panelStack.Pop(this), "No");
+                _dialogBoxShower.Show(_loc.T("Mods.ModsChanged"),
+                                      GameQuitter.Quit, _loc.T("Mods.Quit"),
+                                      () => _panelStack.Pop(this), _loc.T("Mods.Stay"));
             }
             else
             {
@@ -143,7 +143,10 @@ namespace Timberborn.ModsSystemUI
 
             var getTagsTask = _addonService.GetTags().Get();
             getTagsTask.ConfigureAwait(true).GetAwaiter()
-                .OnCompleted(() => OnTagsRetrieved(getTagsTask));
+                .OnCompleted(() => OnTagsRetrieved(getTagsTask))
+                ;
+
+            OnTagsRetrieved(getTagsTask);
         }
 
         private void ShowMoreMods()
@@ -177,6 +180,7 @@ namespace Timberborn.ModsSystemUI
 
             ShowModsAndTags();
         }
+
 
         private void OnTagsRetrieved(Task<IReadOnlyList<TagOption>> task)
         {
@@ -266,7 +270,6 @@ namespace Timberborn.ModsSystemUI
         private void DoUninstall(Mod modInfo, Toggle isInstalledToggle, Toggle isEnabledToggle)
         {
             _modsWereChanged = true;
-            Console.WriteLine($"Try to unistall!");
             _addonService.Uninstall(modInfo.Id);
             isInstalledToggle.SetValueWithoutNotify(false);
             isEnabledToggle.SetValueWithoutNotify(false);
