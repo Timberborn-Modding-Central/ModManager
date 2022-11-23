@@ -1,19 +1,16 @@
 using Modio.Filters;
 using Modio.Models;
-using ModManager;
 using ModManager.AddonSystem;
-using ModManager.ModIoSystem;
 using ModManagerUI;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Timberborn.AssetSystem;
 using Timberborn.Core;
 using Timberborn.CoreUI;
-using Timberborn.GameExitSystem;
 using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -22,6 +19,19 @@ using TextField = UnityEngine.UIElements.TextField;
 
 namespace Timberborn.ModsSystemUI
 {
+    enum InstalledOptions
+    {
+        Both,
+        Installed,
+        Uninstalled
+    }
+    enum EnabledOptions
+    {
+        Both,
+        Enabled,
+        NotEnabled
+    }
+
     public class ModsBox : IPanelController
     {
         private VisualElement LoadVisualElement(VisualTreeAsset visualTreeAsset)
@@ -46,8 +56,12 @@ namespace Timberborn.ModsSystemUI
         private Label _error;
         private TextField _search;
         private RadioButtonGroup _tags;
+        private RadioButtonGroup _options;
+        private RadioButtonGroup _enabledOptions;
         private Button _showMore;
         private List<string> _tagOptions = new();
+        private List<string> _optionsOptions = new();
+        private List<string> _enabledOptionsOptions = new();
         private uint _page;
         private readonly InstalledAddonRepository _installedAddonRepository;
 
@@ -58,6 +72,9 @@ namespace Timberborn.ModsSystemUI
 
         private const string _bundleName = "what.bundle";
         public static AssetBundle _bundle;
+
+        private static CancellationTokenSource s_cts = new CancellationTokenSource();
+        private static CancellationToken _token = s_cts.Token;
 
         public ModsBox(VisualElementLoader visualElementLoader,
                        PanelStack panelStack,
@@ -94,6 +111,8 @@ namespace Timberborn.ModsSystemUI
             _loading = root.Q<Label>("Loading");
             _error = root.Q<Label>("Error");
             _tags = root.Q<RadioButtonGroup>("Tags");
+            _options = root.Q<RadioButtonGroup>("Options");
+            _enabledOptions = root.Q<RadioButtonGroup>("EnabledOptions");
             _showMore = root.Q<Button>("ShowMore");
             _showMore.ToggleDisplayStyle(false);
 
@@ -105,6 +124,8 @@ namespace Timberborn.ModsSystemUI
             _search = root.Q<TextField>("Search");
             _search.isDelayed = true;
             _search.RegisterValueChangedCallback(_ => UpdateMods());
+            PopulateSpecialOptions();
+            PopulateEnabledOptions();
             return root;
         }
 
@@ -134,38 +155,35 @@ namespace Timberborn.ModsSystemUI
 
         private Filter Filter => _filter.And(Filter.WithLimit(ModsPerPage).Offset(_page * ModsPerPage));
 
-        private void ShowModsAndTags()
+        private async void ShowModsAndTags()
         {
             _mods.Clear();
             _page = 0;
 
-            ShowMods();
+            Task modsTask = ShowMods();
 
-            var getTagsTask = _addonService.GetTags().Get();
-            getTagsTask.ConfigureAwait(true).GetAwaiter()
-                .OnCompleted(() => OnTagsRetrieved(getTagsTask))
-                ;
-
-            OnTagsRetrieved(getTagsTask);
+            Task<IReadOnlyList<TagOption>> getTagsTask = _addonService.GetTags().Get();
+            OnTagsRetrieved(await getTagsTask);
         }
 
         private void ShowMoreMods()
         {
             _page++;
-            ShowMods();
+            Task modsTask = ShowMods();
         }
 
-        private void ShowMods()
+        private async Task ShowMods()
         {
             _loading.ToggleDisplayStyle(true);
             _error.ToggleDisplayStyle(false);
+
             var getModsTask = _addonService.GetMods().Search(Filter).FirstPage();
-            getModsTask.ConfigureAwait(true).GetAwaiter()
-                .OnCompleted(() => OnModsRetrieved(getModsTask));
+            Task modsRetrieved = OnModsRetrieved(await getModsTask);
         }
 
         private void UpdateMods()
         {
+            s_cts.Cancel();
             _filter = ModFilter.Downloads.Desc();
 
             if (!string.IsNullOrEmpty(_search.value))
@@ -178,29 +196,100 @@ namespace Timberborn.ModsSystemUI
                 _filter = _filter.And(ModFilter.Tags.Eq(_tagOptions[_tags.value]));
             }
 
+
+            if (_options.value >= 0)
+            {
+                switch (_optionsOptions[_options.value])
+                {
+                    case nameof(InstalledOptions.Installed):
+                        var installedModNames = _installedAddonRepository.All()
+                                                                         .Select(x => x.ModName)
+                                                                         .ToArray();
+                        var modFilter = ModFilter.Name.In(installedModNames);
+                        _filter = _filter.And(modFilter);
+                        break;
+                    case nameof(InstalledOptions.Uninstalled):
+                        var uninstalledModNames = _installedAddonRepository.All()
+                                                                           .Select(x => x.ModName)
+                                                                           .ToArray();
+                        var modFilter2 = ModFilter.Name.NotIn(uninstalledModNames);
+                        _filter = _filter.And(modFilter2);
+                        break;
+                    default:
+                        break;
+                }
+                if(_enabledOptions.value >= 0)
+                {
+                    switch (_enabledOptionsOptions[_enabledOptions.value])
+                    {
+                        case nameof(EnabledOptions.Enabled):
+                            var enabledModNames = _installedAddonRepository.All()
+                                                                           .Where(x => x.Enabled)
+                                                                           .Select(x => x.ModName)
+                                                                           .ToArray();
+                            var modFilter3 = ModFilter.Name.In(enabledModNames);
+                            _filter = _filter.And(modFilter3);
+                            break;
+                        case nameof(EnabledOptions.NotEnabled):
+                            var notEnabledModNames = _installedAddonRepository.All()
+                                                                              .Where(x => x.Enabled)
+                                                                              .Select(x => x.ModName)
+                                                                              .ToArray();
+                            var modFilter4 = ModFilter.Name.NotIn(notEnabledModNames);
+                            _filter = _filter.And(modFilter4);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
             ShowModsAndTags();
         }
 
+        private void PopulateSpecialOptions()
+        {
+            _optionsOptions.Clear();
+            _optionsOptions.AddRange(Enum.GetNames(typeof(InstalledOptions)));
+            _options.choices = _optionsOptions;
 
-        private void OnTagsRetrieved(Task<IReadOnlyList<TagOption>> task)
+            _options.RegisterValueChangedCallback(_ => UpdateMods());
+        }
+
+        private void PopulateEnabledOptions()
+        {
+            _enabledOptionsOptions.Clear();
+            _enabledOptionsOptions.AddRange(Enum.GetNames(typeof(EnabledOptions)));
+            _enabledOptions.choices = _enabledOptionsOptions;
+
+            _enabledOptions.RegisterValueChangedCallback(_ => UpdateMods());
+        }
+
+        private void OnTagsRetrieved(IReadOnlyList<TagOption> task)
         {
             _tagOptions.Clear();
             _tagOptions.Add(_loc.T(AllLocKey));
-            _tagOptions.AddRange(task.Result.SelectMany(tagGroup => tagGroup.Tags));
+            _tagOptions.AddRange(task.SelectMany(tagGroup => tagGroup.Tags));
             _tags.choices = _tagOptions;
 
             _tags.RegisterValueChangedCallback(_ => UpdateMods());
         }
 
-        private void OnModsRetrieved(Task<IReadOnlyList<Mod>> task)
+        private async Task OnModsRetrieved(IReadOnlyList<Mod> task)
         {
+            s_cts = new CancellationTokenSource();
+            _token = s_cts.Token;
             try
             {
-                FillTheWrapper(task.Result);
-                if (task.Result.Count < ModsPerPage)
+                await FillTheWrapper(task, _token);
+                if (task.Count < ModsPerPage)
                 {
                     _showMore.ToggleDisplayStyle(false);
                 }
+            }
+            catch(OperationCanceledException ex)
+            {
+                Console.WriteLine($"{ex.Message}");
             }
             catch (Exception e)
             {
@@ -208,7 +297,7 @@ namespace Timberborn.ModsSystemUI
             }
         }
 
-        private async void FillTheWrapper(IReadOnlyCollection<Mod> mods)
+        private async Task FillTheWrapper(IReadOnlyCollection<Mod> mods, CancellationToken token)
         {
             _loading.ToggleDisplayStyle(false);
             _showMore.ToggleDisplayStyle(true);
@@ -234,7 +323,6 @@ namespace Timberborn.ModsSystemUI
                 enabledToggle.value = modIsEnabled;
                 enabledToggle.RegisterValueChangedCallback((changeEvent) => ToggleEnabled(changeEvent, mod));
 
-
                 item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod, installedToggle);
                 item.Q<Button>("Uninstall").clicked += () => DoUninstall(mod, installedToggle, enabledToggle);
                 SetNumbers(mod, item);
@@ -244,6 +332,10 @@ namespace Timberborn.ModsSystemUI
 
             foreach (var mod in mods)
             {
+                if(token.IsCancellationRequested)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
                 await LoadImage(mod, _mods.Children().Where(x => x.Q<Label>("Name").text == mod.Name).First().Q<Image>("Logo"));
             }
         }
