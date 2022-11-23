@@ -15,6 +15,9 @@
                     </ui:VisualElement>
                     <Timberborn.CoreUI.LocalizableLabel text="Tags:" name="TagsLabel" text-loc-key="Mods.Tags" class="text--big mods-box__tags-label" />
                     <ui:RadioButtonGroup name="Tags" value="-1" class="mods-box__tags" />
+                    <Timberborn.CoreUI.LocalizableLabel text="Options:" name="OptionsLabel" text-loc-key="Mods.Options" class="text--big mods-box__tags-label" />
+                    <ui:RadioButtonGroup name="Options" value="-1" class="mods-box__tags" />
+                    <ui:RadioButtonGroup name="EnabledOptions" value="-1" class="mods-box__tags" style="margin-top:8px;"/>
                 </Timberborn.CoreUI.NineSliceVisualElement>
                 <ui:VisualElement name="ModsWrapper">
                     <ui:Label text="Error" name="Error" class="text--header" />
