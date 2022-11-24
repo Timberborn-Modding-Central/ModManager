@@ -25,7 +25,15 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="TagsWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
                         <Timberborn.CoreUI.LocalizableLabel name="TagsLabel" text="Tags" text-loc-key="Mods.Tags" class="text--default mods-box-full-item__label" />
-                        <ui:Label name="Tags" text="0" class="text--default" />
+                        <ui:Label name="Tags" text="" class="text--default" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="InstalledVersionWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
+                        <Timberborn.CoreUI.LocalizableLabel name="InstalledVersionLabel" text="InstalledVersion" text-loc-key="Mods.InstalledVersion" class="text--default mods-box-full-item__label" />
+                        <ui:Label name="InstalledVersion" text="" class="text--default" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="DependenciesWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
+                        <Timberborn.CoreUI.LocalizableLabel name="DependenciesLabel" text="Dependencies" text-loc-key="Mods.Dependencies" class="text--default mods-box-full-item__label" />
+                        <ui:Label name="Dependencies" text="-" class="text--default" />
                     </ui:VisualElement>
                     <Timberborn.CoreUI.LocalizableButton name="Download" text="Download" text-loc-key="Mods.Download" class="menu-button menu-button--medium" />
                 </ui:VisualElement>

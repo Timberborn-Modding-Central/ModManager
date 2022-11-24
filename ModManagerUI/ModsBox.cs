@@ -2,7 +2,6 @@ using Modio.Filters;
 using Modio.Models;
 using ModManager.AddonSystem;
 using ModManagerUI;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -297,6 +296,25 @@ namespace Timberborn.ModsSystemUI
             }
         }
 
+        private bool IsVersionHigher(string version1, string version2)
+        {
+            var version1Parts = version1.Split('.');
+            var version2Parts = version2.Split('.');
+
+            for (var i = 0; i < version1Parts.Count(); i++)
+            {
+                if(i == version2Parts.Count() && i < version1Parts.Count())
+                {
+                    return true;
+                }
+                if (int.Parse(version1Parts[i]) > int.Parse(version2Parts[i])) 
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private async Task FillTheWrapper(IReadOnlyCollection<Mod> mods, CancellationToken token)
         {
             _loading.ToggleDisplayStyle(false);
@@ -306,6 +324,7 @@ namespace Timberborn.ModsSystemUI
                 string assetName = "assets/resources/ui/views/mods/modsboxitem.uxml";
                 var asset = _bundle.LoadAsset<VisualTreeAsset>(assetName);
                 var item = _visualElementLoader.LoadVisualElement(asset);
+
                 item.Q<Label>("Name").text = mod.Name;
                 item.Q<Button>("ModsBoxItem").clicked += () => ShowFullInfo(mod);
 
@@ -319,6 +338,11 @@ namespace Timberborn.ModsSystemUI
                 if (_installedAddonRepository.TryGet(mod.Id, out Manifest manifest))
                 {
                     modIsEnabled = manifest.Enabled;
+                    var latestVersion = mod.Modfile.Version;
+                    if (IsVersionHigher(latestVersion, manifest.Version))
+                    {
+                        item.Q<Button>("Download").text = "Update";
+                    }
                 }
                 enabledToggle.value = modIsEnabled;
                 enabledToggle.RegisterValueChangedCallback((changeEvent) => ToggleEnabled(changeEvent, mod));

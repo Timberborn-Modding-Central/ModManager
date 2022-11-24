@@ -16,3 +16,5 @@ Mods.Enabled,Enabled,Toggle for if a mod is enabled or not. Keep short.
 Mods.Installed,Installed,Toggle for is a mod is installed or not. Keep short.
 Mods.Uninstall,Uninstall,Button to uninstall a mod.
 Mods.Options,Options:,Header above available list of special options. Keep short.
+Mods.Dependencies,Dependencies:,Header above available list of Dependencies. Keep short.
+Mods.InstalledVersion,Installed version:,Header above available list of InstalledVersion. Keep short.

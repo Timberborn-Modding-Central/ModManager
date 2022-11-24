@@ -1,6 +1,9 @@
 using Modio.Models;
+using ModManager;
 using ModManager.AddonSystem;
+using ModManager.ModIoSystem;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timberborn.AssetSystem;
@@ -25,17 +28,19 @@ namespace Timberborn.ModsSystemUI
         private readonly PanelStack _panelStack;
         private readonly IAddonService _addonService;
         private readonly VisualElement _item = new();
+        private readonly InstalledAddonRepository _installedAddonRepository;
 
         private AssetBundle _bundle;
 
         public ModFullInfoController(PanelStack panelStack,
                                      IAddonService addonService,
-                                     VisualElementInitializer visualElementInitializer)
+                                     VisualElementInitializer visualElementInitializer,
+                                     InstalledAddonRepository installedAddonRepository)
         {
             _panelStack = panelStack;
             _addonService = addonService;
             _visualElementInitializer = visualElementInitializer;
-
+            _installedAddonRepository = installedAddonRepository;
         }
 
         public VisualElement GetPanel()
@@ -57,6 +62,12 @@ namespace Timberborn.ModsSystemUI
             item.Q<Label>("Description").text = string.IsNullOrEmpty(mod.DescriptionPlaintext)
                 ? mod.Summary
                 : mod.DescriptionPlaintext;
+
+            item.Q<Label>("InstalledVersion").text = _installedAddonRepository.Has(mod.Id)
+                ? _installedAddonRepository.Get(mod.Id).Version 
+                : "-";
+
+            var depTask = SetDependencies(item, mod);
 
             LoadLogo(mod, item.Q<Image>("Logo"));
             SetNumbers(mod, item);
@@ -137,6 +148,23 @@ namespace Timberborn.ModsSystemUI
         {
             //return NumberFormatter.Format((int) number);
             return number.ToString();
+        }
+
+        private async Task SetDependencies(VisualElement item, Mod mod)
+        {
+            var deps = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Dependencies.Get();
+
+            Console.WriteLine($"deps count: {deps.Count()}");
+
+            List<string> dependencyNames = new();
+            foreach (var dep in deps)
+            {
+                dependencyNames.Add((await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[dep.ModId].Get()).Name);
+            }
+
+            item.Q<Label>("Dependencies").text = dependencyNames.Count() > 0
+                ? string.Join(Environment.NewLine, dependencyNames)
+                : "-";
         }
 
     }
