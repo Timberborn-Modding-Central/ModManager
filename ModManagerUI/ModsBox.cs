@@ -323,8 +323,14 @@ namespace Timberborn.ModsSystemUI
                 enabledToggle.value = modIsEnabled;
                 enabledToggle.RegisterValueChangedCallback((changeEvent) => ToggleEnabled(changeEvent, mod));
 
-                item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod, installedToggle);
-                item.Q<Button>("Uninstall").clicked += () => DoUninstall(mod, installedToggle, enabledToggle);
+                var uninstallButton = item.Q<Button>("Uninstall");
+                uninstallButton.clicked += () => DoUninstall(mod, installedToggle, enabledToggle, uninstallButton);
+                if(!_installedAddonRepository.Has(mod.Id))
+                {
+                    uninstallButton.visible = false;
+                }
+                item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod, installedToggle, uninstallButton);
+
                 SetNumbers(mod, item);
 
                 _mods.Add(item);
@@ -359,15 +365,16 @@ namespace Timberborn.ModsSystemUI
             _modFullInfoController.SetMod(mod);
         }
 
-        private void DoUninstall(Mod modInfo, Toggle isInstalledToggle, Toggle isEnabledToggle)
+        private void DoUninstall(Mod modInfo, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
         {
             _modsWereChanged = true;
             _addonService.Uninstall(modInfo.Id);
             isInstalledToggle.SetValueWithoutNotify(false);
             isEnabledToggle.SetValueWithoutNotify(false);
+            uninstallButton.visible = false;
         }
 
-        private async Task DoDownloadAndExtract(Mod modInfo, Toggle isInstalledToggle)
+        private async Task DoDownloadAndExtract(Mod modInfo, Toggle isInstalledToggle, Button uninstallButton)
         {
             _modsWereChanged = true;
             IAsyncEnumerable<(string location, Mod Mod)> dependencies;
@@ -378,6 +385,7 @@ namespace Timberborn.ModsSystemUI
                 dependencies = _addonService.DownloadDependencies(modInfo);
                 _addonService.Install(mod.Mod, mod.location);
                 isInstalledToggle.value = true;
+                uninstallButton.visible = true;
             }
             catch (AddonException ex)
             {
