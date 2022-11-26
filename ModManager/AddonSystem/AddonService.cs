@@ -57,6 +57,10 @@ namespace ModManager.AddonSystem
             {
                 throw new AddonException($"Cannot change version of {mod.Name}. Mod is not installed.");
             }
+            if (_installedAddonRepository.Get(mod.Id).Version == file.Version)
+            {
+                throw new AddonException($"{mod.Name} is already installed with version {file.Version}.");
+            }
 
             _addonInstallerService.ChangeVersion(mod, file, zipLocation);
         }
@@ -93,7 +97,8 @@ namespace ModManager.AddonSystem
 
         public async Task<(string location, Mod Mod)> DownloadLatest(Mod mod)
         {
-            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].IsInstalled())
+            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].IsInstalled() &&
+                !VersionComparer.IsVersionHigher(mod.Modfile.Version, _installedAddonRepository.Get(mod.Id).Version))
             {
                 throw new AddonException($"Mod {mod.Name} is already installed.");
             }
@@ -144,7 +149,6 @@ namespace ModManager.AddonSystem
 
         public async Task<(string location, Mod Mod)> Download(Mod mod, File file)
         {
-            //File file = new();
             if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].IsInstalled())
             {
                 if (!_installedAddonRepository.TryGet(mod.Id, out Manifest manifest))
@@ -158,7 +162,6 @@ namespace ModManager.AddonSystem
                 }
             }
 
-            //var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[modId].Get();
             mod.Modfile = file;
 
             Directory.CreateDirectory($"{Paths.ModManager.Temp}");

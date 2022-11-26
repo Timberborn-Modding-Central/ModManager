@@ -1,5 +1,6 @@
 using Modio.Filters;
 using Modio.Models;
+using ModManager;
 using ModManager.AddonSystem;
 using ModManagerUI;
 using System;
@@ -296,25 +297,6 @@ namespace Timberborn.ModsSystemUI
             }
         }
 
-        private bool IsVersionHigher(string version1, string version2)
-        {
-            var version1Parts = version1.Split('.');
-            var version2Parts = version2.Split('.');
-
-            for (var i = 0; i < version1Parts.Count(); i++)
-            {
-                if(i == version2Parts.Count() && i < version1Parts.Count())
-                {
-                    return true;
-                }
-                if (int.Parse(version1Parts[i]) > int.Parse(version2Parts[i])) 
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         private async Task FillTheWrapper(IReadOnlyCollection<Mod> mods, CancellationToken token)
         {
             _loading.ToggleDisplayStyle(false);
@@ -339,13 +321,13 @@ namespace Timberborn.ModsSystemUI
                 {
                     modIsEnabled = manifest.Enabled;
                     var latestVersion = mod.Modfile.Version;
-                    if (IsVersionHigher(latestVersion, manifest.Version))
+                    if (VersionComparer.IsVersionHigher(latestVersion, manifest.Version))
                     {
                         item.Q<Button>("Download").text = "Update";
                     }
                 }
                 enabledToggle.value = modIsEnabled;
-                enabledToggle.RegisterValueChangedCallback((changeEvent) => ToggleEnabled(changeEvent, mod));
+                enabledToggle.RegisterValueChangedCallback((changeEvent) => ToggleEnabled(changeEvent, mod, enabledToggle));
 
                 var uninstallButton = item.Q<Button>("Uninstall");
                 uninstallButton.clicked += () => DoUninstall(mod, installedToggle, enabledToggle, uninstallButton);
@@ -370,16 +352,28 @@ namespace Timberborn.ModsSystemUI
             }
         }
 
-        private void ToggleEnabled(ChangeEvent<bool> changeEvent, Mod mod)
+        private void ToggleEnabled(ChangeEvent<bool> changeEvent, Mod mod, Toggle enabledToggle)
         {
             _modsWereChanged = true;
-            if (changeEvent.newValue == true)
+            try
             {
-                _addonService.Enable(mod.Id);
+                if (changeEvent.newValue == true)
+                {
+                    _addonService.Enable(mod.Id);
+                }
+                else
+                {
+                    _addonService.Disable(mod.Id);
+                }
             }
-            else
+            catch (AddonException ex)
             {
-                _addonService.Disable(mod.Id);
+                enabledToggle.SetValueWithoutNotify(changeEvent.previousValue);
+                Console.WriteLine(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
@@ -405,9 +399,16 @@ namespace Timberborn.ModsSystemUI
             try
             {
                 (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
-
                 dependencies = _addonService.DownloadDependencies(modInfo);
-                _addonService.Install(mod.Mod, mod.location);
+
+                if (_installedAddonRepository.TryGet(mod.Mod.Id, out Manifest manifest) &&
+                   manifest.Version != mod.Mod.Modfile.Version)
+                {
+                    _addonService.ChangeVersion(mod.Mod, mod.Mod.Modfile, mod.location);
+                }
+                else {
+                    _addonService.Install(mod.Mod, mod.location);
+                }
                 isInstalledToggle.value = true;
                 uninstallButton.visible = true;
             }
@@ -419,7 +420,15 @@ namespace Timberborn.ModsSystemUI
             {
                 try
                 {
-                    _addonService.Install(foo.Mod, foo.location);
+                    if (_installedAddonRepository.TryGet(foo.Mod.Id, out Manifest manifest) &&
+                       manifest.Version != foo.Mod.Modfile.Version)
+                    {
+                        _addonService.ChangeVersion(foo.Mod, foo.Mod.Modfile, foo.location);
+                    }
+                    else
+                    {
+                        _addonService.Install(foo.Mod, foo.location);
+                    }
                 }
                 catch (AddonException ex)
                 {

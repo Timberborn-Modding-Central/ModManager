@@ -65,7 +65,20 @@ namespace ModManager.ModSystem
 
         public bool ChangeVersion(Mod mod, Modio.Models.File file, string zipLocation)
         {
-            throw new NotImplementedException();
+            if (!mod.Tags.Any(x => x.Name == "Mod"))
+            {
+                return false;
+            }
+            mod.Modfile= file;
+            string installLocation = _extractor.ExtractMod(zipLocation, mod);
+            var manifest = new Manifest(mod, mod.Modfile, installLocation);
+            string modManifestPath = Path.Combine(installLocation, Manifest.FileName);
+            _persistenceService.SaveObject(manifest, modManifestPath);
+
+            _installedAddonRepository.Remove(mod.Id);
+            _installedAddonRepository.Add(manifest);
+
+            return true;
         }
 
 

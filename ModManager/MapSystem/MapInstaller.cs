@@ -77,6 +77,10 @@ namespace ModManager.MapSystem
 
         public bool ChangeVersion(Mod mod, File file, string zipLocation)
         {
+            if (!mod.Tags.Any(x => x.Name == "Map"))
+            {
+                return false;
+            }
             throw new System.NotImplementedException();
         }
     }
