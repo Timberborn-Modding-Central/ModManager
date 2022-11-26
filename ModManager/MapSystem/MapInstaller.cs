@@ -39,10 +39,10 @@ namespace ModManager.MapSystem
             var zipFile = ZipFile.OpenRead(zipLocation);
             var timberFileName = zipFile.Entries
                                     .Where(x => x.Name.Contains(".timber"))
-                                    .Single()
+                                    .SingleOrDefault()?
                                     .Name;
             zipFile.Dispose();
-            string installLocation = _extractor.ExtractMap(zipLocation, mod);
+            string installLocation = _extractor.ExtractMap(zipLocation, mod, false);
 
             var manifest = new MapManifest(mod, mod.Modfile, installLocation, timberFileName);
             var manifests = _mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();

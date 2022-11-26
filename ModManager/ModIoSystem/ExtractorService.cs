@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Text;
 using System.Linq;
+using System.Diagnostics;
+using ModManager.MapSystem;
 
 namespace ModManager.ModIoSystem
 {
@@ -27,8 +29,16 @@ namespace ModManager.ModIoSystem
 
         public string ExtractMap(string mapZipLocation, Mod modInfo, bool overWrite = true)
         {
+            var zipFile = ZipFile.OpenRead(mapZipLocation);
+            var timberFile = zipFile.Entries
+                                    .Where(x => x.Name.Contains(".timber"))
+                                    .SingleOrDefault() ?? throw new MapException("Map zip does not contain an entry for a .timber file");
+
+            timberFile.ExtractToFile(Path.Combine(Paths.Maps, timberFile.Name));
+            zipFile.Dispose();
+
             var mapsInstallLocation = Paths.Maps;
-            ZipFile.ExtractToDirectory(mapZipLocation, mapsInstallLocation, overWrite);
+
             System.IO.File.Delete(mapZipLocation);
 
             return mapsInstallLocation;
@@ -44,18 +54,11 @@ namespace ModManager.ModIoSystem
             {
                 fullModPath = Path.Combine(Paths.GameRoot, "BepInEx");
             }
-            else if(modInfo.Name.Equals(_timberApiName))
-            {
-                fullModPath = Path.Combine(Paths.Mods, modFolderName);
-                ZipFile.ExtractToDirectory(modZipLocation, Paths.Mods, overWrite);
-                Directory.Move(Path.Combine(Paths.Mods, _timberApiName), fullModPath);
-            }
             else
             {
                 fullModPath = Path.Combine(Paths.Mods, modFolderName);
                 ZipFile.ExtractToDirectory(modZipLocation, fullModPath, overWrite);
             }
-
             System.IO.File.Delete(modZipLocation);
             return fullModPath;
         }

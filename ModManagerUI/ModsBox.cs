@@ -2,6 +2,7 @@ using Modio.Filters;
 using Modio.Models;
 using ModManager;
 using ModManager.AddonSystem;
+using ModManager.MapSystem;
 using ModManagerUI;
 using System;
 using System.Collections.Generic;
@@ -412,12 +413,20 @@ namespace Timberborn.ModsSystemUI
                 else {
                     _addonService.Install(mod.Mod, mod.location);
                 }
-                isInstalledToggle.value = true;
+                isInstalledToggle.SetValueWithoutNotify(true);
                 uninstallButton.visible = true;
+            }
+            catch (MapException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
             }
             catch (AddonException ex)
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
             }
             await foreach (var foo in _addonService.DownloadDependencies(modInfo))
             {
