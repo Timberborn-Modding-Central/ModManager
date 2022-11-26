@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ModManager.AddonSystem;
@@ -19,7 +20,7 @@ namespace ModManager.ModSystem
         public IEnumerable<Manifest> Find()
         {
             var bepInExManifest = Directory.GetFiles(Paths.GameRoot, Manifest.FileName).FirstOrDefault();
-            if(bepInExManifest != null)
+            if (bepInExManifest != null)
             {
                 yield return LoadManifest(bepInExManifest);
             }

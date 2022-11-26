@@ -42,7 +42,7 @@ namespace ModManager.ModIoSystem
             string fullModPath = "";
             if (modInfo.Name.Equals(_bepInExPackName))
             {
-                fullModPath = Path.Combine(Paths.GameRoot);
+                fullModPath = Path.Combine(Paths.GameRoot, "BepInEx");
             }
             else if(modInfo.Name.Equals(_timberApiName))
             {
@@ -113,7 +113,18 @@ namespace ModManager.ModIoSystem
         {
             foreach (FileInfo file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
             {
-                file.Delete();
+                try
+                {
+                    file.Delete();
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    file.MoveTo($"{file.FullName}{Names.Extensions.Remove}");
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             }
         }
 
