@@ -62,10 +62,10 @@ namespace Timberborn.ModsSystemUI
             item.Q<Label>("Description").text = string.IsNullOrEmpty(mod.DescriptionPlaintext)
                 ? mod.Summary
                 : mod.DescriptionPlaintext;
-
             item.Q<Label>("InstalledVersion").text = _installedAddonRepository.Has(mod.Id)
                 ? _installedAddonRepository.Get(mod.Id).Version 
                 : "-";
+            item.Q<Label>("LatestVersion").text = mod?.Modfile?.Version ?? "";
 
             var depTask = SetDependencies(item, mod);
 
