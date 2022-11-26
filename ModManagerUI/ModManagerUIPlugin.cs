@@ -7,6 +7,7 @@ using ModManagerUI.LocalizationSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace ModManagerUI
@@ -24,8 +25,10 @@ namespace ModManagerUI
                 options.GameId = 3659;
                 options.GamePath = BepInEx.Paths.GameRootPath;
                 options.IsGameRunning = true;
-                options.ModInstallationPath = Path.Combine(BepInEx.Paths.GameRootPath, "mods");
+                //options.ModInstallationPath = Path.Combine(BepInEx.Paths.GameRootPath, "mods");
+                options.ModInstallationPath = Path.Combine(Paths.PluginPath);
                 options.ModIoGameUrl = "https://mod.io/g/timberborn";
+                //options.ModManagerPath = Path.Combine(options.ModInstallationPath, "ModManager", "plugins");
                 options.ModManagerPath = Path.Combine(Paths.PluginPath, "ModManager");
             });
 

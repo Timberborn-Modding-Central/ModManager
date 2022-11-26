@@ -19,7 +19,7 @@ namespace ModManager.ModSystem
 
         public IEnumerable<Manifest> Find()
         {
-            var bepInExManifest = Directory.GetFiles(Paths.GameRoot, Manifest.FileName).FirstOrDefault();
+            var bepInExManifest = Directory.GetFiles(Path.Combine(Paths.GameRoot, "BepInEx"), Manifest.FileName).FirstOrDefault();
             if (bepInExManifest != null)
             {
                 yield return LoadManifest(bepInExManifest);
