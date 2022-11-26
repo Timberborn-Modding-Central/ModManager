@@ -311,9 +311,12 @@ namespace Timberborn.ModsSystemUI
                 item.Q<Button>("ModsBoxItem").clicked += () => ShowFullInfo(mod);
 
                 var installedToggle = item.Q<Toggle>("Installed");
-                installedToggle.value = _installedAddonRepository.Has(mod.Id)
+                bool isInstalled = _installedAddonRepository.Has(mod.Id)
                     ? true
                     : false;
+                installedToggle.SetValueWithoutNotify(isInstalled);
+                // HACK: using SetEnabled(false) greys the Toggle and dunno how to fix that ;_;
+                installedToggle.RegisterValueChangedCallback((changeEvent) => installedToggle.SetValueWithoutNotify(changeEvent.previousValue));
 
                 var enabledToggle = item.Q<Toggle>("Enabled");
                 bool modIsEnabled = false;
