@@ -70,7 +70,7 @@ namespace Timberborn.ModsSystemUI
 
         private readonly DialogBoxShower _dialogBoxShower;
 
-        private const string _bundleName = "what.bundle";
+        private const string _bundleName = "modmanagerui.bundle";
         public static AssetBundle _bundle;
 
         private static CancellationTokenSource s_cts = new CancellationTokenSource();
