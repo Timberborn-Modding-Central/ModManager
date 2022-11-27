@@ -143,13 +143,9 @@ namespace ModManager.ModIoSystem
                     dir.Delete();
                 }
             }
-            catch (IOException ex)
+            catch (Exception)
             {
-                Console.WriteLine($"\t\tIO exc: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"\t\texc: {ex.Message}");
+                throw;
             }
         }
     }

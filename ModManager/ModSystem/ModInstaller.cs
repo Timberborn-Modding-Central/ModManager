@@ -114,13 +114,9 @@ namespace ModManager.ModSystem
                     dir.MoveTo($"{dir.FullName}{Names.Extensions.Remove}");
                 }
             }
-            catch (IOException ex)
+            catch (Exception)
             {
-                Console.WriteLine($"\t\tIO exc: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"\t\texc: {ex.Message}");
+                throw;
             }
         }
     }

@@ -373,7 +373,7 @@ namespace Timberborn.ModsSystemUI
             catch (AddonException ex)
             {
                 enabledToggle.SetValueWithoutNotify(changeEvent.previousValue);
-                Console.WriteLine(ex.Message);
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
             }
             catch (Exception)
             {
