@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ModManager.AddonSystem;
+using ModManager.BepInExSystem;
 using ModManager.MapSystem;
 using ModManager.ModIoSystem;
 using ModManager.ModSystem;
@@ -21,7 +22,7 @@ namespace ModManager.StartupSystem
             ModIoGameInfo.Instance,
             ModRegisterer.Instance,
             MapRegisterer.Instance,
-
+            BepInExRegisterer.Instance,
 
 
             InstalledAddonRepository.Instance,
