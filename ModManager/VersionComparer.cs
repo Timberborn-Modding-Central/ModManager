@@ -9,6 +9,8 @@ namespace ModManager
     {
         public static bool IsVersionHigher(string version1, string version2)
         {
+            if(version1 == null) { return false; }
+            if(version2 == null) { return true; }
             var version1Parts = version1.Split('.');
             var version2Parts = version2.Split('.');
 
