@@ -154,8 +154,6 @@ namespace Timberborn.ModsSystemUI
         {
             var deps = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Dependencies.Get();
 
-            Console.WriteLine($"deps count: {deps.Count()}");
-
             List<string> dependencyNames = new();
             foreach (var dep in deps)
             {

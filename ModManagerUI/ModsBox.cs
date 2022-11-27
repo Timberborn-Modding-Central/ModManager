@@ -74,8 +74,8 @@ namespace Timberborn.ModsSystemUI
         private const string _bundleName = "modmanagerui.bundle";
         public static AssetBundle _bundle;
 
-        private static CancellationTokenSource s_cts = new CancellationTokenSource();
-        private static CancellationToken _token = s_cts.Token;
+        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private static CancellationToken _token = _cancellationTokenSource.Token;
 
         public ModsBox(VisualElementLoader visualElementLoader,
                        PanelStack panelStack,
@@ -184,7 +184,7 @@ namespace Timberborn.ModsSystemUI
 
         private void UpdateMods()
         {
-            s_cts.Cancel();
+            _cancellationTokenSource.Cancel();
             _filter = ModFilter.Downloads.Desc();
 
             if (!string.IsNullOrEmpty(_search.value))
@@ -278,8 +278,8 @@ namespace Timberborn.ModsSystemUI
 
         private async Task OnModsRetrieved(IReadOnlyList<Mod> task)
         {
-            s_cts = new CancellationTokenSource();
-            _token = s_cts.Token;
+            _cancellationTokenSource = new CancellationTokenSource();
+            _token = _cancellationTokenSource.Token;
             try
             {
                 await FillTheWrapper(task, _token);
@@ -290,7 +290,7 @@ namespace Timberborn.ModsSystemUI
             }
             catch(OperationCanceledException ex)
             {
-                Console.WriteLine($"{ex.Message}");
+                ModManagerUIPlugin.Log.LogWarning($"{ex.Message}");
             }
             catch (Exception e)
             {
@@ -399,18 +399,26 @@ namespace Timberborn.ModsSystemUI
         private async Task DoDownloadAndExtract(Mod modInfo, Toggle isInstalledToggle, Button uninstallButton)
         {
             _modsWereChanged = true;
-            IAsyncEnumerable<(string location, Mod Mod)> dependencies;
+            (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
+            TryInstall(mod, isInstalledToggle, uninstallButton);
+
+            await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
+            {
+                TryInstall(dependency, isInstalledToggle, uninstallButton);
+            }
+        }
+
+        private void TryInstall((string location, Mod Mod) mod, Toggle isInstalledToggle, Button uninstallButton)
+        {
             try
             {
-                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
-                dependencies = _addonService.DownloadDependencies(modInfo);
-
                 if (_installedAddonRepository.TryGet(mod.Mod.Id, out Manifest manifest) &&
                    manifest.Version != mod.Mod.Modfile.Version)
                 {
                     _addonService.ChangeVersion(mod.Mod, mod.Mod.Modfile, mod.location);
                 }
-                else {
+                else
+                {
                     _addonService.Install(mod.Mod, mod.location);
                 }
                 isInstalledToggle.SetValueWithoutNotify(true);
@@ -427,25 +435,6 @@ namespace Timberborn.ModsSystemUI
             catch (Exception)
             {
                 throw;
-            }
-            await foreach (var foo in _addonService.DownloadDependencies(modInfo))
-            {
-                try
-                {
-                    if (_installedAddonRepository.TryGet(foo.Mod.Id, out Manifest manifest) &&
-                       manifest.Version != foo.Mod.Modfile.Version)
-                    {
-                        _addonService.ChangeVersion(foo.Mod, foo.Mod.Modfile, foo.location);
-                    }
-                    else
-                    {
-                        _addonService.Install(foo.Mod, foo.location);
-                    }
-                }
-                catch (AddonException ex)
-                {
-                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
-                }
             }
         }
 
