@@ -70,10 +70,13 @@ namespace ModManager.ModIoSystem
             {
                 dirs = Directory.GetDirectories(Paths.Mods, $"{modInfo.NameId}_{modInfo.Id}*").SingleOrDefault();
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
-                Console.WriteLine($"Found multiple folders for for \"{modInfo.Name}\"");
-                Console.WriteLine($"{ex.Message}");
+                throw new ExtractorException($"Found multiple folders for \"{modInfo.Name}\"");
+            }
+            catch (Exception)
+            {
+                throw;
             }
             if (dirs != null)
             {
