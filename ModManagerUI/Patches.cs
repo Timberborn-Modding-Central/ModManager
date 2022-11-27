@@ -1,7 +1,7 @@
 ﻿using Bindito.Core;
 using HarmonyLib;
 using ModManager.AddonSystem;
-using ModManager.ModIoSystem;
+using ModManager.ExtractorSystem;
 using System;
 using Timberborn.GameExitSystem;
 using Timberborn.MainMenuScene;

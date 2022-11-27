@@ -7,8 +7,9 @@ using System.Text;
 using System.Linq;
 using System.Diagnostics;
 using ModManager.MapSystem;
+using ModManager.ModIoSystem;
 
-namespace ModManager.ModIoSystem
+namespace ModManager.ExtractorSystem
 {
     public class ExtractorService : Singleton<ExtractorService>
     {

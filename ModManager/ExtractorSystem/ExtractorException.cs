@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModManager.ModIoSystem
+namespace ModManager.ExtractorSystem
 {
     public class ExtractorException : Exception
     {

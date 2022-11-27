@@ -1,7 +1,7 @@
 ﻿using Modio.Models;
 using ModManager.AddonInstallerSystem;
 using ModManager.AddonSystem;
-using ModManager.ModIoSystem;
+using ModManager.ExtractorSystem;
 using ModManager.PersistenceSystem;
 using System;
 using System.Collections.Generic;

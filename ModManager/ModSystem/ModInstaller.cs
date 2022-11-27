@@ -6,8 +6,8 @@ using System.Linq;
 using Modio.Models;
 using ModManager.AddonInstallerSystem;
 using ModManager.AddonSystem;
+using ModManager.ExtractorSystem;
 using ModManager.MapSystem;
-using ModManager.ModIoSystem;
 using ModManager.PersistenceSystem;
 
 namespace ModManager.ModSystem
