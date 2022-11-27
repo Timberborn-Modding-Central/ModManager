@@ -34,11 +34,14 @@ namespace ModManager.MapSystem
             {
                 return false;
             }
-            using var zipFile = ZipFile.OpenRead(zipLocation);
-            var timberFileName = zipFile.Entries
-                                    .Where(x => x.Name.Contains(".timber"))
-                                    .SingleOrDefault()?
-                                    .Name;
+            string timberFileName = "";
+            using (ZipArchive zipFile = ZipFile.OpenRead(zipLocation))
+            {
+                timberFileName = zipFile.Entries
+                                        .Where(x => x.Name.Contains(".timber"))
+                                        .SingleOrDefault()?
+                                        .Name ?? "";
+            }
             string installLocation = _extractor.Extract(mod, zipLocation);
 
             var manifest = new MapManifest(mod, mod.Modfile, installLocation, timberFileName);

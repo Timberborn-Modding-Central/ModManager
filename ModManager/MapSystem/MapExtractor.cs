@@ -1,5 +1,6 @@
 ﻿using Modio.Models;
 using ModManager.ExtractorSystem;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -15,12 +16,13 @@ namespace ModManager.MapSystem
             {
                 return false;
             }
-            using var zipFile = ZipFile.OpenRead(addonZipLocation);
-            var timberFile = zipFile.Entries
-                                    .Where(x => x.Name.Contains(".timber"))
-                                    .SingleOrDefault() ?? throw new MapException("Map zip does not contain an entry for a .timber file");
-
-            timberFile.ExtractToFile(Path.Combine(Paths.Maps, timberFile.Name));
+            using (var zipFile = ZipFile.OpenRead(addonZipLocation))
+            {
+                var timberFile = zipFile.Entries
+                                        .Where(x => x.Name.Contains(".timber"))
+                                        .SingleOrDefault() ?? throw new MapException("Map zip does not contain an entry for a .timber file");
+                timberFile.ExtractToFile(Path.Combine(Paths.Maps, timberFile.Name));
+            }
 
             extractLocation = Paths.Maps;
             System.IO.File.Delete(addonZipLocation);
