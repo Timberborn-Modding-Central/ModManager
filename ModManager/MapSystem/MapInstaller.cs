@@ -3,8 +3,6 @@ using ModManager.AddonInstallerSystem;
 using ModManager.AddonSystem;
 using ModManager.ExtractorSystem;
 using ModManager.PersistenceSystem;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -18,7 +16,7 @@ namespace ModManager.MapSystem
 
         private readonly InstalledAddonRepository _installedAddonRepository;
 
-        private readonly ExtractorService _extractor;
+        private readonly AddonExtractorService _extractor;
 
         private readonly MapManifestFinder _mapManifestFinder;
 
@@ -26,7 +24,7 @@ namespace ModManager.MapSystem
         {
             _persistenceService = PersistenceService.Instance;
             _installedAddonRepository = InstalledAddonRepository.Instance;
-            _extractor = ExtractorService.Instance;
+            _extractor = AddonExtractorService.Instance;
             _mapManifestFinder = new MapManifestFinder();
         }
 
@@ -36,13 +34,12 @@ namespace ModManager.MapSystem
             {
                 return false;
             }
-            var zipFile = ZipFile.OpenRead(zipLocation);
+            using var zipFile = ZipFile.OpenRead(zipLocation);
             var timberFileName = zipFile.Entries
                                     .Where(x => x.Name.Contains(".timber"))
                                     .SingleOrDefault()?
                                     .Name;
-            zipFile.Dispose();
-            string installLocation = _extractor.ExtractMap(zipLocation, mod, false);
+            string installLocation = _extractor.Extract(mod, zipLocation);
 
             var manifest = new MapManifest(mod, mod.Modfile, installLocation, timberFileName);
             var manifests = _mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();

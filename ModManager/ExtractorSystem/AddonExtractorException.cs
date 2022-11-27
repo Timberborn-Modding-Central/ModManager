@@ -4,9 +4,9 @@ using System.Text;
 
 namespace ModManager.ExtractorSystem
 {
-    public class ExtractorException : Exception
+    public class AddonExtractorException : Exception
     {
-        public ExtractorException(string message) : base(message)
+        public AddonExtractorException(string message) : base(message)
         {
         }
     }

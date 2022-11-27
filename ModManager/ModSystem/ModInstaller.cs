@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Modio.Models;
@@ -18,13 +16,13 @@ namespace ModManager.ModSystem
 
         private readonly InstalledAddonRepository _installedAddonRepository;
 
-        private readonly ExtractorService _extractor;
+        private readonly AddonExtractorService _extractor;
 
         public ModInstaller()
         {
             _persistenceService = PersistenceService.Instance;
             _installedAddonRepository = InstalledAddonRepository.Instance;
-            _extractor = ExtractorService.Instance;
+            _extractor = AddonExtractorService.Instance;
         }
 
         public bool Install(Mod mod, string zipLocation)
@@ -33,7 +31,7 @@ namespace ModManager.ModSystem
             {
                 return false;
             }
-            string installLocation = _extractor.ExtractMod(zipLocation, mod);
+            string installLocation = _extractor.Extract(mod, zipLocation);
             var manifest = new Manifest(mod, mod.Modfile, installLocation);
             string modManifestPath = Path.Combine(installLocation, Manifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
@@ -70,7 +68,7 @@ namespace ModManager.ModSystem
                 return false;
             }
             mod.Modfile= file;
-            string installLocation = _extractor.ExtractMod(zipLocation, mod);
+            string installLocation = _extractor.Extract(mod, zipLocation);
             var manifest = new Manifest(mod, mod.Modfile, installLocation);
             string modManifestPath = Path.Combine(installLocation, Manifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
