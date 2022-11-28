@@ -65,7 +65,7 @@ namespace Timberborn.ModsSystemUI
             item.Q<Label>("InstalledVersion").text = _installedAddonRepository.Has(mod.Id)
                 ? _installedAddonRepository.Get(mod.Id).Version 
                 : "-";
-            item.Q<Label>("LatestVersion").text = mod?.Modfile?.Version ?? "";
+            item.Q<Label>("LiveVersion").text = mod?.Modfile?.Version ?? "";
 
             var depTask = SetDependencies(item, mod);
 

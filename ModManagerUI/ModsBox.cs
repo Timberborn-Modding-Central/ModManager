@@ -57,7 +57,7 @@ namespace Timberborn.ModsSystemUI
         private Label _error;
         private TextField _search;
         private RadioButtonGroup _tags;
-        private RadioButtonGroup _options;
+        private RadioButtonGroup _installedOptions;
         private RadioButtonGroup _enabledOptions;
         private Button _showMore;
         private Button _newest;
@@ -65,15 +65,14 @@ namespace Timberborn.ModsSystemUI
         private Button _mostDownloaded;
         private Button _topRated;
         private List<string> _tagOptions = new();
-        private List<string> _optionsOptions = new();
+        private List<string> _installedOptionsOptions = new();
         private List<string> _enabledOptionsOptions = new();
         private uint _page;
         private readonly InstalledAddonRepository _installedAddonRepository;
+        private readonly DialogBoxShower _dialogBoxShower;
 
         private bool _modsWereChanged = false;
         private string _activeSortButton = "MostDownloaded";
-
-        private readonly DialogBoxShower _dialogBoxShower;
 
         private const string _bundleName = "modmanagerui.bundle";
         public static AssetBundle _bundle;
@@ -116,7 +115,7 @@ namespace Timberborn.ModsSystemUI
             _loading = root.Q<Label>("Loading");
             _error = root.Q<Label>("Error");
             _tags = root.Q<RadioButtonGroup>("Tags");
-            _options = root.Q<RadioButtonGroup>("Options");
+            _installedOptions = root.Q<RadioButtonGroup>("Options");
             _enabledOptions = root.Q<RadioButtonGroup>("EnabledOptions");
             _showMore = root.Q<Button>("ShowMore");
             _showMore.ToggleDisplayStyle(false);
@@ -125,7 +124,7 @@ namespace Timberborn.ModsSystemUI
             _topRated = root.Q<Button>("TopRated");
             _lastUpdated = root.Q<Button>("LastUpdated");
 
-        _newest.clicked += () => SetActiveSortButton("Newest");
+            _newest.clicked += () => SetActiveSortButton("Newest");
             _mostDownloaded.clicked += () => SetActiveSortButton("MostDownloaded");
             _topRated.clicked += () => SetActiveSortButton("TopRated");
             _lastUpdated.clicked += () => SetActiveSortButton("LastUpdated");
@@ -198,8 +197,8 @@ namespace Timberborn.ModsSystemUI
         private void UpdateMods()
         {
             _cancellationTokenSource.Cancel();
-            
-            switch(_activeSortButton)
+
+            switch (_activeSortButton)
             {
                 case "MostDownloaded":
                     _filter = ModFilter.Downloads.Desc();
@@ -226,9 +225,9 @@ namespace Timberborn.ModsSystemUI
             }
 
 
-            if (_options.value >= 0)
+            if (_installedOptions.value >= 0)
             {
-                switch (_optionsOptions[_options.value])
+                switch (_installedOptionsOptions[_installedOptions.value])
                 {
                     case nameof(InstalledOptions.Installed):
                         var installedModNames = _installedAddonRepository.All()
@@ -278,11 +277,11 @@ namespace Timberborn.ModsSystemUI
 
         private void PopulateSpecialOptions()
         {
-            _optionsOptions.Clear();
-            _optionsOptions.AddRange(Enum.GetNames(typeof(InstalledOptions)));
-            _options.choices = _optionsOptions;
+            _installedOptionsOptions.Clear();
+            _installedOptionsOptions.AddRange(Enum.GetNames(typeof(InstalledOptions)));
+            _installedOptions.choices = _installedOptionsOptions;
 
-            _options.RegisterValueChangedCallback(_ => UpdateMods());
+            _installedOptions.RegisterValueChangedCallback(_ => UpdateMods());
         }
 
         private void PopulateEnabledOptions()
