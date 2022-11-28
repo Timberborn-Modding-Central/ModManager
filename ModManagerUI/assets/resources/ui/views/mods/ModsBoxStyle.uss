@@ -164,3 +164,12 @@
 .mods-box-full-item__image {
     margin: 10px;
 }
+
+.mods-box__sorting {
+    flex-direction: row;
+}
+
+.mod-box__sort-button--selected {
+    background-image: resource('UI/Images/Buttons/button-hover');
+    color: black;
+}

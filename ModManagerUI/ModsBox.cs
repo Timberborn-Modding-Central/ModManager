@@ -60,6 +60,10 @@ namespace Timberborn.ModsSystemUI
         private RadioButtonGroup _options;
         private RadioButtonGroup _enabledOptions;
         private Button _showMore;
+        private Button _newest;
+        private Button _lastUpdated;
+        private Button _mostDownloaded;
+        private Button _topRated;
         private List<string> _tagOptions = new();
         private List<string> _optionsOptions = new();
         private List<string> _enabledOptionsOptions = new();
@@ -67,7 +71,7 @@ namespace Timberborn.ModsSystemUI
         private readonly InstalledAddonRepository _installedAddonRepository;
 
         private bool _modsWereChanged = false;
-
+        private string _activeSortButton = "MostDownloaded";
 
         private readonly DialogBoxShower _dialogBoxShower;
 
@@ -116,6 +120,15 @@ namespace Timberborn.ModsSystemUI
             _enabledOptions = root.Q<RadioButtonGroup>("EnabledOptions");
             _showMore = root.Q<Button>("ShowMore");
             _showMore.ToggleDisplayStyle(false);
+            _newest = root.Q<Button>("Newest");
+            _mostDownloaded = root.Q<Button>("MostDownloaded");
+            _topRated = root.Q<Button>("TopRated");
+            _lastUpdated = root.Q<Button>("LastUpdated");
+
+        _newest.clicked += () => SetActiveSortButton("Newest");
+            _mostDownloaded.clicked += () => SetActiveSortButton("MostDownloaded");
+            _topRated.clicked += () => SetActiveSortButton("TopRated");
+            _lastUpdated.clicked += () => SetActiveSortButton("LastUpdated");
 
             ShowModsAndTags();
 
@@ -185,7 +198,22 @@ namespace Timberborn.ModsSystemUI
         private void UpdateMods()
         {
             _cancellationTokenSource.Cancel();
-            _filter = ModFilter.Downloads.Desc();
+            
+            switch(_activeSortButton)
+            {
+                case "MostDownloaded":
+                    _filter = ModFilter.Downloads.Desc();
+                    break;
+                case "Newest":
+                    _filter = ModFilter.DateAdded.Desc();
+                    break;
+                case "TopRated":
+                    _filter = ModFilter.Rating.Desc();
+                    break;
+                case "LastUpdated":
+                    _filter = ModFilter.DateUpdated.Desc();
+                    break;
+            }
 
             if (!string.IsNullOrEmpty(_search.value))
             {
@@ -219,7 +247,7 @@ namespace Timberborn.ModsSystemUI
                     default:
                         break;
                 }
-                if(_enabledOptions.value >= 0)
+                if (_enabledOptions.value >= 0)
                 {
                     switch (_enabledOptionsOptions[_enabledOptions.value])
                     {
@@ -288,7 +316,7 @@ namespace Timberborn.ModsSystemUI
                     _showMore.ToggleDisplayStyle(false);
                 }
             }
-            catch(OperationCanceledException ex)
+            catch (OperationCanceledException ex)
             {
                 ModManagerUIPlugin.Log.LogWarning($"{ex.Message}");
             }
@@ -335,7 +363,7 @@ namespace Timberborn.ModsSystemUI
 
                 var uninstallButton = item.Q<Button>("Uninstall");
                 uninstallButton.clicked += () => DoUninstall(mod, installedToggle, enabledToggle, uninstallButton);
-                if(!_installedAddonRepository.Has(mod.Id))
+                if (!_installedAddonRepository.Has(mod.Id))
                 {
                     uninstallButton.visible = false;
                 }
@@ -348,7 +376,7 @@ namespace Timberborn.ModsSystemUI
 
             foreach (var mod in mods)
             {
-                if(token.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                 {
                     token.ThrowIfCancellationRequested();
                 }
@@ -472,5 +500,19 @@ namespace Timberborn.ModsSystemUI
             return number.ToString();
         }
 
+        private void SetActiveSortButton(string activeButton)
+        {
+            _newest.EnableInClassList("mod-box__sort-button--selected", activeButton == "Newest" ? true : false);
+            _mostDownloaded.EnableInClassList("mod-box__sort-button--selected", activeButton == "MostDownloaded" ? true : false);
+            _topRated.EnableInClassList("mod-box__sort-button--selected", activeButton == "TopRated" ? true : false);
+            _lastUpdated.EnableInClassList("mod-box__sort-button--selected", activeButton == "LastUpdated" ? true : false);
+
+            if (_activeSortButton != activeButton)
+            {
+                _activeSortButton = activeButton;
+
+                UpdateMods();
+            }
+        }
     }
 }

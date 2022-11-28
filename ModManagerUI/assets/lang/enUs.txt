@@ -19,3 +19,7 @@ Mods.Options,Options:,Header above available list of special options. Keep short
 Mods.Dependencies,Dependencies:,Header above available list of Dependencies. Keep short.
 Mods.InstalledVersion,Installed version:,Header above available list of InstalledVersion. Keep short.
 Mods.LatestVersion,Latest version:,Header above available list of LatestVersion. Keep short.
+Mods.Newest,Newest,Button to sort by newest.
+Mods.MostDownloaded,Most downloaded,Button to sort by amount of downloads.
+Mods.TopRated,Top rated,Button to sort by amount of likes.
+Mods.LastUpdated,Last updated,Button to sort by last update day.

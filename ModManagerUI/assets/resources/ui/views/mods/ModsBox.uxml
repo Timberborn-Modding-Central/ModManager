@@ -20,6 +20,12 @@
                     <ui:RadioButtonGroup name="EnabledOptions" value="-1" class="mods-box__tags" style="margin-top:8px;"/>
                 </Timberborn.CoreUI.NineSliceVisualElement>
                 <ui:VisualElement name="ModsWrapper">
+                    <ui:VisualElement name="SortingWrapper" class="mods-box__sorting">
+                        <Timberborn.CoreUI.LocalizableButton name="MostDownloaded" text="MostDownloaded" text-loc-key="Mods.MostDownloaded" class="menu-button mod-box__sort-button--selected" />
+                        <Timberborn.CoreUI.LocalizableButton name="Newest" text="Newest" text-loc-key="Mods.Newest" class="menu-button" />
+                        <Timberborn.CoreUI.LocalizableButton name="LastUpdated" text="LastUpdated" text-loc-key="Mods.LastUpdated" class="menu-button" />
+                        <Timberborn.CoreUI.LocalizableButton name="TopRated" text="TopRated" text-loc-key="Mods.TopRated" class="menu-button" />
+                    </ui:VisualElement>
                     <ui:Label text="Error" name="Error" class="text--header" />
                     <ui:ScrollView name="Mods" class="mods-box__mods scroll--green-decorated" />
                     <Timberborn.CoreUI.LocalizableLabel text="Loading..." name="Loading" text-loc-key="Mods.Loading" class="text--header" />
