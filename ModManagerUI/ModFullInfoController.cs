@@ -2,9 +2,11 @@ using Modio.Models;
 using ModManager;
 using ModManager.AddonSystem;
 using ModManager.ModIoSystem;
+using ModManagerUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Timberborn.AssetSystem;
 using Timberborn.CoreUI;
@@ -63,7 +65,7 @@ namespace Timberborn.ModsSystemUI
                 ? mod.Summary
                 : mod.DescriptionPlaintext;
             item.Q<Label>("InstalledVersion").text = _installedAddonRepository.Has(mod.Id)
-                ? _installedAddonRepository.Get(mod.Id).Version 
+                ? _installedAddonRepository.Get(mod.Id).Version
                 : "-";
             item.Q<Label>("LiveVersion").text = mod?.Modfile?.Version ?? "";
 
@@ -90,10 +92,22 @@ namespace Timberborn.ModsSystemUI
         {
             if (mod.Logo != null)
             {
-                var byteArray = await _addonService.GetImage(mod.Logo.Thumb320x180);
-                var texture = new Texture2D(1, 1);
-                texture.LoadImage(byteArray);
-                root.image = texture;
+                try
+                {
+
+                    var byteArray = await _addonService.GetImage(mod.Logo.Thumb320x180);
+                    var texture = new Texture2D(1, 1);
+                    texture.LoadImage(byteArray);
+                    root.image = texture;
+                }
+                catch (HttpRequestException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning($"Error occured while fetching image: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
         }
 
@@ -126,22 +140,33 @@ namespace Timberborn.ModsSystemUI
 
         private async Task AddImage(Uri image, VisualElement root)
         {
-            var byteArray = await _addonService.GetImage(image);
-            var texture = new Texture2D(1, 1);
-            texture.LoadImage(byteArray);
-            var imageElement = new Image
+            try
             {
-                image = texture
-            };
-            imageElement.AddToClassList(ImageClass);
-            const float maxWidth = 1000;
-            if (texture.width > maxWidth)
-            {
-                imageElement.style.width = maxWidth;
-                var scaleFactor = maxWidth / texture.width;
-                imageElement.style.height = texture.height * scaleFactor;
+                var byteArray = await _addonService.GetImage(image);
+                var texture = new Texture2D(1, 1);
+                texture.LoadImage(byteArray);
+                var imageElement = new Image
+                {
+                    image = texture
+                };
+                imageElement.AddToClassList(ImageClass);
+                const float maxWidth = 1000;
+                if (texture.width > maxWidth)
+                {
+                    imageElement.style.width = maxWidth;
+                    var scaleFactor = maxWidth / texture.width;
+                    imageElement.style.height = texture.height * scaleFactor;
+                }
+                root.Add(imageElement);
             }
-            root.Add(imageElement);
+            catch (HttpRequestException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning($"Error occured while fetching image: {ex.Message}");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private static string Format(uint number)

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Timberborn.Core;
@@ -366,7 +367,8 @@ namespace Timberborn.ModsSystemUI
                 {
                     uninstallButton.visible = false;
                 }
-                item.Q<Button>("Download").clicked += async () => await DoDownloadAndExtract(mod, installedToggle, uninstallButton);
+                var downloadButton = item.Q<Button>("Download");
+                downloadButton.clicked += async () => await DoDownloadAndExtract(mod, downloadButton, installedToggle, uninstallButton);
 
                 SetNumbers(mod, item);
 
@@ -416,15 +418,29 @@ namespace Timberborn.ModsSystemUI
 
         private void DoUninstall(Mod modInfo, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
         {
+            uninstallButton.SetEnabled(false);
             _modsWereChanged = true;
-            _addonService.Uninstall(modInfo.Id);
+            try
+            {
+                _addonService.Uninstall(modInfo.Id);
+            }
+            catch (AddonException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch(Exception)
+            {
+                throw;
+            }
             isInstalledToggle.SetValueWithoutNotify(false);
             isEnabledToggle.SetValueWithoutNotify(false);
             uninstallButton.visible = false;
+            uninstallButton.SetEnabled(true);
         }
 
-        private async Task DoDownloadAndExtract(Mod modInfo, Toggle isInstalledToggle, Button uninstallButton)
+        private async Task DoDownloadAndExtract(Mod modInfo, Button downloadButton, Toggle isInstalledToggle, Button uninstallButton)
         {
+            downloadButton.SetEnabled(false);
             _modsWereChanged = true;
             (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
             TryInstall(mod, isInstalledToggle, uninstallButton);
@@ -433,6 +449,7 @@ namespace Timberborn.ModsSystemUI
             {
                 TryInstall(dependency, isInstalledToggle, uninstallButton);
             }
+            downloadButton.SetEnabled(true);
         }
 
         private void TryInstall((string location, Mod Mod) mod, Toggle isInstalledToggle, Button uninstallButton)
@@ -479,10 +496,21 @@ namespace Timberborn.ModsSystemUI
         {
             if (mod.Logo != null)
             {
-                var byteArray = await _addonService.GetImage(mod.Logo.Thumb320x180);
-                var texture = new Texture2D(1, 1);
-                texture.LoadImage(byteArray);
-                root.image = texture;
+                try
+                {
+                    var byteArray = await _addonService.GetImage(mod.Logo.Thumb320x180);
+                    var texture = new Texture2D(1, 1);
+                    texture.LoadImage(byteArray);
+                    root.image = texture;
+                }
+                catch (HttpRequestException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning($"Error occured while fetching image: {ex.Message}");
+                }
+                catch(Exception)
+                {
+                    throw;
+                }
             }
         }
 
