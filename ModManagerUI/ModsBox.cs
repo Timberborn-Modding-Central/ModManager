@@ -247,29 +247,29 @@ namespace Timberborn.ModsSystemUI
                     default:
                         break;
                 }
-                if (_enabledOptions.value >= 0)
+            }
+            if (_enabledOptions.value >= 0)
+            {
+                switch (_enabledOptionsOptions[_enabledOptions.value])
                 {
-                    switch (_enabledOptionsOptions[_enabledOptions.value])
-                    {
-                        case nameof(EnabledOptions.Enabled):
-                            var enabledModNames = _installedAddonRepository.All()
-                                                                           .Where(x => x.Enabled)
-                                                                           .Select(x => x.ModName)
-                                                                           .ToArray();
-                            var modFilter3 = ModFilter.Name.In(enabledModNames);
-                            _filter = _filter.And(modFilter3);
-                            break;
-                        case nameof(EnabledOptions.NotEnabled):
-                            var notEnabledModNames = _installedAddonRepository.All()
-                                                                              .Where(x => x.Enabled)
-                                                                              .Select(x => x.ModName)
-                                                                              .ToArray();
-                            var modFilter4 = ModFilter.Name.NotIn(notEnabledModNames);
-                            _filter = _filter.And(modFilter4);
-                            break;
-                        default:
-                            break;
-                    }
+                    case nameof(EnabledOptions.Enabled):
+                        var enabledModNames = _installedAddonRepository.All()
+                                                                       .Where(x => x.Enabled)
+                                                                       .Select(x => x.ModName)
+                                                                       .ToArray();
+                        var modFilter3 = ModFilter.Name.In(enabledModNames);
+                        _filter = _filter.And(modFilter3);
+                        break;
+                    case nameof(EnabledOptions.NotEnabled):
+                        var notEnabledModNames = _installedAddonRepository.All()
+                                                                          .Where(x => x.Enabled)
+                                                                          .Select(x => x.ModName)
+                                                                          .ToArray();
+                        var modFilter4 = ModFilter.Name.NotIn(notEnabledModNames);
+                        _filter = _filter.And(modFilter4);
+                        break;
+                    default:
+                        break;
                 }
             }
 
