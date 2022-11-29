@@ -368,7 +368,7 @@ namespace Timberborn.ModsSystemUI
                     uninstallButton.visible = false;
                 }
                 var downloadButton = item.Q<Button>("Download");
-                downloadButton.clicked += async () => await DoDownloadAndExtract(mod, downloadButton, installedToggle, uninstallButton);
+                downloadButton.clicked += async () => await DoDownloadAndExtract(mod, downloadButton, installedToggle, enabledToggle, uninstallButton);
 
                 SetNumbers(mod, item);
 
@@ -438,16 +438,16 @@ namespace Timberborn.ModsSystemUI
             uninstallButton.SetEnabled(true);
         }
 
-        private async Task DoDownloadAndExtract(Mod modInfo, Button downloadButton, Toggle isInstalledToggle, Button uninstallButton)
+        private async Task DoDownloadAndExtract(Mod modInfo, Button downloadButton, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
         {
             downloadButton.SetEnabled(false);
             _modsWereChanged = true;
             (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
-            TryInstall(mod, isInstalledToggle, uninstallButton);
+            TryInstall(mod, isInstalledToggle, isEnabledToggle, uninstallButton);
 
             await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
             {
-                TryInstall(dependency, isInstalledToggle, uninstallButton);
+                TryInstall(dependency, isInstalledToggle, isEnabledToggle, uninstallButton);
 
                 var depVisualElement = _mods.Children()
                                             .Where(x => x.Q<Label>("Name").text == dependency.Mod.Name)
@@ -455,12 +455,13 @@ namespace Timberborn.ModsSystemUI
                 if (depVisualElement != null)
                 {
                     depVisualElement.Q<Toggle>("Installed").SetValueWithoutNotify(true);
+                    depVisualElement.Q<Toggle>("Enabled").SetValueWithoutNotify(true);
                 }
             }
             downloadButton.SetEnabled(true);
         }
 
-        private void TryInstall((string location, Mod Mod) mod, Toggle isInstalledToggle, Button uninstallButton)
+        private void TryInstall((string location, Mod Mod) mod, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
         {
             try
             {
@@ -474,6 +475,7 @@ namespace Timberborn.ModsSystemUI
                     _addonService.Install(mod.Mod, mod.location);
                 }
                 isInstalledToggle.SetValueWithoutNotify(true);
+                isEnabledToggle.SetValueWithoutNotify(true);
                 uninstallButton.visible = true;
             }
             catch (MapException ex)

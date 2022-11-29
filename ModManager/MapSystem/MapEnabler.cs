@@ -21,6 +21,7 @@ namespace ModManager.MapSystem
             }
 
             File.Move(enabledFilePath + Names.Extensions.Disabled, enabledFilePath);
+            manifest.Enabled = true;
 
             return true;
         }
@@ -40,6 +41,7 @@ namespace ModManager.MapSystem
             }
 
             File.Move(mapFilePath, mapFilePath + Names.Extensions.Disabled);
+            manifest.Enabled = false;
 
             return true;
         }
