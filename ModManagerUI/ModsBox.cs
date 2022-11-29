@@ -387,6 +387,12 @@ namespace Timberborn.ModsSystemUI
 
         private void ToggleEnabled(ChangeEvent<bool> changeEvent, Mod mod, Toggle enabledToggle)
         {
+            if(mod.Name == "BepInExPack")
+            {
+                enabledToggle.SetValueWithoutNotify(true);
+                ModManagerUIPlugin.Log.LogWarning("Disabling BepInEx is not allowed.");
+                return;
+            }
             _modsWereChanged = true;
             try
             {
@@ -428,7 +434,7 @@ namespace Timberborn.ModsSystemUI
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -442,13 +448,27 @@ namespace Timberborn.ModsSystemUI
         {
             downloadButton.SetEnabled(false);
             _modsWereChanged = true;
-            (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
-            TryInstall(mod, isInstalledToggle, isEnabledToggle, uninstallButton);
-
+            try
+            {
+                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
+                TryInstall(mod, isInstalledToggle, isEnabledToggle, uninstallButton);
+            }
+            catch (MapException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch (AddonException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
             await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
             {
+                try { 
                 TryInstall(dependency, isInstalledToggle, isEnabledToggle, uninstallButton);
-
                 var depVisualElement = _mods.Children()
                                             .Where(x => x.Q<Label>("Name").text == dependency.Mod.Name)
                                             .FirstOrDefault();
@@ -456,6 +476,20 @@ namespace Timberborn.ModsSystemUI
                 {
                     depVisualElement.Q<Toggle>("Installed").SetValueWithoutNotify(true);
                     depVisualElement.Q<Toggle>("Enabled").SetValueWithoutNotify(true);
+                    }
+
+                }
+                catch (MapException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (AddonException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (Exception)
+                {
+                    throw;
                 }
             }
             downloadButton.SetEnabled(true);
@@ -517,7 +551,7 @@ namespace Timberborn.ModsSystemUI
                 {
                     ModManagerUIPlugin.Log.LogWarning($"Error occured while fetching image: {ex.Message}");
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     throw;
                 }
