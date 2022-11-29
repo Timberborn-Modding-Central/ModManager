@@ -13,13 +13,13 @@
         <ui:Image name="Logo" class="mods-box-item__logo" />
         <ui:VisualElement name="Footer" class="mods-box-item__footer">
             <Timberborn.CoreUI.LocalizableButton name="Download" text="Download" text-loc-key="Mods.Download" class="menu-button menu-button--medium" />
-            <Timberborn.CoreUI.LocalizableToggle name="Installed" text="Installed" text-loc-key="Mods.Installed" class="text--default" />
+            <Timberborn.CoreUI.LocalizableToggle name="Installed" text="Installed" text-loc-key="Mods.Installed" class="text--default mods-box-toggle" />
             <ui:Image name="DownloadIcon" class="mods-box-item__download-icon" />
             <ui:Label name="DownloadCount" text="0" class="text--default" />
         </ui:VisualElement>
         <ui:VisualElement name="Footer" class="mods-box-item__footer">
             <Timberborn.CoreUI.LocalizableButton name="Uninstall" text="Uninstall" text-loc-key="Mods.Uninstall" class="menu-button menu-button--medium" />
-            <Timberborn.CoreUI.LocalizableToggle name="Enabled" text="Enabled" text-loc-key="Mods.Enabled" class="text--default" />
+            <Timberborn.CoreUI.LocalizableToggle name="Enabled" text="Enabled" text-loc-key="Mods.Enabled" class="text--default mods-box-toggle" />
         </ui:VisualElement>
     </Timberborn.CoreUI.NineSliceButton>
 </ui:UXML>

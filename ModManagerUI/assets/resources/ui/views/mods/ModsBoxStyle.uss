@@ -102,6 +102,7 @@
 .mods-box-item__up-icon {
     height: 14px;
     width: 16px;
+    margin-left: 4px;
     margin-right: 4px;
     background-image: url('/assets/resources/UI/Images/Mods/thumbs-up.png');
 }
@@ -122,6 +123,7 @@
 .mods-box-item__footer {
     flex-direction: row;
     align-items: center;
+    align-content: cneter;
     width: 100%;
     padding-right: 4px;
 }
@@ -172,4 +174,27 @@
 .mod-box__sort-button--selected {
     background-image: resource('UI/Images/Buttons/button-hover');
     color: black;
+}
+
+.mods-box-toggle {
+    --click-sound: "UI.Click";
+}
+
+.mods-box-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off');
+    width: 25px;
+    height: 25px;
+    margin-right: 5px;
+}
+
+.mods-box-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on');
+}
+
+.mods-box-toggle > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on_hover');
+}
+
+.mods-box-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off_hover');
 }

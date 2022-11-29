@@ -363,7 +363,7 @@ namespace Timberborn.ModsSystemUI
 
                 var uninstallButton = item.Q<Button>("Uninstall");
                 uninstallButton.clicked += () => DoUninstall(mod, installedToggle, enabledToggle, uninstallButton);
-                if (!_installedAddonRepository.Has(mod.Id))
+                if (!_installedAddonRepository.Has(mod.Id) || mod.Name == "BepInExPack")
                 {
                     uninstallButton.visible = false;
                 }
