@@ -448,6 +448,14 @@ namespace Timberborn.ModsSystemUI
             await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
             {
                 TryInstall(dependency, isInstalledToggle, uninstallButton);
+
+                var depVisualElement = _mods.Children()
+                                            .Where(x => x.Q<Label>("Name").text == dependency.Mod.Name)
+                                            .FirstOrDefault();
+                if (depVisualElement != null)
+                {
+                    depVisualElement.Q<Toggle>("Installed").SetValueWithoutNotify(true);
+                }
             }
             downloadButton.SetEnabled(true);
         }
