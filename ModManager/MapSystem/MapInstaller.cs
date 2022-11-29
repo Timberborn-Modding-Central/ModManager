@@ -44,7 +44,7 @@ namespace ModManager.MapSystem
             }
             string installLocation = _extractor.Extract(mod, zipLocation);
 
-            var manifest = new MapManifest(mod, mod.Modfile, installLocation, timberFileName);
+            var manifest = new MapManifest(mod, mod.Modfile, installLocation, timberFileName.Replace(Names.Extensions.TimberbornMap, ""));
             var manifests = _mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();
             manifests.Add(manifest);
 
