@@ -1,6 +1,7 @@
 using Modio.Models;
 using ModManager;
 using ModManager.AddonSystem;
+using ModManager.MapSystem;
 using ModManager.ModIoSystem;
 using ModManagerUI;
 using System;
@@ -64,12 +65,16 @@ namespace Timberborn.ModsSystemUI
             item.Q<Label>("Description").text = string.IsNullOrEmpty(mod.DescriptionPlaintext)
                 ? mod.Summary
                 : mod.DescriptionPlaintext;
-            item.Q<Label>("InstalledVersion").text = _installedAddonRepository.Has(mod.Id)
+            Label installedVersion = item.Q<Label>("InstalledVersion");
+            installedVersion.text = _installedAddonRepository.Has(mod.Id)
                 ? _installedAddonRepository.Get(mod.Id).Version
                 : "-";
             item.Q<Label>("LiveVersion").text = mod?.Modfile?.Version ?? "";
 
             var depTask = SetDependencies(item, mod);
+
+            var downloadButton = item.Q<Button>("Download");
+            downloadButton.clicked += async () => DoDownloadAndExtract(mod, downloadButton, installedVersion);
 
             LoadLogo(mod, item.Q<Image>("Logo"));
             SetNumbers(mod, item);
@@ -188,6 +193,81 @@ namespace Timberborn.ModsSystemUI
             item.Q<Label>("Dependencies").text = dependencyNames.Count() > 0
                 ? string.Join(Environment.NewLine, dependencyNames)
                 : "-";
+        }
+
+        private async Task DoDownloadAndExtract(Mod modInfo, Button downloadButton, Label installedVersion)
+        {
+            downloadButton.SetEnabled(false);
+            ModsBox.ModsWereChanged = true;
+            try
+            {
+                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
+                TryInstall(mod, installedVersion);
+            }
+            catch (MapException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch (AddonException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
+            {
+                try
+                {
+                    TryInstall(dependency, installedVersion);
+                }
+                catch (MapException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (AddonException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            downloadButton.SetEnabled(true);
+        }
+
+        private void TryInstall((string location, Mod Mod) mod, Label installedVersion)
+        {
+            try
+            {
+                if (_installedAddonRepository.TryGet(mod.Mod.Id, out Manifest manifest) &&
+                   manifest.Version != mod.Mod.Modfile.Version)
+                {
+                    _addonService.ChangeVersion(mod.Mod, mod.Mod.Modfile, mod.location);
+                }
+                else
+                {
+                    _addonService.Install(mod.Mod, mod.location);
+                }
+                if (_item.Q<Label>("Name").text == mod.Mod.Name)
+                {
+                    installedVersion.text = mod.Mod.Modfile.Version;
+                }
+            }
+            catch (MapException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch (AddonException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
     }

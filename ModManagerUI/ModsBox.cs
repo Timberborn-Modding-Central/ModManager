@@ -36,6 +36,9 @@ namespace Timberborn.ModsSystemUI
 
     public class ModsBox : IPanelController
     {
+        public static bool ModsWereChanged = false;
+        public static Action OpenOptionsDelegate;
+
         private VisualElement LoadVisualElement(VisualTreeAsset visualTreeAsset)
         {
             VisualElement visualElement = visualTreeAsset.CloneTree().ElementAt(0);
@@ -45,7 +48,6 @@ namespace Timberborn.ModsSystemUI
 
         private static readonly string AllLocKey = "Mods.Tags.All";
         private static readonly uint ModsPerPage = 25;
-        public static Action OpenOptionsDelegate;
         private readonly VisualElementLoader _visualElementLoader;
         private readonly PanelStack _panelStack;
         private readonly IAddonService _addonService;
@@ -72,7 +74,6 @@ namespace Timberborn.ModsSystemUI
         private readonly InstalledAddonRepository _installedAddonRepository;
         private readonly DialogBoxShower _dialogBoxShower;
 
-        private bool _modsWereChanged = false;
         private string _activeSortButton = "MostDownloaded";
 
         private const string _bundleName = "modmanagerui.bundle";
@@ -155,7 +156,7 @@ namespace Timberborn.ModsSystemUI
 
         public void OnUICancelled()
         {
-            if (_modsWereChanged)
+            if (ModsWereChanged)
             {
                 _dialogBoxShower.Show(_loc.T("Mods.ModsChanged"),
                                       GameQuitter.Quit, _loc.T("Mods.Quit"),
@@ -393,7 +394,7 @@ namespace Timberborn.ModsSystemUI
                 ModManagerUIPlugin.Log.LogWarning("Disabling BepInEx is not allowed.");
                 return;
             }
-            _modsWereChanged = true;
+            ModsWereChanged = true;
             try
             {
                 if (changeEvent.newValue == true)
@@ -425,7 +426,7 @@ namespace Timberborn.ModsSystemUI
         private void DoUninstall(Mod modInfo, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
         {
             uninstallButton.SetEnabled(false);
-            _modsWereChanged = true;
+            ModsWereChanged = true;
             try
             {
                 _addonService.Uninstall(modInfo.Id);
@@ -447,7 +448,7 @@ namespace Timberborn.ModsSystemUI
         private async Task DoDownloadAndExtract(Mod modInfo, Button downloadButton, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
         {
             downloadButton.SetEnabled(false);
-            _modsWereChanged = true;
+            ModsWereChanged = true;
             try
             {
                 (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
