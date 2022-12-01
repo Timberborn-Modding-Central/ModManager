@@ -23,3 +23,6 @@ Mods.Newest,Newest,Button to sort by newest.
 Mods.MostDownloaded,Most downloaded,Button to sort by amount of downloads.
 Mods.TopRated,Top rated,Button to sort by amount of likes.
 Mods.LastUpdated,Last updated,Button to sort by last update day.
+Mods.UpdateAllLabel,You have {0} updates available.,Label for informing how many mods have updates pending.
+Mods.UpdateAll,Update All,Button for updating all updatable mods. Keep short
+Mods.Empty,,Empty string

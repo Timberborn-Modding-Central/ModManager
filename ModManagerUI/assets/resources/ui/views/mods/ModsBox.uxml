@@ -26,6 +26,10 @@
                         <Timberborn.CoreUI.LocalizableButton name="LastUpdated" text="LastUpdated" text-loc-key="Mods.LastUpdated" class="menu-button" />
                         <Timberborn.CoreUI.LocalizableButton name="TopRated" text="TopRated" text-loc-key="Mods.TopRated" class="menu-button" />
                     </ui:VisualElement>
+                    <ui:VisualElement name="UpdateAllWrapper" class="mods-box__update-all">
+                        <Timberborn.CoreUI.LocalizableLabel name="UpdateAllLabel" text-loc-key="Mods.Empty" class="text--big mods-box-full-item__update-all-label" />
+                        <Timberborn.CoreUI.LocalizableButton name="UpdateAll" text="Update All" text-loc-key="Mods.UpdateAll" class="menu-button" />
+                    </ui:VisualElement>
                     <ui:Label text="Error" name="Error" class="text--header" />
                     <ui:ScrollView name="Mods" class="mods-box__mods scroll--green-decorated" />
                     <Timberborn.CoreUI.LocalizableLabel text="Loading..." name="Loading" text-loc-key="Mods.Loading" class="text--header" />

@@ -19,7 +19,13 @@ namespace ModManagerUI
 
         public void Awake()
         {
-            Log = Logger; 
+            Log = Logger;
+
+            foreach(var file in Directory.GetFiles(Path.Combine(Paths.PluginPath, "ModManager", "libs")))
+            {
+                Assembly.LoadFile(file);
+            }
+
             ModManagerStartup.Run("7f52d134de5cde63fdcf163478e688e3", (options) =>
             {
                 options.GameId = 3659;

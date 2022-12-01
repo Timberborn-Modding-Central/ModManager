@@ -3,12 +3,14 @@ using Modio.Models;
 using ModManager;
 using ModManager.AddonSystem;
 using ModManager.MapSystem;
+using ModManager.ModIoSystem;
 using ModManagerUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Timberborn.Core;
@@ -67,12 +69,16 @@ namespace Timberborn.ModsSystemUI
         private Button _lastUpdated;
         private Button _mostDownloaded;
         private Button _topRated;
+        private Label _updateAllLabel;
+        private VisualElement _updateAllWrapper;
         private List<string> _tagOptions = new();
         private List<string> _installedOptionsOptions = new();
         private List<string> _enabledOptionsOptions = new();
         private uint _page;
         private readonly InstalledAddonRepository _installedAddonRepository;
         private readonly DialogBoxShower _dialogBoxShower;
+
+        private Dictionary<uint, Mod> _updateAvailable = new();
 
         private string _activeSortButton = "MostDownloaded";
 
@@ -125,6 +131,8 @@ namespace Timberborn.ModsSystemUI
             _mostDownloaded = root.Q<Button>("MostDownloaded");
             _topRated = root.Q<Button>("TopRated");
             _lastUpdated = root.Q<Button>("LastUpdated");
+            _updateAllLabel = root.Q<Label>("UpdateAllLabel");
+            _updateAllWrapper = root.Q<VisualElement>("UpdateAllWrapper");
 
             _newest.clicked += () => SetActiveSortButton("Newest");
             _mostDownloaded.clicked += () => SetActiveSortButton("MostDownloaded");
@@ -141,7 +149,30 @@ namespace Timberborn.ModsSystemUI
             _search.RegisterValueChangedCallback(_ => UpdateMods());
             PopulateSpecialOptions();
             PopulateEnabledOptions();
+
             return root;
+        }
+
+        private void SetUpdateAllVisibility()
+        {
+            _updateAllWrapper.visible = _updateAvailable.Count > 0
+                ? true
+                : false;
+        }
+
+        private async Task PopulateUpdatableMods()
+        {
+            _updateAvailable.Clear();
+            foreach (Manifest manifest in _installedAddonRepository.All())
+            {
+                var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
+                if (mod.Modfile.Version != manifest.Version)
+                {
+                    _updateAvailable.Add(mod.Id, mod);
+                }
+            }
+
+            _updateAllLabel.text = _loc.T("Mods.UpdateAllLabel", _updateAvailable.Count);
         }
 
         private void OpenOptionsPanel()
@@ -172,13 +203,28 @@ namespace Timberborn.ModsSystemUI
 
         private async void ShowModsAndTags()
         {
-            _mods.Clear();
-            _page = 0;
+            try
+            {
+                var populateModsTask = PopulateUpdatableMods();
+                _mods.Clear();
+                _page = 0;
 
-            Task modsTask = ShowMods();
+                Task modsTask = ShowMods();
 
-            Task<IReadOnlyList<TagOption>> getTagsTask = _addonService.GetTags().Get();
-            OnTagsRetrieved(await getTagsTask);
+                Task<IReadOnlyList<TagOption>> getTagsTask = _addonService.GetTags().Get();
+
+                OnTagsRetrieved(await getTagsTask);
+
+                await populateModsTask;
+
+                //SetUpdateAllVisibility();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine($"inner: {ex.InnerException?.Message}");
+                throw ex;
+            }
         }
 
         private void ShowMoreMods()

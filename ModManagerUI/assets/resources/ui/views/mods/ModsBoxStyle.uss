@@ -123,7 +123,7 @@
 .mods-box-item__footer {
     flex-direction: row;
     align-items: center;
-    align-content: cneter;
+    align-content: center;
     width: 100%;
     padding-right: 4px;
 }
@@ -171,6 +171,11 @@
     flex-direction: row;
 }
 
+.mods-box__update-all {
+    margin-top: 4px;
+    flex-direction: row;
+}
+
 .mod-box__sort-button--selected {
     background-image: resource('UI/Images/Buttons/button-hover');
     color: black;
@@ -197,4 +202,7 @@
 
 .mods-box-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
     background-image: resource('UI/Images/Buttons/checkbox_off_hover');
+}
+.mods-box-full-item__update-all-label {
+    -unity-text-align: middle-left;
 }
