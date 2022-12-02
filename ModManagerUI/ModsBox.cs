@@ -181,6 +181,10 @@ namespace Timberborn.ModsSystemUI
                 {
                     ModManagerUIPlugin.Log.LogWarning(ex.Message);
                 }
+                catch (IOException ex)
+                {
+                    ModManagerUIPlugin.Log.LogError($"{ex.Message}");
+                }
                 catch (Exception)
                 {
                     throw;
@@ -539,12 +543,43 @@ namespace Timberborn.ModsSystemUI
 
         private async Task DoDownloadAndExtract(Mod modInfo, Button downloadButton, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
         {
-            downloadButton.SetEnabled(false);
-            ModsWereChanged = true;
             try
             {
+                downloadButton.SetEnabled(false);
+                ModsWereChanged = true;
                 (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
                 TryInstall(mod, isInstalledToggle, isEnabledToggle, uninstallButton, downloadButton);
+                await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
+                {
+                    try
+                    {
+                        TryInstall(dependency, isInstalledToggle, isEnabledToggle, uninstallButton, downloadButton);
+                        var depVisualElement = _mods.Children()
+                                                    .Where(x => x.Q<Label>("Name").text == dependency.Mod.Name)
+                                                    .FirstOrDefault();
+                        if (depVisualElement != null)
+                        {
+                            depVisualElement.Q<Toggle>("Installed").SetValueWithoutNotify(true);
+                            depVisualElement.Q<Toggle>("Enabled").SetValueWithoutNotify(true);
+                        }
+                    }
+                    catch (MapException ex)
+                    {
+                        ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                    }
+                    catch (AddonException ex)
+                    {
+                        ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                    }
+                    catch (IOException ex)
+                    {
+                        ModManagerUIPlugin.Log.LogError($"{ex.Message}");
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
             }
             catch (MapException ex)
             {
@@ -554,36 +589,13 @@ namespace Timberborn.ModsSystemUI
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
             }
+            catch (IOException ex)
+            {
+                ModManagerUIPlugin.Log.LogError($"{ex.Message}");
+            }
             catch (Exception)
             {
                 throw;
-            }
-            await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
-            {
-                try
-                {
-                    TryInstall(dependency, isInstalledToggle, isEnabledToggle, uninstallButton, downloadButton);
-                    var depVisualElement = _mods.Children()
-                                                .Where(x => x.Q<Label>("Name").text == dependency.Mod.Name)
-                                                .FirstOrDefault();
-                    if (depVisualElement != null)
-                    {
-                        depVisualElement.Q<Toggle>("Installed").SetValueWithoutNotify(true);
-                        depVisualElement.Q<Toggle>("Enabled").SetValueWithoutNotify(true);
-                    }
-                }
-                catch (MapException ex)
-                {
-                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
-                }
-                catch (AddonException ex)
-                {
-                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
             }
             downloadButton.SetEnabled(true);
         }
