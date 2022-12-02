@@ -17,6 +17,7 @@ using Timberborn.Core;
 using Timberborn.CoreUI;
 using Timberborn.Localization;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UIElements.Image;
 using TextField = UnityEngine.UIElements.TextField;
@@ -71,6 +72,7 @@ namespace Timberborn.ModsSystemUI
         private Button _topRated;
         private Label _updateAllLabel;
         private VisualElement _updateAllWrapper;
+        private Button _updateAllButton;
         private List<string> _tagOptions = new();
         private List<string> _installedOptionsOptions = new();
         private List<string> _enabledOptionsOptions = new();
@@ -87,6 +89,8 @@ namespace Timberborn.ModsSystemUI
 
         private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private static CancellationToken _token = _cancellationTokenSource.Token;
+        private static CancellationTokenSource _cancellationTokenSource2 = new CancellationTokenSource();
+        private static CancellationToken _token2 = _cancellationTokenSource2.Token;
 
         public ModsBox(VisualElementLoader visualElementLoader,
                        PanelStack panelStack,
@@ -133,11 +137,13 @@ namespace Timberborn.ModsSystemUI
             _lastUpdated = root.Q<Button>("LastUpdated");
             _updateAllLabel = root.Q<Label>("UpdateAllLabel");
             _updateAllWrapper = root.Q<VisualElement>("UpdateAllWrapper");
+            _updateAllButton = root.Q<Button>("UpdateAll");
 
             _newest.clicked += () => SetActiveSortButton("Newest");
             _mostDownloaded.clicked += () => SetActiveSortButton("MostDownloaded");
             _topRated.clicked += () => SetActiveSortButton("TopRated");
             _lastUpdated.clicked += () => SetActiveSortButton("LastUpdated");
+            _updateAllButton.clicked += async () => await UpdateUpdatableMods();
 
             ShowModsAndTags();
 
@@ -153,6 +159,35 @@ namespace Timberborn.ModsSystemUI
             return root;
         }
 
+        private async Task UpdateUpdatableMods()
+        {
+            _updateAllButton.SetEnabled(false);
+            var modList = new Dictionary<uint, Mod>(_updateAvailable);
+            foreach (KeyValuePair<uint, Mod> updatableMod in modList)
+            {
+                try
+                {
+                    (string location, Mod Mod) mod = await _addonService.DownloadLatest(updatableMod.Value);
+                    TryInstall(mod);
+                    _updateAvailable.Remove(updatableMod.Key);
+                }
+                catch (MapException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (AddonException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            _updateAllButton.SetEnabled(true);
+            SetUpdateAllVisibility();
+        }
+
         private void SetUpdateAllVisibility()
         {
             _updateAllWrapper.visible = _updateAvailable.Count > 0
@@ -160,7 +195,7 @@ namespace Timberborn.ModsSystemUI
                 : false;
         }
 
-        private async Task PopulateUpdatableMods()
+        private async Task PopulateUpdatableMods(CancellationToken token)
         {
             _updateAvailable.Clear();
             foreach (Manifest manifest in _installedAddonRepository.All())
@@ -168,6 +203,10 @@ namespace Timberborn.ModsSystemUI
                 var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
                 if (mod.Modfile.Version != manifest.Version)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
                     _updateAvailable.Add(mod.Id, mod);
                 }
             }
@@ -203,9 +242,12 @@ namespace Timberborn.ModsSystemUI
 
         private async void ShowModsAndTags()
         {
+            _cancellationTokenSource2.Cancel();
+            _cancellationTokenSource2 = new CancellationTokenSource();
+            _token2 = _cancellationTokenSource2.Token;
             try
             {
-                var populateModsTask = PopulateUpdatableMods();
+                var populateModsTask = PopulateUpdatableMods(_token2);
                 _mods.Clear();
                 _page = 0;
 
@@ -217,12 +259,14 @@ namespace Timberborn.ModsSystemUI
 
                 await populateModsTask;
 
-                //SetUpdateAllVisibility();
+                SetUpdateAllVisibility();
             }
-            catch(Exception ex)
+            catch (OperationCanceledException ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine($"inner: {ex.InnerException?.Message}");
+                ModManagerUIPlugin.Log.LogWarning($"Async operation was cancelled: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
                 throw ex;
             }
         }
@@ -365,7 +409,7 @@ namespace Timberborn.ModsSystemUI
             }
             catch (OperationCanceledException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning($"{ex.Message}");
+                ModManagerUIPlugin.Log.LogWarning($"Async operation was cancelled: {ex.Message}");
             }
             catch (Exception e)
             {
@@ -434,7 +478,7 @@ namespace Timberborn.ModsSystemUI
 
         private void ToggleEnabled(ChangeEvent<bool> changeEvent, Mod mod, Toggle enabledToggle)
         {
-            if(mod.Name == "BepInExPack")
+            if (mod.Name == "BepInExPack")
             {
                 enabledToggle.SetValueWithoutNotify(true);
                 ModManagerUIPlugin.Log.LogWarning("Disabling BepInEx is not allowed.");
@@ -498,7 +542,7 @@ namespace Timberborn.ModsSystemUI
             try
             {
                 (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
-                TryInstall(mod, isInstalledToggle, isEnabledToggle, uninstallButton);
+                TryInstall(mod, isInstalledToggle, isEnabledToggle, uninstallButton, downloadButton);
             }
             catch (MapException ex)
             {
@@ -514,17 +558,17 @@ namespace Timberborn.ModsSystemUI
             }
             await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
             {
-                try { 
-                TryInstall(dependency, isInstalledToggle, isEnabledToggle, uninstallButton);
-                var depVisualElement = _mods.Children()
-                                            .Where(x => x.Q<Label>("Name").text == dependency.Mod.Name)
-                                            .FirstOrDefault();
-                if (depVisualElement != null)
+                try
                 {
-                    depVisualElement.Q<Toggle>("Installed").SetValueWithoutNotify(true);
-                    depVisualElement.Q<Toggle>("Enabled").SetValueWithoutNotify(true);
+                    TryInstall(dependency, isInstalledToggle, isEnabledToggle, uninstallButton, downloadButton);
+                    var depVisualElement = _mods.Children()
+                                                .Where(x => x.Q<Label>("Name").text == dependency.Mod.Name)
+                                                .FirstOrDefault();
+                    if (depVisualElement != null)
+                    {
+                        depVisualElement.Q<Toggle>("Installed").SetValueWithoutNotify(true);
+                        depVisualElement.Q<Toggle>("Enabled").SetValueWithoutNotify(true);
                     }
-
                 }
                 catch (MapException ex)
                 {
@@ -542,7 +586,19 @@ namespace Timberborn.ModsSystemUI
             downloadButton.SetEnabled(true);
         }
 
-        private void TryInstall((string location, Mod Mod) mod, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton)
+        private void TryInstall((string location, Mod Mod) mod)
+        {
+            var modVisualElement = _mods.Children()
+                                         .Where(x => x.Q<Label>("Name").text == mod.Mod.Name)
+                                         .FirstOrDefault();
+            var installedToggle = modVisualElement?.Q<Toggle>("Installed");
+            var enabledToggle = modVisualElement?.Q<Toggle>("Enabled");
+            var uninstallButton = modVisualElement?.Q<Button>("Uninstall");
+            var downloadButton = modVisualElement?.Q<Button>("Download");
+            TryInstall(mod, installedToggle, enabledToggle, uninstallButton, downloadButton);
+        }
+
+        private void TryInstall((string location, Mod Mod) mod, Toggle isInstalledToggle, Toggle isEnabledToggle, Button uninstallButton, Button downloadButton)
         {
             try
             {
@@ -555,9 +611,16 @@ namespace Timberborn.ModsSystemUI
                 {
                     _addonService.Install(mod.Mod, mod.location);
                 }
-                isInstalledToggle.SetValueWithoutNotify(true);
-                isEnabledToggle.SetValueWithoutNotify(true);
-                uninstallButton.visible = true;
+                isInstalledToggle?.SetValueWithoutNotify(true);
+                isEnabledToggle?.SetValueWithoutNotify(true);
+                if (uninstallButton != null)
+                {
+                    uninstallButton.visible = true;
+                }
+                if (downloadButton != null)
+                {
+                    downloadButton.text = _loc.T("Mods.Download");
+                }
             }
             catch (MapException ex)
             {
