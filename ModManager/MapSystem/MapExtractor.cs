@@ -21,7 +21,7 @@ namespace ModManager.MapSystem
                 var timberFile = zipFile.Entries
                                         .Where(x => x.Name.Contains(".timber"))
                                         .SingleOrDefault() ?? throw new MapException("Map zip does not contain an entry for a .timber file");
-                timberFile.ExtractToFile(Path.Combine(Paths.Maps, timberFile.Name));
+                timberFile.ExtractToFile(Path.Combine(Paths.Maps, timberFile.Name), overWrite);
             }
 
             extractLocation = Paths.Maps;
