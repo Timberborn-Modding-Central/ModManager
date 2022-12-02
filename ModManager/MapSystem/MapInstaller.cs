@@ -48,7 +48,7 @@ namespace ModManager.MapSystem
             var manifests = _mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();
             manifests.Add(manifest);
 
-            string mapManifestPath = Path.Combine(installLocation, Manifest.FileName);
+            string mapManifestPath = Path.Combine(installLocation, MapManifest.FileName);
             _persistenceService.SaveObject(manifests, mapManifestPath);
             _installedAddonRepository.Add(manifest);
 

@@ -5,6 +5,8 @@ namespace ModManager.MapSystem
 {
     public class MapManifest : Manifest
     {
+        public new const string FileName = Manifest.FileName + Names.Extensions.Hidden;
+
         public string MapFileName { get; set; } = null!;
 
         public MapManifest()

@@ -19,7 +19,7 @@ namespace ModManager.MapSystem
 
         public IEnumerable<Manifest> Find()
         {
-            string manifestPath = Path.Combine(Paths.Maps, Manifest.FileName);
+            string manifestPath = Path.Combine(Paths.Maps, MapManifest.FileName);
 
             if (! File.Exists(manifestPath))
             {
