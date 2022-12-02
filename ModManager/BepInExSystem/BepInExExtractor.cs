@@ -24,7 +24,11 @@ namespace ModManager.BepInExSystem
             }
 
             extractLocation = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", "BepInExPack");
-            
+            if (!Directory.Exists(extractLocation))
+            {
+                Directory.CreateDirectory(extractLocation);
+            }
+
             System.IO.File.Delete(addonZipLocation);
 
             return true;
