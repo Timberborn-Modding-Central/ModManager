@@ -145,6 +145,8 @@ namespace Timberborn.ModsSystemUI
             _lastUpdated.clicked += () => SetActiveSortButton("LastUpdated");
             _updateAllButton.clicked += async () => await UpdateUpdatableMods();
 
+            _updateAllWrapper.visible = false;
+
             ShowModsAndTags();
 
             root.Q<Button>("Close").clicked += OnUICancelled;
