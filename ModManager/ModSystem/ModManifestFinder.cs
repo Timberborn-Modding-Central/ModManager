@@ -56,7 +56,6 @@ namespace ModManager.ModSystem
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 throw ex;
             }
         }
