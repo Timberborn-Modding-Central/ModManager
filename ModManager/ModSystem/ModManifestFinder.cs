@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using ModManager.AddonSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
@@ -19,11 +20,6 @@ namespace ModManager.ModSystem
 
         public IEnumerable<Manifest> Find()
         {
-            var bepInExManifest = Directory.GetFiles(Path.Combine(Paths.GameRoot, "BepInEx"), Manifest.FileName).FirstOrDefault();
-            if (bepInExManifest != null)
-            {
-                yield return LoadManifest(bepInExManifest);
-            }
 
             foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName, SearchOption.AllDirectories))
             {
@@ -48,13 +44,21 @@ namespace ModManager.ModSystem
 
         private Manifest LoadManifest(string manifestPath)
         {
-            var manifest = _persistenceService.LoadObject<Manifest>(manifestPath, false);
+            try
+            {
+                var manifest = _persistenceService.LoadObject<Manifest>(manifestPath, false);
 
-            manifest.Enabled = ! Path.GetExtension(manifestPath).Equals(Names.Extensions.Disabled);
+                manifest.Enabled = !Path.GetExtension(manifestPath).Equals(Names.Extensions.Disabled);
 
-            manifest.RootPath = Path.GetDirectoryName(manifestPath)!;
+                manifest.RootPath = Path.GetDirectoryName(manifestPath)!;
 
-            return manifest;
+                return manifest;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw ex;
+            }
         }
     }
 }

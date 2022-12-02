@@ -23,7 +23,7 @@ namespace ModManager.BepInExSystem
                 return false;
             }
 
-            extractLocation = Path.Combine(Paths.GameRoot, "BepInEx");
+            extractLocation = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", "BepInExPack");
             
             System.IO.File.Delete(addonZipLocation);
 
