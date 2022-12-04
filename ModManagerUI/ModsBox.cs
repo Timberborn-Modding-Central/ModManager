@@ -2,6 +2,7 @@ using Modio.Filters;
 using Modio.Models;
 using ModManager;
 using ModManager.AddonSystem;
+using ModManager.ManifestValidatorSystem;
 using ModManager.MapSystem;
 using ModManager.ModIoSystem;
 using ModManagerUI;
@@ -222,6 +223,7 @@ namespace Timberborn.ModsSystemUI
 
         private void OpenOptionsPanel()
         {
+            ManifestValidatorService.Instance.ValidateManifests();
             _panelStack.HideAndPush(this);
         }
 

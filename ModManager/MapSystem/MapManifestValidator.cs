@@ -1,16 +1,15 @@
-﻿using ModManager.PersistenceSystem;
+﻿using ModManager.AddonSystem;
+using ModManager.ManifestValidatorSystem;
+using ModManager.PersistenceSystem;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace ModManager.MapSystem
 {
-    // TODO: Idea is that this validates manifests on startup and removes invalid manifests
-    //       Is this needed?
-    //       Probably good to have atleast in someone manually deleted maps
-    //
-    //       For whenever maps are deleted we could check this indeed.
-    public class MapManifestValidator
+    public class MapManifestValidator : IManifestValidator
     {
         private readonly PersistenceService _persistenceService;
 
@@ -18,9 +17,28 @@ namespace ModManager.MapSystem
         {
             _persistenceService = PersistenceService.Instance;
         }
-        public void ValidateMapManifest(List<MapManifest> mapManifests)
-        {
 
+        public void ValidateManifests()
+        {
+            var mapManifestFinder = new MapManifestFinder();
+            var mapManifests = mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();
+            int oldManifestCount = mapManifests.Count;
+
+            foreach (MapManifest mapManifest in mapManifests.ToList())
+            {
+                var fileName = Path.Combine(Paths.Maps, $"{mapManifest.MapFileName}{Names.Extensions.TimberbornMap}");
+                if (!File.Exists(fileName))
+                {
+                    mapManifests.Remove(mapManifest);
+                }
+            }
+            int newManifestCount = mapManifests.Count;
+
+            if(oldManifestCount != newManifestCount )
+            {
+                string mapManifestPath = Path.Combine(Paths.Maps, MapManifest.FileName);
+                _persistenceService.SaveObject(mapManifests, mapManifestPath);
+            }
         }
     }
 }

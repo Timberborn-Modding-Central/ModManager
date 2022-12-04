@@ -2,6 +2,7 @@
 using ModManager.AddonInstallerSystem;
 using ModManager.ExtractorSystem;
 using ModManager.ManifestLocationFinderSystem;
+using ModManager.ManifestValidatorSystem;
 using ModManager.StartupSystem;
 
 namespace ModManager.MapSystem
@@ -16,6 +17,7 @@ namespace ModManager.MapSystem
             AddonEnablerRegistry.Instance.Add(RegistryId, new MapEnabler());
             ManifestLocationFinderRegistry.Instance.Add(RegistryId, new MapManifestFinder());
             AddonExtractorRegistry.Instance.Add(RegistryId, new MapExtractor());
+            ManifestValidatorRegistry.Instance.Add(RegistryId, new MapManifestValidator());
         }
     }
 }

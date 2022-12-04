@@ -1,14 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using ModManager.ModIoSystem;
+using ModManager.ManifestValidatorSystem;
 using ModManager.StartupSystem;
 using ModManagerUI.LocalizationSystem;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace ModManagerUI
 {
@@ -38,6 +35,7 @@ namespace ModManagerUI
                 options.ModManagerPath = Path.Combine(Paths.PluginPath, "ModManager");
             });
 
+            ManifestValidatorService.Instance.ValidateManifests();
 
             var harmony = new Harmony("com.modmanagerui");
             harmony.PatchAll();

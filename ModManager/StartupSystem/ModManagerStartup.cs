@@ -24,7 +24,6 @@ namespace ModManager.StartupSystem
             MapRegisterer.Instance,
             BepInExRegisterer.Instance,
 
-
             InstalledAddonRepository.Instance,
             RemoveFilesOnStartup.Instance
         };
