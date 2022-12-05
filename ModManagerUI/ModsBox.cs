@@ -146,7 +146,7 @@ namespace Timberborn.ModsSystemUI
             _lastUpdated.clicked += () => SetActiveSortButton("LastUpdated");
             _updateAllButton.clicked += async () => await UpdateUpdatableMods();
 
-            _updateAllWrapper.visible = false;
+            SetUpdateAllVisibility(false);
 
             ShowModsAndTags();
 
@@ -197,9 +197,19 @@ namespace Timberborn.ModsSystemUI
 
         private void SetUpdateAllVisibility()
         {
-            _updateAllWrapper.visible = _updateAvailable.Count > 0
-                ? true
+            bool updateAllVisible = _updateAvailable.Count > 0 
+                ? true 
                 : false;
+            SetUpdateAllVisibility(updateAllVisible);
+        }
+
+        private void SetUpdateAllVisibility(bool visible)
+        {
+            _updateAllWrapper.ToggleDisplayStyle(visible);
+            foreach (VisualElement child in _updateAllWrapper.Children())
+            {
+                child.ToggleDisplayStyle(visible);
+            }
         }
 
         private async Task PopulateUpdatableMods(CancellationToken token)
