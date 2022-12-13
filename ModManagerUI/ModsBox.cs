@@ -215,7 +215,8 @@ namespace Timberborn.ModsSystemUI
         private async Task PopulateUpdatableMods(CancellationToken token)
         {
             _updateAvailable.Clear();
-            foreach (Manifest manifest in _installedAddonRepository.All())
+            var installedMods = _installedAddonRepository.All().ToList();
+            foreach (Manifest manifest in installedMods)
             {
                 var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
                 if (mod.Modfile.Version != manifest.Version)
