@@ -19,7 +19,7 @@
 	  <PackageReference Include="BepInEx.Core" Version="5.4.21" />
 	  <PackageReference Include="Lib.Harmony" Version="2.2.2" />
 	  <PackageReference Include="TimberApi" Version="0.5.1" />
-	  <PackageReference Include="Timberborn.GameLibs" Version="0.2.9.1-r.0" />
+	  <PackageReference Include="Timberborn.GameLibs" Version="0.3.4.3-r.0" />
 	</ItemGroup>
 	
 	<ItemGroup>

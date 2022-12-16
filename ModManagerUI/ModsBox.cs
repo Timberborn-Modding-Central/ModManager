@@ -247,9 +247,11 @@ namespace Timberborn.ModsSystemUI
         {
             if (ModsWereChanged)
             {
-                _dialogBoxShower.Show(_loc.T("Mods.ModsChanged"),
-                                      GameQuitter.Quit, _loc.T("Mods.Quit"),
-                                      () => _panelStack.Pop(this), _loc.T("Mods.Stay"));
+                _dialogBoxShower.Create()
+                                .SetLocalizedMessage("Mods.ModsChanged")
+                                .SetConfirmButton(GameQuitter.Quit, _loc.T("Mods.Quit"))
+                                .SetCancelButton(() => _panelStack.Pop(this), _loc.T("Mods.Stay"))
+                                .Show();
             }
             else
             {
