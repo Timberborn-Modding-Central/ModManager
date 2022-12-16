@@ -39,6 +39,9 @@
                         <Timberborn.CoreUI.LocalizableLabel name="DependenciesLabel" text="Dependencies" text-loc-key="Mods.Dependencies" class="text--default mods-box-full-item__label" />
                         <ui:Label name="Dependencies" text="-" class="text--default" />
                     </ui:VisualElement>
+                    <ui:VisualElement name="VersionsWrapper" class="content-row-centered mods-box-full-item__header-item-wrapper">
+                        <Timberborn.CoreUI.Dropdown name="Versions" label-loc-key="Mods.Versions"  class="text--default" />
+                    </ui:VisualElement>
                     <Timberborn.CoreUI.LocalizableButton name="Download" text="Download" text-loc-key="Mods.Download" class="menu-button menu-button--medium" />
                 </ui:VisualElement>
             </ui:VisualElement>

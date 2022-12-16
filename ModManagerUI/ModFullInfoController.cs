@@ -6,6 +6,7 @@ using ModManager.ModIoSystem;
 using ModManagerUI;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,6 +20,10 @@ namespace Timberborn.ModsSystemUI
 {
     public class ModFullInfoController : IPanelController
     {
+        public ImmutableArray<string> VersionsString;
+        public ImmutableArray<File> Versions;
+        public File CurrentFile;
+
         private VisualElement LoadVisualElement(VisualTreeAsset visualTreeAsset)
         {
             VisualElement visualElement = visualTreeAsset.CloneTree().ElementAt(0);
@@ -33,13 +38,19 @@ namespace Timberborn.ModsSystemUI
         private readonly VisualElement _item = new();
         private readonly InstalledAddonRepository _installedAddonRepository;
 
+        private Mod _currentMod;
+        private Dropdown _versionsDropdown;
+        private readonly DropdownOptionsSetter _dropdownOptionsSetter;
+
         private AssetBundle _bundle;
 
         public ModFullInfoController(PanelStack panelStack,
                                      IAddonService addonService,
                                      VisualElementInitializer visualElementInitializer,
-                                     InstalledAddonRepository installedAddonRepository)
+                                     InstalledAddonRepository installedAddonRepository,
+                                     DropdownOptionsSetter dropdownOptionsSetter)
         {
+            _dropdownOptionsSetter = dropdownOptionsSetter;
             _panelStack = panelStack;
             _addonService = addonService;
             _visualElementInitializer = visualElementInitializer;
@@ -52,11 +63,49 @@ namespace Timberborn.ModsSystemUI
             return _item;
         }
 
+        public async Task SetVersions(Dropdown dropdown)
+        {
+            Console.WriteLine($"foo");
+            //var versions = _addonService.GetFiles(_currentMod).ToEnumerable();
+            var versions = _addonService.GetFiles(_currentMod);
+            var foo = new List<File>();
+            await foreach(var version in versions)
+            {
+                foo.Add(version);
+            }
+            Console.WriteLine($"foo1");
+            Versions = foo.ToImmutableArray();
+            Console.WriteLine($"foo2");
+
+            _dropdownOptionsSetter.SetOptions(
+                dropdown,
+                Versions.Select(x => x.Version ?? ""),
+                () => CurrentFile.Version ?? "",
+                delegate (string value)
+                {
+                    SetVersion(value);
+                });
+            Console.WriteLine($"foo3");
+        }
+
+        private void SetVersion(string value)
+        {
+            File currFile = Versions.Where(x => (x.Version ?? "") == value).SingleOrDefault();
+            CurrentFile = currFile;
+            _versionsDropdown.RefreshContent();
+        }
+
         public void SetMod(Mod mod)
         {
+            _currentMod = mod;
+            CurrentFile = mod.Modfile;
+
             string assetName = "assets/resources/ui/views/mods/ModsBoxFullItem.uxml";
             var asset = ModsBox._bundle.LoadAsset<VisualTreeAsset>(assetName);
             var item = LoadVisualElement(asset);
+
+            _versionsDropdown = item.Q<Dropdown>("Versions");
+            SetVersions(_versionsDropdown);
 
             item.Q<Button>("Close").clicked += OnUICancelled;
             item.Q<Label>("Name").text = mod.Name;
@@ -89,6 +138,7 @@ namespace Timberborn.ModsSystemUI
 
         public void OnUICancelled()
         {
+            _currentMod = null;
             _item.Clear();
             _panelStack.Pop(this);
         }

@@ -18,6 +18,7 @@
 	<ItemGroup>
 	  <PackageReference Include="BepInEx.Core" Version="5.4.21" />
 	  <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+	  <PackageReference Include="System.Linq.Async" Version="6.0.1" />
 	  <PackageReference Include="TimberApi" Version="0.5.1" />
 	  <PackageReference Include="Timberborn.GameLibs" Version="0.3.4.3-r.0" />
 	</ItemGroup>

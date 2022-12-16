@@ -187,5 +187,11 @@ namespace ModManager.AddonSystem
             _imageCache[uri] = byteArray;
             return byteArray;
         }
+
+        public IAsyncEnumerable<File> GetFiles(Mod mod)
+        {
+            var files = ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files.Search().ToEnumerable();
+            return files;
+        }
     }
 }

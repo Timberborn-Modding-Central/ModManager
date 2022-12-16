@@ -29,5 +29,7 @@ namespace ModManager.AddonSystem
         Task<(string location, Mod Mod)> Download(Mod mod, File file);
 
         Task<byte[]> GetImage(Uri uri);
+
+        IAsyncEnumerable<File> GetFiles(Mod mod);
     }
 }
