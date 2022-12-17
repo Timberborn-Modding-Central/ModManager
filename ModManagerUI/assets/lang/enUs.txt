@@ -27,4 +27,4 @@ Mods.UpdateAllLabel,You have {0} updates available.,Label for informing how many
 Mods.UpdateAll,Update All,Button for updating all updatable mods. Keep short
 Mods.Empty,,Empty string
 Mods.Update,Update,Button to update mod. Keep short
-Mods.Versions, Versions, test
+Mods.Versions,Version to install, Label for versions of a mod that are available in mod.io

@@ -122,7 +122,7 @@ namespace Timberborn.ModsSystemUI
             var depTask = SetDependencies(item, mod);
 
             var downloadButton = item.Q<Button>("Download");
-            downloadButton.clicked += async () => DoDownloadAndExtract(mod, downloadButton, installedVersion);
+            downloadButton.clicked += async () => await DoDownloadAndExtract(mod, downloadButton, installedVersion);
 
             LoadLogo(mod, item.Q<Image>("Logo"));
             SetNumbers(mod, item);
@@ -250,7 +250,7 @@ namespace Timberborn.ModsSystemUI
             ModsBox.ModsWereChanged = true;
             try
             {
-                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
+                (string location, Mod Mod) mod = await _addonService.Download(modInfo, CurrentFile);
                 TryInstall(mod, installedVersion);
             }
             catch (MapException ex)
