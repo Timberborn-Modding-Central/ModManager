@@ -1,3 +1,5 @@
+using Modio;
+using Modio.Filters;
 using Modio.Models;
 using ModManager;
 using ModManager.AddonSystem;
@@ -65,17 +67,15 @@ namespace Timberborn.ModsSystemUI
 
         public async Task SetVersions(Dropdown dropdown)
         {
-            Console.WriteLine($"foo");
-            //var versions = _addonService.GetFiles(_currentMod).ToEnumerable();
-            var versions = _addonService.GetFiles(_currentMod);
+            FilesClient filesCLient = _addonService.GetFiles(_currentMod);
+            var versions = filesCLient.Search(FileFilter.Version.Desc()).ToEnumerable();
+
             var foo = new List<File>();
             await foreach(var version in versions)
             {
                 foo.Add(version);
             }
-            Console.WriteLine($"foo1");
             Versions = foo.ToImmutableArray();
-            Console.WriteLine($"foo2");
 
             _dropdownOptionsSetter.SetOptions(
                 dropdown,
@@ -85,7 +85,6 @@ namespace Timberborn.ModsSystemUI
                 {
                     SetVersion(value);
                 });
-            Console.WriteLine($"foo3");
         }
 
         private void SetVersion(string value)

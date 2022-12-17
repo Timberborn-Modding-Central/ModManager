@@ -1,4 +1,5 @@
 ﻿using Modio;
+using Modio.Filters;
 using Modio.Models;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,6 @@ namespace ModManager.AddonSystem
 
         Task<byte[]> GetImage(Uri uri);
 
-        IAsyncEnumerable<File> GetFiles(Mod mod);
+        FilesClient GetFiles(Mod mod);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Modio;
+using Modio.Filters;
 using Modio.Models;
 using ModManager.AddonEnableSystem;
 using ModManager.AddonInstallerSystem;
@@ -188,10 +189,14 @@ namespace ModManager.AddonSystem
             return byteArray;
         }
 
-        public IAsyncEnumerable<File> GetFiles(Mod mod)
+        //public IAsyncEnumerable<File> GetFiles(Mod mod)
+        //{
+        //    var files = ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files.Search(filter).ToEnumerable();
+        //    return files;
+        //}
+        public FilesClient GetFiles(Mod mod)
         {
-            var files = ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files.Search().ToEnumerable();
-            return files;
+            return ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files;
         }
     }
 }
