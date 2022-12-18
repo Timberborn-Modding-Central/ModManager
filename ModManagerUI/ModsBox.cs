@@ -27,9 +27,10 @@ namespace Timberborn.ModsSystemUI
 {
     enum InstalledOptions
     {
-        Both,
+        All,
         Installed,
-        Uninstalled
+        Uninstalled,
+        UpdateAvailable
     }
     enum EnabledOptions
     {
@@ -355,6 +356,11 @@ namespace Timberborn.ModsSystemUI
                                                                            .ToArray();
                         var modFilter2 = ModFilter.Name.NotIn(uninstalledModNames);
                         _filter = _filter.And(modFilter2);
+                        break;
+                    case nameof(InstalledOptions.UpdateAvailable):
+                        var updateAvailableNames = _updateAvailable.Select(x => x.Value.Name ?? "");
+                        var modFilter3 = ModFilter.Name.In(updateAvailableNames);
+                        _filter = _filter.And(modFilter3);
                         break;
                     default:
                         break;
