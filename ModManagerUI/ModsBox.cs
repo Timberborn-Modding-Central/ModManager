@@ -157,7 +157,7 @@ namespace Timberborn.ModsSystemUI
             _search = root.Q<TextField>("Search");
             _search.isDelayed = true;
             _search.RegisterValueChangedCallback(_ => UpdateMods());
-            PopulateSpecialOptions();
+            PopulateInstalledOptions();
             PopulateEnabledOptions();
 
             return root;
@@ -394,7 +394,7 @@ namespace Timberborn.ModsSystemUI
             ShowModsAndTags();
         }
 
-        private void PopulateSpecialOptions()
+        private void PopulateInstalledOptions()
         {
             _installedOptionsOptions.Clear();
             _installedOptionsOptions.AddRange(Enum.GetNames(typeof(InstalledOptions)));
