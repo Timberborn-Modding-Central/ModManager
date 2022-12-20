@@ -206,3 +206,7 @@
 .mods-box-full-item__update-all-label {
     -unity-text-align: middle-left;
 }
+
+.mods-box-full-item__dropdown {
+    flex-grow: 1;
+}
