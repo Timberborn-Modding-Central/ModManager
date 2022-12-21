@@ -62,7 +62,7 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         with:
           text: ${{ steps.read_versions_file.outputs.content }}
-          regex: '(?<=TIMBER_API=).*'
+          regex: '(?<=MOD_MANAGER=).*'
 
       - id: bump_modmanager_version
         uses: christian-draeger/increment-semantic-version@1.0.2
@@ -123,7 +123,7 @@ jobs:
         uses: actions/upload-artifact@v3.0.0
         with:
           name: ModManager_${{ needs.versions.outputs.modmanager }}
-          path: ${{ env.timber_api_package_folder }}
+          path: ${{ env.modmanager_package_folder }}
 
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.2
@@ -178,7 +178,7 @@ jobs:
         uses: mingjun97/file-regex-replace@v1
         with:
           regex: '(?<=MOD_MANAGER=).*'
-          replacement: '${{ needs.versions.outputs.timber_api }}'
+          replacement: '${{ needs.versions.outputs.modmanager }}'
           include: 'project_versions.txt'
 
       - name: Modify changelog
