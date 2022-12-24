@@ -21,7 +21,7 @@ namespace ModManager.MapSystem
         {
             string manifestPath = Path.Combine(Paths.Maps, MapManifest.FileName);
 
-            if (! File.Exists(manifestPath))
+            if (!File.Exists(manifestPath))
             {
                 return new List<Manifest>();
             }
@@ -43,11 +43,19 @@ namespace ModManager.MapSystem
             foreach (MapManifest mapManifest in manifests)
             {
                 mapManifest.RootPath = Paths.Maps;
-                var mapFullname = $"{mapManifest.MapFileName}{Names.Extensions.TimberbornMap}";
-                var mapFile = Directory.GetFiles(Paths.Maps, mapFullname).FirstOrDefault();
-                mapManifest.Enabled = mapFile?.EndsWith(Names.Extensions.Disabled) ?? true
-                    ? false
-                    : true;
+
+                var mapNames = mapManifest.MapFileNames
+                                          .Select(mapname => mapname + Names.Extensions.TimberbornMap);
+                var enabled = true;
+                foreach (var mapName in mapNames)
+                {
+                    if (Directory.GetFiles(Paths.Maps, mapName).FirstOrDefault()?.EndsWith(Names.Extensions.Disabled) ?? false)
+                    {
+                        enabled = false;
+                        break;
+                    }
+                }
+                mapManifest.Enabled = enabled;
             }
         }
     }

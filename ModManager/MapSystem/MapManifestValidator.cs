@@ -26,8 +26,23 @@ namespace ModManager.MapSystem
 
             foreach (MapManifest mapManifest in mapManifests.ToList())
             {
-                var fileName = Path.Combine(Paths.Maps, $"{mapManifest.MapFileName}{Names.Extensions.TimberbornMap}");
-                if (!File.Exists(fileName))
+                List<string> fileNames = 
+                    mapManifest.MapFileNames
+                               .Select(filename => Path.Combine(Paths.Maps, 
+                                                         $"{filename}{Names.Extensions.TimberbornMap}"))
+                               .ToList();
+
+                bool filesDontExist = true;
+
+
+                foreach(var filename in fileNames)
+                {
+                    if (File.Exists(filename))
+                    {
+                        filesDontExist = false;
+                    }
+                }
+                if (filesDontExist)
                 {
                     mapManifests.Remove(mapManifest);
                 }

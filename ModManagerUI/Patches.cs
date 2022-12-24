@@ -35,7 +35,6 @@ namespace ModManagerUI
             containerDefinition.Bind<GoodbyeBoxFactory>().AsSingleton();
             containerDefinition.Bind<ModFullInfoController>().AsSingleton();
             containerDefinition.Bind<InstalledAddonRepository>().ToInstance(InstalledAddonRepository.Instance);
-            containerDefinition.Bind<ModVersionsDropdownOptionsSetter>().AsSingleton();
         }
     }
 }

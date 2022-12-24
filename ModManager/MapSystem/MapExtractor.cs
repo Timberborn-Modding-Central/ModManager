@@ -1,6 +1,7 @@
 ﻿using Modio.Models;
 using ModManager.ExtractorSystem;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -18,10 +19,26 @@ namespace ModManager.MapSystem
             }
             using (var zipFile = ZipFile.OpenRead(addonZipLocation))
             {
-                var timberFile = zipFile.Entries
-                                        .Where(x => x.Name.Contains(".timber"))
-                                        .SingleOrDefault() ?? throw new MapException("Map zip does not contain an entry for a .timber file");
-                timberFile.ExtractToFile(Path.Combine(Paths.Maps, timberFile.Name), overWrite);
+                var timberFiles = zipFile.Entries
+                                         .Where(x => x.Name.Contains(".timber"))
+                                         .ToList();
+
+                if (timberFiles.Count() == 0)
+                {
+                    throw new MapException("Map zip does not contain an entry for a .timber file");
+                }
+
+                foreach (ZipArchiveEntry timberFile in timberFiles)
+                {
+                    var filename = timberFile.Name.Replace(Names.Extensions.TimberbornMap, "");
+                    string[] files = Directory.GetFiles(Paths.Maps, filename);
+                    if (files.Length > 0)
+                    {
+                        filename += $"_{files.Length + 1}";
+                    }
+
+                    timberFile.ExtractToFile(Path.Combine(Paths.Maps, timberFile.Name), overWrite);
+                }
             }
 
             extractLocation = Paths.Maps;
