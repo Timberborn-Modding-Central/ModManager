@@ -1,14 +1,4 @@
 ## Unreleased
-
-### Changes
-
-## 0.0.1
-The first unuffocial release to test mod.io
-
-### Changes
-- The mod manager might work
-
-## 0.0.2
 The first release of a in-game mod manager for Timberborn! Contains basic features listed in the Changes
 
 ### Changes
@@ -17,3 +7,9 @@ The first release of a in-game mod manager for Timberborn! Contains basic featur
 - Enabling and disabling installed mods and maps
 - Filtering of mods by tags and installed/enabled status
 - Sorting of mods and maps by date added, download count and rating
+
+## 0.0.1
+The first unuffocial release to test mod.io
+
+### Changes
+- The mod manager might work
