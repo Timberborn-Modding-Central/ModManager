@@ -1,4 +1,6 @@
 ## Unreleased
+
+## 0.0.1
 The first release of a in-game mod manager for Timberborn! Contains basic features listed in the Changes
 
 ### Changes
