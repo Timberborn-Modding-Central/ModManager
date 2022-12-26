@@ -1,0 +1,30 @@
+ID,Text,Comment
+Menu.Mods,Custom maps and mods,Button opening a menu that allows downloading mods and custom maps. Keep short.
+Mods.Download,Download,Button to download a mod. Keep short.
+Mods.Info,Info,Button to show more info about a mod. Keep short.
+Mods.Loading,Loading...,Info text shown when mods are loading.
+Mods.Tags,Tags:,Header above available list of tags. Keep short.
+Mods.Author,Author:,Label before the author of mod.
+Mods.Downloads,Downloads:,Label before count of mod downloads.
+Mods.ShowMore,Show more,Button to show more mods. Keep short.
+Mods.Tags.All,All,Tag options to show all mods and maps. Keep short.
+Mods.Votes,Votes:,Label before count of mod likes and dislikes.
+Mods.ModsChanged,Changes to mods will take effect after a restart,Instruction on the dialog for the user to restart the game after changes to mods have been made
+Mods.Quit,Quit,Button to quit game
+Mods.Stay,Stay,Button to not quit the game immediately
+Mods.Enabled,Enabled,Toggle for if a mod is enabled or not. Keep short.
+Mods.Installed,Installed,Toggle for is a mod is installed or not. Keep short.
+Mods.Uninstall,Uninstall,Button to uninstall a mod.
+Mods.Options,Options:,Header above available list of special options. Keep short.
+Mods.Dependencies,Dependencies:,Header above available list of Dependencies. Keep short.
+Mods.InstalledVersion,Installed version:,Header above available list of InstalledVersion. Keep short.
+Mods.LiveVersion,Live version:,Header above of Live version. Keep short.
+Mods.Newest,Newest,Button to sort by newest.
+Mods.MostDownloaded,Most downloaded,Button to sort by amount of downloads.
+Mods.TopRated,Top rated,Button to sort by amount of likes.
+Mods.LastUpdated,Last updated,Button to sort by last update day.
+Mods.UpdateAllLabel,You have {0} updates available.,Label for informing how many mods have updates pending.
+Mods.UpdateAll,Update All,Button for updating all updatable mods. Keep short
+Mods.Empty,,Empty string
+Mods.Update,Update,Button to update mod. Keep short
+Mods.Versions,Version to install, Label for versions of a mod that are available in mod.io

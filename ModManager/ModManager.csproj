@@ -4,8 +4,15 @@
         <Nullable>enable</Nullable>
         <LangVersion>9</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <ReleaseVersion>0.1.0</ReleaseVersion>
+        <ReleaseVersion>MODMANAGER_VERSION</ReleaseVersion>
     </PropertyGroup>
+
+	<PropertyGroup>
+		<!--   Set to true if you want to use the live timberborn assemblies of the game, requires symlink     -->
+		<UseLocalTimberbornSource>true</UseLocalTimberbornSource>
+		<!--   none: don't copy, bepinex: path to game > bepinex > plugins, timberapi: path to game > timberapi     -->
+		<CopyDllToPath>bepinex</CopyDllToPath>
+	</PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="System.Buffers" Version="4.5.1" />
@@ -19,4 +26,21 @@
             <DestinationSubDirectory>libs/</DestinationSubDirectory>
         </Reference>
     </ItemGroup>
+
+	<!--    Used for automaticly transfer dll to Timberborn location, make a symlink `Timberborn` in the solution folder -->
+	<PropertyGroup Condition="$(CopyDllToPath) == 'timberapi'">
+		<TimberApiPath>$(SolutionDir)Timberborn\TimberAPI</TimberApiPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(CopyDllToPath) == 'bepinex'">
+		<TimberApiPath>$(SolutionDir)Timberborn\BepInEx\plugins\$(SolutionName)</TimberApiPath>
+	</PropertyGroup>
+
+	<Target Name="AutomaticCopyToTimberborn" BeforeTargets="AfterBuild" Condition="$(CopyDllToPath) != 'none'">
+		<Message Text="### Copy TimberApi common ###" Importance="high" />
+		<Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(TimberApiPath)" />
+		<Copy SourceFiles="$(ProjectDir)\libs\Microsoft.Bcl.AsyncInterfaces.dll" DestinationFolder="$(TimberApiPath)\libs" />
+		<Copy SourceFiles="$(ProjectDir)\libs\Modio.dll" DestinationFolder="$(TimberApiPath)\libs" />
+		<Copy SourceFiles="$(ProjectDir)\libs\System.Text.Json.dll" DestinationFolder="$(TimberApiPath)\libs" />
+	</Target>
 </Project>

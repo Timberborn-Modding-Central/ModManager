@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using ModManager.AddonEnableSystem;
 using ModManager.AddonSystem;
 
@@ -13,15 +15,20 @@ namespace ModManager.MapSystem
                 return false;
             }
 
-            string enabledFilePath = Path.Combine(Paths.Maps, mapManifest.MapFileName + Names.Extensions.TimberbornMap);
+            List<string> enabledFilePaths = mapManifest.MapFileNames
+                                                       .Select(mapfilename => Path.Combine(Paths.Maps, mapfilename + Names.Extensions.TimberbornMap))
+                                                       .ToList();
 
-            if (! File.Exists(enabledFilePath + Names.Extensions.Disabled))
+            foreach (string enabledFilePath in enabledFilePaths)
             {
-                return true;
+                if (!File.Exists(enabledFilePath + Names.Extensions.Disabled))
+                {
+                    continue;
+                }
+
+                File.Move(enabledFilePath + Names.Extensions.Disabled, enabledFilePath);
+                manifest.Enabled = true;
             }
-
-            File.Move(enabledFilePath + Names.Extensions.Disabled, enabledFilePath);
-
             return true;
         }
 
@@ -32,14 +39,20 @@ namespace ModManager.MapSystem
                 return false;
             }
 
-            string mapFilePath = Path.Combine(Paths.Maps, mapManifest.MapFileName + Names.Extensions.TimberbornMap);
+            List<string> mapFilePaths = mapManifest.MapFileNames
+                                                   .Select(mapfilename => Path.Combine(Paths.Maps, mapfilename + Names.Extensions.TimberbornMap))
+                                                   .ToList();
 
-            if (! File.Exists(mapFilePath))
+            foreach (string mapFilePath in mapFilePaths)
             {
-                return true;
-            }
+                if (!File.Exists(mapFilePath))
+                {
+                    continue;
+                }
 
-            File.Move(mapFilePath, mapFilePath + Names.Extensions.Disabled);
+                File.Move(mapFilePath, mapFilePath + Names.Extensions.Disabled);
+                manifest.Enabled = false;
+            }
 
             return true;
         }

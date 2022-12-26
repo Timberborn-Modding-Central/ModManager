@@ -1,0 +1,9 @@
+## Unreleased
+The first release of a in-game mod manager for Timberborn! Contains basic features listed in the Changes
+
+### Changes
+- Initial release of in-game mod manager
+- Installing and uninstalling of mods and maps
+- Enabling and disabling installed mods and maps
+- Filtering of mods by tags and installed/enabled status
+- Sorting of mods and maps by date added, download count and rating
