@@ -87,11 +87,10 @@ jobs:
           regex: false
 
       - name: Replace MOD_IO_APIKEY with actual api key
-        uses: mingjun97/file-regex-replace@v1
+        uses: jacobtomlinson/gha-find-replace@v2
         with:
-          regex: 'MOD_IO_APIKEY'
-          replacement: '${{ secrets.MODIO_APIKEY }}'
-          include: 'ModManagerUIPlugin.cs'
+          find: 'MOD_IO_APIKEY'
+          replace: '${{ secrets.MODIO_APIKEY }}'
 
       - name: Restore dependencies
         run: dotnet restore
