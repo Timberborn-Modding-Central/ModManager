@@ -31,7 +31,7 @@ env:
   modmanager_ui_project_path: "ModManagerUI/ModManagerUI.csproj"
   modmanager_ui_output_path: "ModManagerUI/bin/RELEASE/netstandard2.1"
   modmanager_ui_nuget_path: "ModManagerUI/bin/RELEASE"
-  modmanager_ui_libs: "ModManagerUi/libs/"
+  modmanager_ui_libs: "ModManagerUI/libs/"
 
   assets_folder: "Assets"
   modmanager_package_folder: "ModIoPackage"
@@ -86,6 +86,12 @@ jobs:
           replace: ${{ needs.versions.outputs.modmanager }}
           regex: false
 
+      - name: Replace MOD_IO_APIKEY with actual api key
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'MOD_IO_APIKEY'
+          replace: '${{ secrets.MODIO_APIKEY }}'
+
       - name: Restore dependencies
         run: dotnet restore
 
@@ -117,7 +123,7 @@ jobs:
         run: cp ${{ env.modmanager_ui_output_path }}/ModManagerUI.dll ${{ env.modmanager_package_dll_folder }} 
 
       - name: Cope libs
-        run: cp ${{ modmanager_ui_libs }} ${{ env.modmanager_package_libs_folder }} 
+        run: cp ${{ env.modmanager_ui_libs }} ${{ env.modmanager_package_dll_folder }} -r
 #
       - name: Upload ModMonager Mod.io Build Artifact
         uses: actions/upload-artifact@v3.0.0
@@ -142,7 +148,7 @@ jobs:
         id: regex
         uses: MeilCli/regex-match@v1.0.1
         with:
-          regex_pattern: '(?<=### Changes\n).*?(?(?=##)(?=##)|\Z)'
+          regex_pattern: '(?<=### Changes\n).*?(?:(?=##)|$(?![\r\n]))'
           regex_option: s
           search_string: "${{ steps.package.outputs.content }}"
 
@@ -161,8 +167,8 @@ jobs:
           game: ${{ steps.metadata.outputs.GAME }}
           mod: ${{ steps.metadata.outputs.MOD }}
           version: ${{ needs.versions.outputs.modmanager }}
-          path: ${{ github.event.inputs.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
-          active: ${{env.make_active_file_in_modio }}
+          path: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
+          active: ${{ github.event.inputs.make_active_file_in_modio }}
           changelog: "${{ steps.regex.outputs.matched_first }}"
 
 
@@ -180,6 +186,7 @@ jobs:
           regex: '(?<=MOD_MANAGER=).*'
           replacement: '${{ needs.versions.outputs.modmanager }}'
           include: 'project_versions.txt'
+          exclude: 'Timberborn'
 
       - name: Modify changelog
         if: needs.create_modmanager_modio_pack.result == 'success'
@@ -188,9 +195,12 @@ jobs:
           regex: '## Unreleased'
           replacement: |
             ## Unreleased
+
+            ### Changes
             
             ## ${{ needs.versions.outputs.modmanager }}
           include: 'changelog.txt'
+          exclude: 'Timberborn'
 
       - name: Commit updated version
         uses: EndBug/add-and-commit@v9
