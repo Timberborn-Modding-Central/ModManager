@@ -183,7 +183,7 @@ jobs:
         if: needs.create_modmanager_modio_pack.result == 'success'
         uses: mingjun97/file-regex-replace@v1
         with:
-          regex: '(?<=MOD_MANAGER).*'
+          regex: '(?<=MOD_MANAGER=).*'
           replacement: '${{ needs.versions.outputs.modmanager }}'
           include: 'project_versions.txt'
 
