@@ -123,7 +123,7 @@ jobs:
         run: cp ${{ env.modmanager_ui_output_path }}/ModManagerUI.dll ${{ env.modmanager_package_dll_folder }} 
 
       - name: Cope libs
-        run: cp ${{ env.modmanager_ui_libs }} ${{ env.modmanager_package_libs_folder }} -r
+        run: cp ${{ env.modmanager_ui_libs }} ${{ env.modmanager_package_dll_folder }} -r
 #
       - name: Upload ModMonager Mod.io Build Artifact
         uses: actions/upload-artifact@v3.0.0
@@ -148,7 +148,7 @@ jobs:
         id: regex
         uses: MeilCli/regex-match@v1.0.1
         with:
-          regex_pattern: '(?<=### Changes\n).*?(?(?=##)(?=##)|\Z)'
+          regex_pattern: '(?<=### Changes\n).*?(?:(?=##)|\Z)'
           regex_option: s
           search_string: "${{ steps.package.outputs.content }}"
 
