@@ -190,6 +190,7 @@ jobs:
           regex: '(?<=MOD_MANAGER=).*'
           replacement: '${{ needs.versions.outputs.modmanager }}'
           include: 'project_versions.txt'
+          exclude: 'Timberborn'
 
       - name: Modify changelog
         if: needs.create_modmanager_modio_pack.result == 'success'
