@@ -86,6 +86,14 @@ jobs:
           replace: ${{ needs.versions.outputs.modmanager }}
           regex: false
 
+      - name: Replace MOD_IO_APIKEY with actual api key
+        if: needs.create_modmanager_modio_pack.result == 'success'
+        uses: mingjun97/file-regex-replace@v1
+        with:
+          regex: 'MOD_IO_APIKEY'
+          replacement: '${{ secrets.MODIO_APIKEY }}'
+          include: 'ModManagerUIPlugin.cs'
+
       - name: Restore dependencies
         run: dotnet restore
 

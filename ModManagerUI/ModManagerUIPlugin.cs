@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace ModManagerUI
 {
-    [BepInPlugin("com.modmanagerui", "Mod Manager UI", "0.1.0")]
+    [BepInPlugin("com.modmanagerui", "Mod Manager UI", "MODMANAGER_VERSION")]
     public class ModManagerUIPlugin : BaseUnityPlugin
     {
         public static ManualLogSource Log;
@@ -23,15 +23,13 @@ namespace ModManagerUI
                 Assembly.LoadFile(file);
             }
 
-            ModManagerStartup.Run("7f52d134de5cde63fdcf163478e688e3", (options) =>
+            ModManagerStartup.Run("MOD_IO_APIKEY", (options) =>
             {
                 options.GameId = 3659;
                 options.GamePath = BepInEx.Paths.GameRootPath;
                 options.IsGameRunning = true;
-                //options.ModInstallationPath = Path.Combine(BepInEx.Paths.GameRootPath, "mods");
                 options.ModInstallationPath = Path.Combine(Paths.PluginPath);
                 options.ModIoGameUrl = "https://mod.io/g/timberborn";
-                //options.ModManagerPath = Path.Combine(options.ModInstallationPath, "ModManager", "plugins");
                 options.ModManagerPath = Path.Combine(Paths.PluginPath, "ModManager");
             });
 
