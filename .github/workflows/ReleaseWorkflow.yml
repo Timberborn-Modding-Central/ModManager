@@ -148,7 +148,6 @@ jobs:
         id: regex
         uses: MeilCli/regex-match@v1.0.1
         with:
-#          regex_pattern: '(?<=### Changes\n).*?(?:(?=##)|\Z)'
           regex_pattern: '(?<=### Changes\n).*?(?:(?=##)|$(?![\r\n]))'
           regex_option: s
           search_string: "${{ steps.package.outputs.content }}"
@@ -169,7 +168,7 @@ jobs:
           mod: ${{ steps.metadata.outputs.MOD }}
           version: ${{ needs.versions.outputs.modmanager }}
           path: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
-          active: ${{env.make_active_file_in_modio }}
+          active: ${{ github.event.inputs.make_active_file_in_modio }}
           changelog: "${{ steps.regex.outputs.matched_first }}"
 
 
@@ -179,9 +178,6 @@ jobs:
     if: always() && (needs.create_modmanager_modio_pack.result == 'success')
     steps:
       - uses: actions/checkout@v2
-
-      - name: foo
-        run: ls -l
 
       - name: Modify modmanager version number
         if: needs.create_modmanager_modio_pack.result == 'success'
