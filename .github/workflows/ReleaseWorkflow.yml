@@ -202,6 +202,7 @@ jobs:
             
             ## ${{ needs.versions.outputs.modmanager }}
           include: 'changelog.txt'
+          exclude: 'Timberborn'
 
       - name: Commit updated version
         uses: EndBug/add-and-commit@v9
