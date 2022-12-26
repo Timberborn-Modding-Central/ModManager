@@ -31,7 +31,7 @@ env:
   modmanager_ui_project_path: "ModManagerUI/ModManagerUI.csproj"
   modmanager_ui_output_path: "ModManagerUI/bin/RELEASE/netstandard2.1"
   modmanager_ui_nuget_path: "ModManagerUI/bin/RELEASE"
-  modmanager_ui_libs: "ModManagerUi/libs/"
+  modmanager_ui_libs: "ModManagerUI/libs/"
 
   assets_folder: "Assets"
   modmanager_package_folder: "ModIoPackage"
@@ -87,7 +87,6 @@ jobs:
           regex: false
 
       - name: Replace MOD_IO_APIKEY with actual api key
-        if: needs.create_modmanager_modio_pack.result == 'success'
         uses: mingjun97/file-regex-replace@v1
         with:
           regex: 'MOD_IO_APIKEY'
