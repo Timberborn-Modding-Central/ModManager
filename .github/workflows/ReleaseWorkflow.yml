@@ -195,6 +195,8 @@ jobs:
           regex: '## Unreleased'
           replacement: |
             ## Unreleased
+
+            ### Changes
             
             ## ${{ needs.versions.outputs.modmanager }}
           include: 'changelog.txt'
