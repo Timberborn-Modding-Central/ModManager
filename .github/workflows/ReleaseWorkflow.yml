@@ -116,8 +116,11 @@ jobs:
       - name: Copy ModManagerUI.dll
         run: cp ${{ env.modmanager_ui_output_path }}/ModManagerUI.dll ${{ env.modmanager_package_dll_folder }} 
 
-      - name: Cope libs
-        run: cp ${{ modmanager_ui_libs }} ${{ env.modmanager_package_libs_folder }} 
+      - name: Copy libs
+        run: cp ${{ env.modmanager_ui_libs }} ${{ env.modmanager_package_dll_folder }} -r
+
+      - name: Copy lang
+        run: cp ${{ env.modmanager_ui_lang }} ${{ env.modmanager_package_dll_folder }} -r
 #
       - name: Upload ModMonager Mod.io Build Artifact
         uses: actions/upload-artifact@v3.0.0
