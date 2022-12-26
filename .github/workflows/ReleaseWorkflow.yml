@@ -167,7 +167,7 @@ jobs:
           game: ${{ steps.metadata.outputs.GAME }}
           mod: ${{ steps.metadata.outputs.MOD }}
           version: ${{ needs.versions.outputs.modmanager }}
-          path: ${{ github.event.inputs.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
+          path: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
           active: ${{env.make_active_file_in_modio }}
           changelog: "${{ steps.regex.outputs.matched_first }}"
 
