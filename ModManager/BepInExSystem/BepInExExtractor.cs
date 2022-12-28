@@ -23,7 +23,7 @@ namespace ModManager.BepInExSystem
                 return false;
             }
 
-            extractLocation = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", "BepInExPack");
+            extractLocation = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}");
             if (!Directory.Exists(extractLocation))
             {
                 Directory.CreateDirectory(extractLocation);
