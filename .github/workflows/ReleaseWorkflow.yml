@@ -32,6 +32,8 @@ env:
   modmanager_ui_output_path: "ModManagerUI/bin/RELEASE/netstandard2.1"
   modmanager_ui_nuget_path: "ModManagerUI/bin/RELEASE"
   modmanager_ui_libs: "ModManagerUI/libs/"
+  modmanager_ui_lang: "ModManagerUI/assets/lang/"
+  modmanager_ui_assentbundle: "ModManagerUI/assets/assetbundles/"
 
   assets_folder: "Assets"
   modmanager_package_folder: "ModIoPackage"
@@ -121,6 +123,9 @@ jobs:
 
       - name: Copy ModManagerUI.dll
         run: cp ${{ env.modmanager_ui_output_path }}/ModManagerUI.dll ${{ env.modmanager_package_dll_folder }} 
+
+      - name: Copy assetbundle
+        run: cp ${{ env.modmanager_ui_assentbundle }}modmanagerui.bundle ${{ env.modmanager_package_assets_folder }} -r
 
       - name: Copy libs
         run: cp ${{ env.modmanager_ui_libs }} ${{ env.modmanager_package_dll_folder }} -r
