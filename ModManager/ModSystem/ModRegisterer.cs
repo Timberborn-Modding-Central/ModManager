@@ -1,5 +1,6 @@
 ﻿using ModManager.AddonEnableSystem;
 using ModManager.AddonInstallerSystem;
+using ModManager.ExtractorSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.StartupSystem;
 
@@ -14,6 +15,7 @@ namespace ModManager.ModSystem
             AddonInstallerRegistry.Instance.Add(RegistryId, new ModInstaller());
             AddonEnablerRegistry.Instance.Add(RegistryId, new ModEnabler());
             ManifestLocationFinderRegistry.Instance.Add(RegistryId, new ModManifestFinder());
+            AddonExtractorRegistry.Instance.Add(RegistryId, new ModExtractor());
         }
     }
 }

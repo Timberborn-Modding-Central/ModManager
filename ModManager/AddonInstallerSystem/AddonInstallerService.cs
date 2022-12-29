@@ -13,11 +13,11 @@ namespace ModManager.AddonInstallerSystem
             _addonInstallerRegistry = AddonInstallerRegistry.Instance;
         }
 
-        public void Install(Mod mod, File file)
+        public void Install(Mod mod, string zipLocation)
         {
             foreach (IAddonInstaller installer in _addonInstallerRegistry.GetAddonInstallers())
             {
-                if (installer.Install(mod, file))
+                if (installer.Install(mod, zipLocation))
                 {
                     return;
                 }
@@ -39,11 +39,11 @@ namespace ModManager.AddonInstallerSystem
             throw new AddonInstallerException($"{manifest.ModName} could not be uninstalled by any installer");
         }
 
-        public void ChangeVersion(Mod mod, File file)
+        public void ChangeVersion(Mod mod, File file, string zipLocation)
         {
             foreach (IAddonInstaller installer in _addonInstallerRegistry.GetAddonInstallers())
             {
-                if (installer.ChangeVersion(mod, file))
+                if (installer.ChangeVersion(mod, file, zipLocation))
                 {
                     return;
                 }

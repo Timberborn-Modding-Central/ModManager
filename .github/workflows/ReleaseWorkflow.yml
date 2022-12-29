@@ -1,0 +1,217 @@
+name: Automatic release
+
+on:
+  workflow_dispatch:
+    inputs:
+      modmanager_update_type:
+        type: choice
+        default: beta
+        description: Update type
+        required: false
+        options:
+          - major
+          - feature
+          - bug
+          - alpha
+          - beta
+          - rc
+      make_active_file_in_modio:
+        type: boolean
+        description: Make active file in Mod.io
+        default: false
+        required: true
+
+env:
+  modmanager_release_name: "ModManager"
+  
+  modmanager_project_path: "ModManager/ModManager.csproj"
+  modmanager_output_path: "ModManager/bin/RELEASE/netstandard2.1"
+  modmanager_nuget_path: "ModManager/bin/RELEASE"
+  
+  modmanager_ui_project_path: "ModManagerUI/ModManagerUI.csproj"
+  modmanager_ui_output_path: "ModManagerUI/bin/RELEASE/netstandard2.1"
+  modmanager_ui_nuget_path: "ModManagerUI/bin/RELEASE"
+  modmanager_ui_libs: "ModManagerUI/libs/"
+  modmanager_ui_lang: "ModManagerUI/assets/lang/"
+  modmanager_ui_assentbundle: "ModManagerUI/assets/assetbundles/"
+
+  assets_folder: "Assets"
+  modmanager_package_folder: "ModIoPackage"
+  modmanager_package_dll_folder: "ModIoPackage/ModManager"
+  modmanager_package_assets_folder: "ModIoPackage/ModManager/assets"
+  modmanager_package_libs_folder: "ModIoPackage/ModManager/libs"
+  modmanager_package_lang_folder: "ModIoPackage/ModManager/lang"
+
+
+jobs:
+  # Automatic updating semantic versioning
+  versions:
+    name: Parse project versions
+    runs-on: ubuntu-latest
+    outputs:
+      modmanager: ${{ steps.bump_modmanager_version.outputs.next-version }}
+    steps:
+      - uses: actions/checkout@v3
+
+      # Loading versioning file
+      - name: Read versions.txt
+        id: read_versions_file
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./project_versions.txt
+
+      - id: modmananger
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ steps.read_versions_file.outputs.content }}
+          regex: '(?<=MOD_MANAGER=).*'
+
+      - id: bump_modmanager_version
+        uses: christian-draeger/increment-semantic-version@1.0.2
+        with:
+          current-version: ${{ steps.modmananger.outputs.match }}
+          version-fragment: ${{ github.event.inputs.modmanager_update_type }}
+
+  create_modmanager_modio_pack:
+    needs: [versions]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+
+      - name: Find and Replace MODMANAGER_VERSION
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "MODMANAGER_VERSION"
+          replace: ${{ needs.versions.outputs.modmanager }}
+          regex: false
+
+      - name: Replace MOD_IO_APIKEY with actual api key
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'MOD_IO_APIKEY'
+          replace: '${{ secrets.MODIO_APIKEY }}'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build ModManager
+        run: dotnet build ${{env.modmanager_project_path}} --no-restore --configuration RELEASE -p:Version=${{ needs.versions.outputs.modmanager }}
+
+      - name: Build ModManagerUI
+        run: dotnet build ${{env.modmanager_ui_project_path}} --no-restore --configuration RELEASE -p:Version=${{ needs.versions.outputs.modmanager }}
+      
+      - name: Create package folder
+        run: mkdir ${{ env.modmanager_package_folder }}
+
+      - name: Create ModManager dll folder
+        run: mkdir ${{ env.modmanager_package_dll_folder }} -p
+
+      - name: Create ModManager assets folder
+        run: mkdir ${{ env.modmanager_package_assets_folder }} -p
+
+      - name: Create ModManager libs folder
+        run: mkdir ${{ env.modmanager_package_libs_folder }} -p
+
+      - name: Create ModManager lang folder
+        run: mkdir ${{ env.modmanager_package_lang_folder }} -p
+
+      - name: Copy ModManager.dll
+        run: cp ${{ env.modmanager_output_path }}/ModManager.dll ${{ env.modmanager_package_dll_folder }} 
+
+      - name: Copy ModManagerUI.dll
+        run: cp ${{ env.modmanager_ui_output_path }}/ModManagerUI.dll ${{ env.modmanager_package_dll_folder }} 
+
+      - name: Copy assetbundle
+        run: cp ${{ env.modmanager_ui_assentbundle }}modmanagerui.bundle ${{ env.modmanager_package_assets_folder }} -r
+
+      - name: Copy libs
+        run: cp ${{ env.modmanager_ui_libs }} ${{ env.modmanager_package_dll_folder }} -r
+
+      - name: Copy lang
+        run: cp ${{ env.modmanager_ui_lang }} ${{ env.modmanager_package_dll_folder }} -r
+#
+      - name: Upload ModMonager Mod.io Build Artifact
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: ModManager_${{ needs.versions.outputs.modmanager }}
+          path: ${{ env.modmanager_package_folder }}
+
+      - name: Zip Release
+        uses: TheDoctor0/zip-release@0.6.2
+        with:
+          filename: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
+          path: ${{ env.modmanager_package_folder }}
+          directory: .
+
+      - name: Read changelog
+        id: package
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./changelog.txt
+
+      - name: regex match action
+        id: regex
+        uses: MeilCli/regex-match@v1.0.1
+        with:
+          regex_pattern: '(?<=### Changes\n).*?(?:(?=##)|$(?![\r\n]))'
+          regex_option: s
+          search_string: "${{ steps.package.outputs.content }}"
+
+      - name: extract metadata
+        id: metadata
+        run: |
+          GAME_ID=$(jq '.game_id' metadata.json)
+          MOD_ID=$(jq '.modmanager_mod_id' metadata.json)
+
+          echo "GAME=$GAME_ID" >> $GITHUB_OUTPUT
+          echo "MOD=$MOD_ID" >> $GITHUB_OUTPUT
+
+      - uses: nickelc/upload-to-modio@v2.0.0
+        with:
+          token: ${{ secrets.MODIO_TOKEN }}
+          game: ${{ steps.metadata.outputs.GAME }}
+          mod: ${{ steps.metadata.outputs.MOD }}
+          version: ${{ needs.versions.outputs.modmanager }}
+          path: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
+          active: ${{ github.event.inputs.make_active_file_in_modio }}
+          changelog: "${{ steps.regex.outputs.matched_first }}"
+
+
+  update_version:
+    runs-on: ubuntu-latest
+    needs: [versions, create_modmanager_modio_pack]
+    if: always() && (needs.create_modmanager_modio_pack.result == 'success')
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Modify modmanager version number
+        if: needs.create_modmanager_modio_pack.result == 'success'
+        uses: mingjun97/file-regex-replace@v1
+        with:
+          regex: '(?<=MOD_MANAGER=).*'
+          replacement: '${{ needs.versions.outputs.modmanager }}'
+          include: 'project_versions.txt'
+          exclude: 'Timberborn'
+
+      - name: Modify changelog
+        if: needs.create_modmanager_modio_pack.result == 'success'
+        uses: mingjun97/file-regex-replace@v1
+        with:
+          regex: '## Unreleased'
+          replacement: |
+            ## Unreleased
+
+            ### Changes
+            
+            ## ${{ needs.versions.outputs.modmanager }}
+          include: 'changelog.txt'
+          exclude: 'Timberborn'
+
+      - name: Commit updated version
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Updated versions"
+          default_author: github_actions

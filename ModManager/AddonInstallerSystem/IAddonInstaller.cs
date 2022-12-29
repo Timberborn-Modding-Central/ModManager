@@ -5,10 +5,10 @@ namespace ModManager.AddonInstallerSystem
 {
     public interface IAddonInstaller
     {
-        public bool Install(Mod mod, File file);
+        public bool Install(Mod mod, string zipLocation);
 
         public bool Uninstall(Manifest manifest);
 
-        public bool ChangeVersion(Mod mod, File file);
+        public bool ChangeVersion(Mod mod, File file, string zipLocation);
     }
 }
