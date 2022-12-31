@@ -1,31 +1,30 @@
 ﻿using Modio.Models;
 using ModManager.ExtractorSystem;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
-namespace ModManager.ModSystem
+namespace ModManager.ModManagerSystem
 {
-    public class ModExtractor : IAddonExtractor
+    public class ModManagerExtractor : IAddonExtractor
     {
-        private const string _bepInExPackName = "BepInExPack";
+        private string _modManagerFolderName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private const string _modManagerPackageName = "Mod Manager";
-        private List<string> _foldersToIgnore = new() { "configs" };
 
         public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         {
+            Console.WriteLine($"Mod Manager extractor!");
+            Console.WriteLine($"_modManagerFolderName: {_modManagerFolderName}");
             extractLocation = "";
             if (!modInfo.Tags.Any(x => x.Name == "Mod") ||
-                modInfo.Name == _bepInExPackName ||
-                modInfo.Name == _modManagerPackageName)
+                modInfo.Name != _modManagerPackageName)
             {
                 return false;
             }
-            string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
+            string modFolderName = _modManagerFolderName;
+            Console.WriteLine($"modFolderName: {modFolderName}");
             ClearOldModFiles(modInfo, modFolderName);
             extractLocation = Path.Combine(Paths.Mods, modFolderName);
             ZipFile.ExtractToDirectory(addonZipLocation, extractLocation, overWrite);
@@ -33,7 +32,6 @@ namespace ModManager.ModSystem
 
             return true;
         }
-
         private void ClearOldModFiles(Mod modInfo, string modFolderName)
         {
             if (TryGetExistingModFolder(modInfo, out string dirs))
@@ -69,11 +67,11 @@ namespace ModManager.ModSystem
 
             return false;
         }
+
         private void DeleteModFiles(string modFolderName)
         {
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Mods, modFolderName));
-            var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
-                                          .Where(folder => !_foldersToIgnore.Contains(folder.FullName.Split(Path.DirectorySeparatorChar).Last()));
+            var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories);
             foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
