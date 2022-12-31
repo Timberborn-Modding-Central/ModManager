@@ -144,7 +144,7 @@ jobs:
         with:
           filename: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
           path: "ModManager"
-          directory: ${{ env.modmanager_package_folder }}
+          directory: ./${{ env.modmanager_package_folder }}
 
       - name: Read changelog
         id: package
