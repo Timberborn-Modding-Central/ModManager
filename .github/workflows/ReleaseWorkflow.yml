@@ -36,7 +36,6 @@ env:
   modmanager_ui_assentbundle: "ModManagerUI/assets/assetbundles/"
 
   assets_folder: "Assets"
-  modmanager_package_folder: ""
   modmanager_package_dll_folder: "ModManager"
   modmanager_package_assets_folder: "ModManager/assets"
   modmanager_package_libs_folder: "ModManager/libs"
@@ -102,9 +101,6 @@ jobs:
 
       - name: Build ModManagerUI
         run: dotnet build ${{env.modmanager_ui_project_path}} --no-restore --configuration RELEASE -p:Version=${{ needs.versions.outputs.modmanager }}
-      
-      - name: Create package folder
-        run: mkdir ${{ env.modmanager_package_folder }}
 
       - name: Create ModManager dll folder
         run: mkdir ${{ env.modmanager_package_dll_folder }} -p
@@ -137,13 +133,13 @@ jobs:
         uses: actions/upload-artifact@v3.0.0
         with:
           name: ModManager_${{ needs.versions.outputs.modmanager }}
-          path: ${{ env.modmanager_package_folder }}
+          path: ${{ env.modmanager_package_dll_folder }}
 
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.2
         with:
           filename: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
-          path: ${{ env.modmanager_package_folder }}
+          path: ${{ env.modmanager_package_dll_folder }}
           directory: .
 
       - name: Read changelog
