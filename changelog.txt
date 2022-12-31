@@ -2,6 +2,10 @@
 
 ### Changes
 
+## 1.0.2
+
+### Changes
+
 ## 1.0.1
 The first release of a in-game mod manager for Timberborn! Contains basic features listed in the Changes
 
