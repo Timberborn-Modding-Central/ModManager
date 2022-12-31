@@ -144,7 +144,7 @@ jobs:
         with:
           filename: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
           path: "ModManager"
-          directory: ./${{ env.modmanager_package_folder }}
+          directory: ${{ env.modmanager_package_folder }}
 
       - name: Read changelog
         id: package
@@ -175,7 +175,7 @@ jobs:
           game: ${{ steps.metadata.outputs.GAME }}
           mod: ${{ steps.metadata.outputs.MOD }}
           version: ${{ needs.versions.outputs.modmanager }}
-          path: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
+          path: ${{ env.modmanager_package_folder }}/${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
           active: ${{ github.event.inputs.make_active_file_in_modio }}
           changelog: "${{ steps.regex.outputs.matched_first }}"
 
