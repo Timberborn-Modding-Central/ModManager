@@ -25,7 +25,7 @@ namespace ModManagerUI
                 options.IsGameRunning = true;
                 options.ModInstallationPath = Path.Combine(Paths.PluginPath);
                 options.ModIoGameUrl = "https://mod.io/g/timberborn";
-                options.ModManagerPath = Path.Combine(Paths.PluginPath, "ModManager");
+                options.ModManagerPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             });
 
             ManifestValidatorService.Instance.ValidateManifests();
