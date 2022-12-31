@@ -18,12 +18,7 @@ namespace ModManagerUI
         {
             Log = Logger;
 
-            foreach(var file in Directory.GetFiles(Path.Combine(Paths.PluginPath, "ModManager", "libs")))
-            {
-                Assembly.LoadFile(file);
-            }
-
-            ModManagerStartup.Run("MOD_IO_APIKEY", (options) =>
+            ModManagerStartup.Run("MOD_IO_APIKEY", options =>
             {
                 options.GameId = 3659;
                 options.GamePath = BepInEx.Paths.GameRootPath;
