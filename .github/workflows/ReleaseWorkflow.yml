@@ -36,11 +36,11 @@ env:
   modmanager_ui_assentbundle: "ModManagerUI/assets/assetbundles/"
 
   assets_folder: "Assets"
-  modmanager_package_folder: "ModIoPackage"
-  modmanager_package_dll_folder: "ModIoPackage/ModManager"
-  modmanager_package_assets_folder: "ModIoPackage/ModManager/assets"
-  modmanager_package_libs_folder: "ModIoPackage/ModManager/libs"
-  modmanager_package_lang_folder: "ModIoPackage/ModManager/lang"
+  modmanager_package_folder: ""
+  modmanager_package_dll_folder: "ModManager"
+  modmanager_package_assets_folder: "ModManager/assets"
+  modmanager_package_libs_folder: "ModManager/libs"
+  modmanager_package_lang_folder: "ModManager/lang"
 
 
 jobs:
