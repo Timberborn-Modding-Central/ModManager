@@ -143,8 +143,8 @@ jobs:
         uses: TheDoctor0/zip-release@0.6.2
         with:
           filename: ${{ env.modmanager_release_name }}_${{ needs.versions.outputs.modmanager }}.zip
-          path: ${{ env.modmanager_package_dll_folder }}
-          directory: .
+          path: .
+          directory: ${{ env.modmanager_package_folder }}
 
       - name: Read changelog
         id: package
