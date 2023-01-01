@@ -250,7 +250,9 @@ namespace Timberborn.ModsSystemUI
             ModsBox.ModsWereChanged = true;
             try
             {
-                (string location, Mod Mod) mod = await _addonService.Download(modInfo, CurrentFile);
+                //(string location, Mod Mod) mod = await _addonService.Download(modInfo, CurrentFile);
+
+                (string location, Mod Mod) mod = new("C:\\Users\\Hyto\\Downloads\\modmanager_1.0.3-hg8z.zip", modInfo);
                 TryInstall(mod, installedVersion);
             }
             catch (MapException ex)
@@ -265,25 +267,25 @@ namespace Timberborn.ModsSystemUI
             {
                 throw;
             }
-            await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
-            {
-                try
-                {
-                    TryInstall(dependency, installedVersion);
-                }
-                catch (MapException ex)
-                {
-                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
-                }
-                catch (AddonException ex)
-                {
-                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
+            //await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
+            //{
+            //    try
+            //    {
+            //        TryInstall(dependency, installedVersion);
+            //    }
+            //    catch (MapException ex)
+            //    {
+            //        ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            //    }
+            //    catch (AddonException ex)
+            //    {
+            //        ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        throw;
+            //    }
+            //}
             downloadButton.SetEnabled(true);
         }
 
