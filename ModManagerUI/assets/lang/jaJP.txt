@@ -1,0 +1,30 @@
+ID,Text,Comment
+Menu.Mods,カスタムマップとMOD,Button opening a menu that allows downloading mods and custom maps. Keep short.
+Mods.Download,ダウンロード,Button to download a mod. Keep short.
+Mods.Info,詳細,Button to show more info about a mod. Keep short.
+Mods.Loading,ロード中…,Info text shown when mods are loading.
+Mods.Tags,タグ:,Header above available list of tags. Keep short.
+Mods.Author,作者:,Label before the author of mod.
+Mods.Downloads,ダウンロード数:,Label before count of mod downloads.
+Mods.ShowMore,もっと表示,Button to show more mods. Keep short.
+Mods.Tags.All,全て,Tag options to show all mods and maps. Keep short.
+Mods.Votes,評価:,Label before count of mod likes and dislikes.
+Mods.ModsChanged,MODの変更はゲームのリスタート時に適用されます。,Instruction on the dialog for the user to restart the game after changes to mods have been made
+Mods.Quit,今すぐ終了,Button to quit game
+Mods.Stay,後で再起動,Button to not quit the game immediately
+Mods.Enabled,有効化,Toggle for if a mod is enabled or not. Keep short.
+Mods.Installed,導入済,Toggle for is a mod is installed or not. Keep short.
+Mods.Uninstall,削除,Button to uninstall a mod.
+Mods.Options,オプション:,Header above available list of special options. Keep short.
+Mods.Dependencies,前提MOD:,Header above available list of Dependencies. Keep short.
+Mods.InstalledVersion,使用中のバージョン:,Header above available list of InstalledVersion. Keep short.
+Mods.LiveVersion,最新バージョン:,Header above of Live version. Keep short.
+Mods.Newest,新着順,Button to sort by newest.
+Mods.MostDownloaded,ダウンロード数が多い順,Button to sort by amount of downloads.
+Mods.TopRated,評価が高い順,Button to sort by amount of likes.
+Mods.LastUpdated,最近更新された順,Button to sort by last update day.
+Mods.UpdateAllLabel,{0}個のアップデートが利用可能です。,Label for informing how many mods have updates pending.
+Mods.UpdateAll,全てアップデート,Button for updating all updatable mods. Keep short
+Mods.Empty,,Empty string
+Mods.Update,アップデート,Button to update mod. Keep short
+Mods.Versions,インストールするバージョン, Label for versions of a mod that are available in mod.io
