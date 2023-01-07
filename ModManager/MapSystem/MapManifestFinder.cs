@@ -40,7 +40,7 @@ namespace ModManager.MapSystem
             }
             catch (JsonSerializationException ex)
             {
-                _logger.LogWarning($"Failed to serialize JSON in file {manifestPath}");
+                _logger.LogWarning($"Failed to serialize JSON in file {manifestPath}. It is advised to delete the file.");
                 return new List<MapManifest>();
             }
             catch (Exception)

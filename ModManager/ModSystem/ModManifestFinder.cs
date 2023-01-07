@@ -72,7 +72,7 @@ namespace ModManager.ModSystem
             }
             catch (JsonSerializationException ex)
             {
-                _logger.LogWarning($"Failed to serialize JSON in file {manifestPath}");
+                _logger.LogWarning($"Failed to serialize JSON in file {manifestPath} It is advised to delete the file.");
                 return null;
             }
             catch (Exception ex)
