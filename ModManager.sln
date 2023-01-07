@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModManager", "ModManager\ModManager.csproj", "{58EF86C1-69FB-4470-A805-0FD083BDD80C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModManagerUI", "ModManagerUI\ModManagerUI.csproj", "{C3AD4E2A-8ADE-4FD7-93BA-41BFB48B18D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModManagerUI", "ModManagerUI\ModManagerUI.csproj", "{C3AD4E2A-8ADE-4FD7-93BA-41BFB48B18D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
