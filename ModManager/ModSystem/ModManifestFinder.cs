@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 using ModManager.AddonSystem;
+using ModManager.LoggingSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
 using Newtonsoft.Json;
@@ -14,9 +13,12 @@ namespace ModManager.ModSystem
     {
         private readonly PersistenceService _persistenceService;
 
-        public ModManifestFinder()
+        private IModManagerLogger _logger;
+
+        public ModManifestFinder(IModManagerLogger logger)
         {
             _persistenceService = PersistenceService.Instance;
+            _logger = logger;
         }
 
         public IEnumerable<Manifest> Find()
@@ -70,6 +72,7 @@ namespace ModManager.ModSystem
             }
             catch (JsonSerializationException ex)
             {
+                _logger.LogWarning($"Failed to serialize JSON in file {manifestPath}");
                 return null;
             }
             catch (Exception ex)

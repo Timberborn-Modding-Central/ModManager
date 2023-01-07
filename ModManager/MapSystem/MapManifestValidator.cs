@@ -1,6 +1,7 @@
 ﻿using ModManager.AddonSystem;
 using ModManager.ManifestValidatorSystem;
 using ModManager.PersistenceSystem;
+using ModManager.StartupSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,16 +13,17 @@ namespace ModManager.MapSystem
     public class MapManifestValidator : IManifestValidator
     {
         private readonly PersistenceService _persistenceService;
+        private readonly MapManifestFinder _mapManifestFinder;
 
-        public MapManifestValidator()
+        public MapManifestValidator(ModManagerStartupOptions startupOptions)
         {
             _persistenceService = PersistenceService.Instance;
+            _mapManifestFinder = new MapManifestFinder(startupOptions.Logger);
         }
 
         public void ValidateManifests()
         {
-            var mapManifestFinder = new MapManifestFinder();
-            var mapManifests = mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();
+            var mapManifests = _mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();
             int oldManifestCount = mapManifests.Count;
 
             foreach (MapManifest mapManifest in mapManifests.ToList())

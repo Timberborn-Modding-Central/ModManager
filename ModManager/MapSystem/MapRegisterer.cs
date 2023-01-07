@@ -13,11 +13,11 @@ namespace ModManager.MapSystem
 
         public void Load(ModManagerStartupOptions startupOptions)
         {
-            AddonInstallerRegistry.Instance.Add(RegistryId, new MapInstaller());
+            AddonInstallerRegistry.Instance.Add(RegistryId, new MapInstaller(startupOptions));
             AddonEnablerRegistry.Instance.Add(RegistryId, new MapEnabler());
-            ManifestLocationFinderRegistry.Instance.Add(RegistryId, new MapManifestFinder());
+            ManifestLocationFinderRegistry.Instance.Add(RegistryId, new MapManifestFinder(startupOptions.Logger));
             AddonExtractorRegistry.Instance.Add(RegistryId, new MapExtractor());
-            ManifestValidatorRegistry.Instance.Add(RegistryId, new MapManifestValidator());
+            ManifestValidatorRegistry.Instance.Add(RegistryId, new MapManifestValidator(startupOptions));
         }
     }
 }

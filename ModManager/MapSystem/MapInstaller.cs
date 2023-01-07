@@ -3,6 +3,7 @@ using ModManager.AddonInstallerSystem;
 using ModManager.AddonSystem;
 using ModManager.ExtractorSystem;
 using ModManager.PersistenceSystem;
+using ModManager.StartupSystem;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -21,12 +22,12 @@ namespace ModManager.MapSystem
 
         private readonly MapManifestFinder _mapManifestFinder;
 
-        public MapInstaller()
+        public MapInstaller(ModManagerStartupOptions startupOptions)
         {
             _persistenceService = PersistenceService.Instance;
             _installedAddonRepository = InstalledAddonRepository.Instance;
             _extractor = AddonExtractorService.Instance;
-            _mapManifestFinder = new MapManifestFinder();
+            _mapManifestFinder = new MapManifestFinder(startupOptions.Logger);
         }
 
         public bool Install(Mod mod, string zipLocation)
