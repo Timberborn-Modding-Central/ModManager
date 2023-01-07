@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ModManager.ModManagerSystem
@@ -18,8 +17,6 @@ namespace ModManager.ModManagerSystem
 
         public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         {
-            Console.WriteLine($"Mod Manager extractor!");
-            Console.WriteLine($"_modManagerFolderName: {_modManagerFolderPath}");
             extractLocation = "";
             if (!modInfo.Tags.Any(x => x.Name == "Mod") ||
                 modInfo.Name != _modManagerPackageName)
@@ -35,41 +32,8 @@ namespace ModManager.ModManagerSystem
         }
         private void ClearOldModFiles(string modFolderName)
         {
-            //if (TryGetExistingModFolder(out string dirs))
-            //{
-                //var dirInfo = new DirectoryInfo(_modManagerFolderPath);
-                //if (dirInfo.Name.Equals(modFolderName))
-                //{
-                //    return;
-                //}
-                //dirInfo.MoveTo(Path.Combine(Paths.Mods, modFolderName));
                 DeleteModFiles(modFolderName);
-            //}
         }
-        //private bool TryGetExistingModFolder(out string dirs)
-        //{
-        //    dirs = null;
-        //    try
-        //    {
-        //        string managerFolderName = _modManagerFolderPath.Split(Path.DirectorySeparatorChar).Last();
-        //        string modsFolderPath = 
-        //        dirs = Directory.GetDirectories(_modManagerFolderPath).SingleOrDefault();
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        throw new AddonExtractorException($"Found multiple folders for \"{_modManagerPackageName}\"");
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //    if (dirs != null)
-        //    {
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
 
         private void DeleteModFiles(string modFolderName)
         {
@@ -109,13 +73,11 @@ namespace ModManager.ModManagerSystem
                 {
                     try
                     {
-                        Console.WriteLine($"cant delete file: {file.Name}");
-                        //System.IO.File.Move(file.FullName, $"{file.FullName}{Names.Extensions.Remove}");
                         file.MoveTo($"{file.FullName}{Names.Extensions.Remove}");
                     }
                     catch(IOException ex2)
                     {
-                        Console.WriteLine($"cant move file: {file.Name}");
+                        throw;
                     }
                     catch(Exception)
                     {
