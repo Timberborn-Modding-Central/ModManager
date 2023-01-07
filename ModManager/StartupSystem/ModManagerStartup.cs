@@ -4,6 +4,7 @@ using ModManager.AddonSystem;
 using ModManager.BepInExSystem;
 using ModManager.MapSystem;
 using ModManager.ModIoSystem;
+using ModManager.ModManagerSystem;
 using ModManager.ModSystem;
 
 namespace ModManager.StartupSystem
@@ -23,6 +24,7 @@ namespace ModManager.StartupSystem
             ModRegisterer.Instance,
             MapRegisterer.Instance,
             BepInExRegisterer.Instance,
+            ModManagerRegisterer.Instance,
 
             InstalledAddonRepository.Instance,
             RemoveFilesOnStartup.Instance

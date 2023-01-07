@@ -1,6 +1,7 @@
 ## Unreleased
 
 ### Changes
+- Made Mod Manager to be able to update itself
 
 ## 1.0.3
 

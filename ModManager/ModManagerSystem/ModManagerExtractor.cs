@@ -5,69 +5,43 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 
-namespace ModManager.ModSystem
+namespace ModManager.ModManagerSystem
 {
-    public class ModExtractor : IAddonExtractor
+    public class ModManagerExtractor : IAddonExtractor
     {
-        private List<string> _foldersToIgnore = new() { "configs" };
+        private string _modManagerFolderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        private const string _modManagerPackageName = "Mod Manager";
+        private List<string> _foldersToIgnore = new() { "temp" };
 
         public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         {
             extractLocation = "";
-            if (!modInfo.Tags.Any(x => x.Name == "Mod"))
+            if (modInfo.Name != _modManagerPackageName)
             {
                 return false;
             }
-            string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
-            ClearOldModFiles(modInfo, modFolderName);
-            extractLocation = Path.Combine(Paths.Mods, modFolderName);
-            ZipFile.ExtractToDirectory(addonZipLocation, extractLocation, overWrite);
+            ClearOldModFiles(_modManagerFolderPath);
+            extractLocation = _modManagerFolderPath;
+            ZipFile.ExtractToDirectory(addonZipLocation, Paths.Mods, overWrite);
             System.IO.File.Delete(addonZipLocation);
 
             return true;
         }
-
-        private void ClearOldModFiles(Mod modInfo, string modFolderName)
+        private void ClearOldModFiles(string modFolderName)
         {
-            if (TryGetExistingModFolder(modInfo, out string dirs))
-            {
-                var dirInfo = new DirectoryInfo(dirs);
-                if (dirInfo.Name.Equals(modFolderName))
-                {
-                    return;
-                }
-                dirInfo.MoveTo(Path.Combine(Paths.Mods, modFolderName));
                 DeleteModFiles(modFolderName);
-            }
         }
-        private bool TryGetExistingModFolder(Mod modInfo, out string dirs)
-        {
-            dirs = null;
-            try
-            {
-                dirs = Directory.GetDirectories(Paths.Mods, $"{modInfo.NameId}_{modInfo.Id}*").SingleOrDefault();
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new AddonExtractorException($"Found multiple folders for \"{modInfo.Name}\"");
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            if (dirs != null)
-            {
-                return true;
-            }
 
-            return false;
-        }
         private void DeleteModFiles(string modFolderName)
         {
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Mods, modFolderName));
-            var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
-                                          .Where(folder => !_foldersToIgnore.Contains(folder.FullName.Split(Path.DirectorySeparatorChar).Last()));
+            var modSubFolders = 
+                modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
+                          .Where(folder => !_foldersToIgnore.Contains(folder.FullName
+                                                            .Split(Path.DirectorySeparatorChar)
+                                                            .Last()));
             foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
@@ -84,11 +58,30 @@ namespace ModManager.ModSystem
             {
                 try
                 {
+                    if(!file.Name.EndsWith(".dll"))
+                    {
+                        continue;
+                    }
                     file.Delete();
                 }
                 catch (UnauthorizedAccessException ex)
                 {
                     file.MoveTo($"{file.FullName}{Names.Extensions.Remove}");
+                }
+                catch (IOException ex)
+                {
+                    try
+                    {
+                        file.MoveTo($"{file.FullName}{Names.Extensions.Remove}");
+                    }
+                    catch(IOException ex2)
+                    {
+                        throw;
+                    }
+                    catch(Exception)
+                    {
+                        throw;
+                    }
                 }
                 catch (Exception ex)
                 {

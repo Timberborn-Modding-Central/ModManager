@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModManager
+namespace ModManagerUI
 {
     public abstract class Singleton<T> where T : class, new()
     {

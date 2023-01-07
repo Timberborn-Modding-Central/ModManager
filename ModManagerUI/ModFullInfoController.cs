@@ -12,7 +12,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timberborn.AssetSystem;
 using Timberborn.CoreUI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -71,7 +70,7 @@ namespace Timberborn.ModsSystemUI
             var versions = filesCLient.Search(FileFilter.Version.Desc()).ToEnumerable();
 
             var foo = new List<File>();
-            await foreach(var version in versions)
+            await foreach (var version in versions)
             {
                 foo.Add(version);
             }
