@@ -1,12 +1,9 @@
 ﻿using LINQtoCSV;
-using ModManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Timberborn.Localization;
-using UnityEngine;
 
 namespace ModManagerUI.LocalizationSystem
 {
