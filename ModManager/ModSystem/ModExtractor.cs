@@ -5,23 +5,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace ModManager.ModSystem
 {
     public class ModExtractor : IAddonExtractor
     {
-        private const string _bepInExPackName = "BepInExPack";
-        private const string _modManagerPackageName = "Mod Manager";
         private List<string> _foldersToIgnore = new() { "configs" };
 
         public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         {
             extractLocation = "";
-            if (!modInfo.Tags.Any(x => x.Name == "Mod") ||
-                modInfo.Name == _bepInExPackName ||
-                modInfo.Name == _modManagerPackageName)
+            if (!modInfo.Tags.Any(x => x.Name == "Mod"))
             {
                 return false;
             }

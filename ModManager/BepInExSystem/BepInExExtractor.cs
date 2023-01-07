@@ -1,9 +1,6 @@
 ﻿using Modio.Models;
 using ModManager.ExtractorSystem;
-using System;
-using System.IO.Compression;
 using System.IO;
-using System.Linq;
 
 namespace ModManager.BepInExSystem
 {
@@ -17,8 +14,7 @@ namespace ModManager.BepInExSystem
         public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         {
             extractLocation = "";
-            if (!modInfo.Tags.Any(x => x.Name == "Mod") ||
-                modInfo.Name != _bepInExPackName)
+            if (modInfo.Name != _bepInExPackName)
             {
                 return false;
             }

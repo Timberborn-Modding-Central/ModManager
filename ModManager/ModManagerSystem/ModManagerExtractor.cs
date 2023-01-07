@@ -18,8 +18,7 @@ namespace ModManager.ModManagerSystem
         public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         {
             extractLocation = "";
-            if (!modInfo.Tags.Any(x => x.Name == "Mod") ||
-                modInfo.Name != _modManagerPackageName)
+            if (modInfo.Name != _modManagerPackageName)
             {
                 return false;
             }
