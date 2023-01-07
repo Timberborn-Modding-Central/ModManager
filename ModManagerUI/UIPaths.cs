@@ -1,13 +1,10 @@
 ﻿using ModManager;
 using ModManager.StartupSystem;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace ModManagerUI
 {
-    public class UIPaths : Singleton<Paths>, ILoadable
+    public class UIPaths : Singleton<UIPaths> , ILoadable
     {
         public void Load(ModManagerStartupOptions startupOptions)
         {
