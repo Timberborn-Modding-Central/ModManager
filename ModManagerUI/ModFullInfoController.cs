@@ -12,7 +12,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timberborn.AssetSystem;
 using Timberborn.CoreUI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -71,7 +70,7 @@ namespace Timberborn.ModsSystemUI
             var versions = filesCLient.Search(FileFilter.Version.Desc()).ToEnumerable();
 
             var foo = new List<File>();
-            await foreach(var version in versions)
+            await foreach (var version in versions)
             {
                 foo.Add(version);
             }
@@ -250,9 +249,7 @@ namespace Timberborn.ModsSystemUI
             ModsBox.ModsWereChanged = true;
             try
             {
-                //(string location, Mod Mod) mod = await _addonService.Download(modInfo, CurrentFile);
-
-                (string location, Mod Mod) mod = new("C:\\Users\\Hyto\\Downloads\\modmanager_1.0.3-hg8z.zip", modInfo);
+                (string location, Mod Mod) mod = await _addonService.Download(modInfo, CurrentFile);
                 TryInstall(mod, installedVersion);
             }
             catch (MapException ex)
@@ -267,25 +264,25 @@ namespace Timberborn.ModsSystemUI
             {
                 throw;
             }
-            //await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
-            //{
-            //    try
-            //    {
-            //        TryInstall(dependency, installedVersion);
-            //    }
-            //    catch (MapException ex)
-            //    {
-            //        ModManagerUIPlugin.Log.LogWarning(ex.Message);
-            //    }
-            //    catch (AddonException ex)
-            //    {
-            //        ModManagerUIPlugin.Log.LogWarning(ex.Message);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        throw;
-            //    }
-            //}
+            await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
+            {
+                try
+                {
+                    TryInstall(dependency, installedVersion);
+                }
+                catch (MapException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (AddonException ex)
+                {
+                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
             downloadButton.SetEnabled(true);
         }
 
