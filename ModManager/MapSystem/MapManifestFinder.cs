@@ -5,6 +5,7 @@ using System.Linq;
 using ModManager.AddonSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
+using Newtonsoft.Json;
 
 namespace ModManager.MapSystem
 {
@@ -23,14 +24,23 @@ namespace ModManager.MapSystem
 
             if (!File.Exists(manifestPath))
             {
-                return new List<Manifest>();
+                return new List<MapManifest>();
             }
 
-            List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
-
-            UpdateManifestInfo(manifests);
-
-            return manifests;
+            try
+            {
+                List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
+                UpdateManifestInfo(manifests);
+                return manifests;
+            }
+            catch (JsonSerializationException ex)
+            {
+                return new List<MapManifest>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public IEnumerable<Manifest> FindRemovable()
