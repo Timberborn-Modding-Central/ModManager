@@ -2,6 +2,8 @@
 
 ### Changes
 - Made Mod Manager to be able to update itself
+- Fixed crash on startup if manifest.json with unexpected contents existed
+- Added japanese localization
 
 ## 1.0.3
 

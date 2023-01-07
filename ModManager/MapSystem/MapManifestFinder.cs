@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ModManager.AddonSystem;
+using ModManager.LoggingSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
+using Newtonsoft.Json;
 
 namespace ModManager.MapSystem
 {
+
     public class MapManifestFinder : IManifestLocationFinder
     {
         private readonly PersistenceService _persistenceService;
 
-        public MapManifestFinder()
+        private IModManagerLogger _logger;
+
+        public MapManifestFinder(IModManagerLogger logger)
         {
             _persistenceService = PersistenceService.Instance;
+            _logger = logger;
         }
 
         public IEnumerable<Manifest> Find()
@@ -23,14 +29,24 @@ namespace ModManager.MapSystem
 
             if (!File.Exists(manifestPath))
             {
-                return new List<Manifest>();
+                return new List<MapManifest>();
             }
 
-            List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
-
-            UpdateManifestInfo(manifests);
-
-            return manifests;
+            try
+            {
+                List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
+                UpdateManifestInfo(manifests);
+                return manifests;
+            }
+            catch (JsonSerializationException ex)
+            {
+                _logger.LogWarning($"Failed to serialize JSON in file {manifestPath}. It is advised to delete the file.");
+                return new List<MapManifest>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public IEnumerable<Manifest> FindRemovable()

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 using ModManager.AddonSystem;
+using ModManager.LoggingSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
+using Newtonsoft.Json;
 
 namespace ModManager.ModSystem
 {
@@ -13,9 +13,12 @@ namespace ModManager.ModSystem
     {
         private readonly PersistenceService _persistenceService;
 
-        public ModManifestFinder()
+        private IModManagerLogger _logger;
+
+        public ModManifestFinder(IModManagerLogger logger)
         {
             _persistenceService = PersistenceService.Instance;
+            _logger = logger;
         }
 
         public IEnumerable<Manifest> Find()
@@ -23,17 +26,33 @@ namespace ModManager.ModSystem
 
             foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName, SearchOption.AllDirectories))
             {
-                yield return LoadManifest(enabledManifest);
+                var manifest = LoadManifest(enabledManifest);
+                if (manifest == null)
+                { 
+                    continue; 
+                }
+                yield return manifest;
+
             }
 
             foreach (string disabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Disabled, SearchOption.AllDirectories))
             {
-                yield return LoadManifest(disabledManifest);
+                var manifest = LoadManifest(disabledManifest);
+                if (manifest == null)
+                {
+                    continue;
+                }
+                yield return manifest;
             }
 
             foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Remove, SearchOption.AllDirectories))
             {
-                yield return LoadManifest(enabledManifest);
+                var manifest = LoadManifest(enabledManifest);
+                if (manifest == null)
+                {
+                    continue;
+                }
+                yield return manifest;
             }
         }
 
@@ -47,12 +66,14 @@ namespace ModManager.ModSystem
             try
             {
                 var manifest = _persistenceService.LoadObject<Manifest>(manifestPath, false);
-
                 manifest.Enabled = !Path.GetExtension(manifestPath).Equals(Names.Extensions.Disabled);
-
                 manifest.RootPath = Path.GetDirectoryName(manifestPath)!;
-
                 return manifest;
+            }
+            catch (JsonSerializationException ex)
+            {
+                _logger.LogWarning($"Failed to serialize JSON in file {manifestPath} It is advised to delete the file.");
+                return null;
             }
             catch (Exception ex)
             {
