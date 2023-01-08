@@ -60,6 +60,10 @@
 		<Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(TimberApiPath)" />
 		<Copy SourceFiles="$(ProjectDir)\libs\Microsoft.Bcl.AsyncInterfaces.dll" DestinationFolder="$(TimberApiPath)\libs" />
 		<Copy SourceFiles="$(ProjectDir)\libs\Modio.dll" DestinationFolder="$(TimberApiPath)\libs" />
+		<Copy SourceFiles="$(ProjectDir)\libs\System.Buffers.dll" DestinationFolder="$(TimberApiPath)\libs" />
+		<Copy SourceFiles="$(ProjectDir)\libs\System.Linq.Async.dll" DestinationFolder="$(TimberApiPath)\libs" />
+		<Copy SourceFiles="$(ProjectDir)\libs\System.Numerics.Vectors.dll" DestinationFolder="$(TimberApiPath)\libs" />
+		<Copy SourceFiles="$(ProjectDir)\libs\System.Text.Encodings.Web.dll" DestinationFolder="$(TimberApiPath)\libs" />
 		<Copy SourceFiles="$(ProjectDir)\libs\System.Text.Json.dll" DestinationFolder="$(TimberApiPath)\libs" />
 	</Target>
 
