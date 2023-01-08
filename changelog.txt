@@ -1,6 +1,10 @@
 ## Unreleased
 
 ### Changes
+
+## 1.1.1
+
+### Changes
 - Actually fixed crash on startup if manifest.json with unexpected contents existed
 
 ## 1.1.0
