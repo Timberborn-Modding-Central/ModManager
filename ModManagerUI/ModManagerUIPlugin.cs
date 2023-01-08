@@ -16,17 +16,18 @@ namespace ModManagerUI
 
         public void Awake()
         {
-            Log = Logger;
+            Log = Logger; 
 
             ModManagerStartup.Run("MOD_IO_APIKEY", options =>
-            {
-                options.GameId = 3659;
-                options.GamePath = BepInEx.Paths.GameRootPath;
-                options.IsGameRunning = true;
-                options.ModInstallationPath = Path.Combine(Paths.PluginPath);
-                options.ModIoGameUrl = "https://mod.io/g/timberborn";
-                options.ModManagerPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            });
+                {
+                    options.GameId = 3659;
+                    options.GamePath = BepInEx.Paths.GameRootPath;
+                    options.IsGameRunning = true;
+                    options.ModInstallationPath = Path.Combine(Paths.PluginPath);
+                    options.ModIoGameUrl = "https://mod.io/g/timberborn";
+                    options.ModManagerPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+                    options.Logger = new ModManagerLogger();
+                });
 
             ManifestValidatorService.Instance.ValidateManifests();
 
