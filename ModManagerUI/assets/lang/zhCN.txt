@@ -10,8 +10,8 @@ Mods.ShowMore,显示更多,Button to show more mods. Keep short.
 Mods.Tags.All,全部,Tag options to show all mods and maps. Keep short.
 Mods.Votes,评价:,Label before count of mod likes and dislikes.
 Mods.ModsChanged,模组变化需要重启游戏以应用,Instruction on the dialog for the user to restart the game after changes to mods have been made
-Mods.Quit,回到桌面,Button to quit game
-Mods.Stay,回到主菜单,Button to not quit the game immediately
+Mods.Quit,退出游戏,Button to quit game
+Mods.Stay,稍后重启,Button to not quit the game immediately
 Mods.Enabled,已启用,Toggle for if a mod is enabled or not. Keep short.
 Mods.Installed,已下载,Toggle for is a mod is installed or not. Keep short.
 Mods.Uninstall,卸载,Button to uninstall a mod.
