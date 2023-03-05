@@ -1,5 +1,5 @@
 ID,Text,Comment
-Menu.Mods,自定義地圖與模組,Button opening a menu that allows downloading mods and custom maps. Keep short.
+Menu.Mods,自訂地圖與模組,Button opening a menu that allows downloading mods and custom maps. Keep short.
 Mods.Download,下載,Button to download a mod. Keep short.
 Mods.Info,資訊,Button to show more info about a mod. Keep short.
 Mods.Loading,載入中...,Info text shown when mods are loading.
