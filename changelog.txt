@@ -1,4 +1,8 @@
 ## Unreleased
+
+### Changes
+
+## 1.2.0
 Fixed to work with game version 0.4.0.0
 
 ### Changes
