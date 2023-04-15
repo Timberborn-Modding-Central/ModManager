@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace ModManager
 {
@@ -20,7 +17,9 @@ namespace ModManager
                 {
                     return true;
                 }
-                if (int.Parse(version1Parts[i]) > int.Parse(version2Parts[i]))
+                if (int.TryParse(version1Parts[i], out int result1) && 
+                    int.TryParse(version2Parts[i], out int result2) &&
+                    result1 > result2)
                 {
                     return true;
                 }
