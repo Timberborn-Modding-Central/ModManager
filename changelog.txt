@@ -1,6 +1,9 @@
 ## Unreleased
+Fixed to work with game version 0.4.0.0
 
 ### Changes
+- Changes so that mod manager is compatible with game v0.4.0.0
+- Should no longet crash if mod version has text in it
 
 ## 1.1.1
 
