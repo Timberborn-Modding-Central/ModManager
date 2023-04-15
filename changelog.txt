@@ -1,6 +1,9 @@
 ## Unreleased
+Fixed VerisonComparer and added chinese translatetions
 
 ### Changes
+- Fixed VersionComparer to not show update for mod that has higher versions than the live version
+- Added chinese translations
 
 ## 1.2.0
 Fixed to work with game version 0.4.0.0
