@@ -1,6 +1,8 @@
 ## Unreleased
+Fixed assetbundle
 
 ### Changes
+- Updated asset bundle
 
 ## 1.2.1
 Fixed VerisonComparer and added chinese translatetions
