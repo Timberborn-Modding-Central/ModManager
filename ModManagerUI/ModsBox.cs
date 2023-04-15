@@ -220,7 +220,8 @@ namespace Timberborn.ModsSystemUI
             foreach (Manifest manifest in installedMods)
             {
                 var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
-                if (mod.Modfile.Version != manifest.Version)
+                if (mod.Modfile.Version != manifest.Version &&
+                    VersionComparer.IsVersionHigher(mod.Modfile.Version, manifest.Version))
                 {
                     if (token.IsCancellationRequested)
                     {
