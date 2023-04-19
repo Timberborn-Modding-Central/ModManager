@@ -1,6 +1,9 @@
 ## Unreleased
+Fixed tag related bug
 
 ### Changes
+- Fixed a bug where clicking a tag would immediately unselect itself and not work as a filter at all
+- Fixed a bug where "UpdateAvailable" showed all addons if no updates were available
 
 ## 1.2.2
 Fixed assetbundle
