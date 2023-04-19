@@ -1,4 +1,8 @@
 ## Unreleased
+
+### Changes
+
+## 1.2.3
 Fixed tag related bug
 
 ### Changes
