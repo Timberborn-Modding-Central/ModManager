@@ -227,7 +227,15 @@ namespace Timberborn.ModsSystemUI
             var installedMods = _installedAddonRepository.All().ToList();
             foreach (Manifest manifest in installedMods)
             {
-                var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
+                Mod mod;
+                try
+                {
+                    mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
                 if (mod.Modfile.Version != manifest.Version &&
                     VersionComparer.IsVersionHigher(mod.Modfile.Version, manifest.Version))
                 {
