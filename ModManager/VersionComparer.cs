@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace ModManager
 {
@@ -9,8 +6,8 @@ namespace ModManager
     {
         public static bool IsVersionHigher(string version1, string version2)
         {
-            if(version1 == null) { return false; }
-            if(version2 == null) { return true; }
+            if (version1 == null) { return false; }
+            if (version2 == null) { return true; }
             var version1Parts = version1.Split('.');
             var version2Parts = version2.Split('.');
 
@@ -20,9 +17,17 @@ namespace ModManager
                 {
                     return true;
                 }
-                if (int.Parse(version1Parts[i]) > int.Parse(version2Parts[i]))
+                if (int.TryParse(version1Parts[i], out int result1) &&
+                    int.TryParse(version2Parts[i], out int result2))
                 {
-                    return true;
+                    if (result1 > result2)
+                    {
+                        return true;
+                    }
+                    else if (result1 < result2)
+                    {
+                        return false;
+                    }
                 }
             }
             return false;

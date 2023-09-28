@@ -150,6 +150,7 @@ namespace Timberborn.ModsSystemUI
             SetUpdateAllVisibility(false);
 
             ShowModsAndTags();
+            ShowTags();
 
             root.Q<Button>("Close").clicked += OnUICancelled;
             root.Q<Button>("SearchButton").clicked += UpdateMods;
@@ -161,6 +162,13 @@ namespace Timberborn.ModsSystemUI
             PopulateEnabledOptions();
 
             return root;
+        }
+
+        private async void ShowTags()
+        {
+            Task<IReadOnlyList<TagOption>> getTagsTask = _addonService.GetTags().Get();
+
+            OnTagsRetrieved(await getTagsTask);
         }
 
         private async Task UpdateUpdatableMods()
@@ -219,8 +227,17 @@ namespace Timberborn.ModsSystemUI
             var installedMods = _installedAddonRepository.All().ToList();
             foreach (Manifest manifest in installedMods)
             {
-                var mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
-                if (mod.Modfile.Version != manifest.Version)
+                Mod mod;
+                try
+                {
+                    mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                if (mod.Modfile.Version != manifest.Version &&
+                    VersionComparer.IsVersionHigher(mod.Modfile.Version, manifest.Version))
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -272,15 +289,8 @@ namespace Timberborn.ModsSystemUI
                 var populateModsTask = PopulateUpdatableMods(_token2);
                 _mods.Clear();
                 _page = 0;
-
                 Task modsTask = ShowMods();
-
-                Task<IReadOnlyList<TagOption>> getTagsTask = _addonService.GetTags().Get();
-
-                OnTagsRetrieved(await getTagsTask);
-
                 await populateModsTask;
-
                 SetUpdateAllVisibility();
             }
             catch (OperationCanceledException ex)
@@ -359,8 +369,16 @@ namespace Timberborn.ModsSystemUI
                         break;
                     case nameof(InstalledOptions.UpdateAvailable):
                         var updateAvailableNames = _updateAvailable.Select(x => x.Value.Name ?? "");
-                        var modFilter3 = ModFilter.Name.In(updateAvailableNames);
-                        _filter = _filter.And(modFilter3);
+                        if (updateAvailableNames.Any())
+                        {
+                            var modFilter3 = ModFilter.Name.In(updateAvailableNames);
+                            _filter = _filter.And(modFilter3);
+                        }
+                        else
+                        {
+                            // HACK: Dummy filter to ensure results is 0
+                            _filter = _filter.And(ModFilter.Id.Eq(1));
+                        }
                         break;
                     default:
                         break;
@@ -418,7 +436,6 @@ namespace Timberborn.ModsSystemUI
             _tagOptions.Add(_loc.T(AllLocKey));
             _tagOptions.AddRange(task.SelectMany(tagGroup => tagGroup.Tags));
             _tags.choices = _tagOptions;
-
             _tags.RegisterValueChangedCallback(_ => UpdateMods());
         }
 

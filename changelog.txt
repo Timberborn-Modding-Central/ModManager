@@ -2,6 +2,37 @@
 
 ### Changes
 
+## 1.2.4
+
+### Changes
+
+## 1.2.3
+Fixed tag related bug
+
+### Changes
+- Fixed a bug where clicking a tag would immediately unselect itself and not work as a filter at all
+- Fixed a bug where "UpdateAvailable" showed all addons if no updates were available
+
+## 1.2.2
+Fixed assetbundle
+
+### Changes
+- Updated asset bundle
+
+## 1.2.1
+Fixed VerisonComparer and added chinese translatetions
+
+### Changes
+- Fixed VersionComparer to not show update for mod that has higher versions than the live version
+- Added chinese translations
+
+## 1.2.0
+Fixed to work with game version 0.4.0.0
+
+### Changes
+- Changes so that mod manager is compatible with game v0.4.0.0
+- Should no longet crash if mod version has text in it
+
 ## 1.1.1
 
 ### Changes

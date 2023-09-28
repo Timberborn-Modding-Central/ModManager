@@ -69,22 +69,15 @@ namespace Timberborn.ModsSystemUI
         {
             FilesClient filesCLient = _addonService.GetFiles(_currentMod);
             var versions = filesCLient.Search(FileFilter.Version.Desc()).ToEnumerable();
-
-            var foo = new List<File>();
+            var versionList = new List<File>();
             await foreach (var version in versions)
             {
-                foo.Add(version);
+                versionList.Add(version);
             }
-            Versions = foo.ToImmutableArray();
-
-            _dropdownOptionsSetter.SetItems(
-                dropdown,
-                Versions.Select(x => x.Version ?? ""),
-                () => CurrentFile.Version ?? "",
-                delegate (string value)
-                {
-                    SetVersion(value);
-                });
+            Versions = versionList.ToImmutableArray();
+            var dropdownProvider = new VersionDropdownProvider(this, versionList);
+            _dropdownOptionsSetter.SetItems(dropdown, dropdownProvider);
+            _versionsDropdown.RefreshContent();
         }
 
         private void SetVersion(string value)
@@ -94,7 +87,7 @@ namespace Timberborn.ModsSystemUI
             _versionsDropdown.RefreshContent();
         }
 
-        public void SetMod(Mod mod)
+        public async void SetMod(Mod mod)
         {
             _currentMod = mod;
             CurrentFile = mod.Modfile;
@@ -104,7 +97,7 @@ namespace Timberborn.ModsSystemUI
             var item = LoadVisualElement(asset);
 
             _versionsDropdown = item.Q<Dropdown>("Versions");
-            SetVersions(_versionsDropdown);
+            await SetVersions(_versionsDropdown);
 
             item.Q<Button>("Close").clicked += OnUICancelled;
             item.Q<Label>("Name").text = mod.Name;

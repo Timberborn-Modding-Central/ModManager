@@ -1,0 +1,30 @@
+ID,Text,Comment
+Menu.Mods,自訂地圖與模組,Button opening a menu that allows downloading mods and custom maps. Keep short.
+Mods.Download,下載,Button to download a mod. Keep short.
+Mods.Info,資訊,Button to show more info about a mod. Keep short.
+Mods.Loading,載入中...,Info text shown when mods are loading.
+Mods.Tags,標籤：,Header above available list of tags. Keep short.
+Mods.Author,作者：,Label before the author of mod.
+Mods.Downloads,下載次數：,Label before count of mod downloads.
+Mods.ShowMore,顯示更多,Button to show more mods. Keep short.
+Mods.Tags.All,全部,Tag options to show all mods and maps. Keep short.
+Mods.Votes,評價：,Label before count of mod likes and dislikes.
+Mods.ModsChanged,變更模組必須重開遊戲才會生效,Instruction on the dialog for the user to restart the game after changes to mods have been made
+Mods.Quit,退出遊戲,Button to quit game
+Mods.Stay,留在遊戲,Button to not quit the game immediately
+Mods.Enabled,啟用,Toggle for if a mod is enabled or not. Keep short.
+Mods.Installed,已安裝,Toggle for is a mod is installed or not. Keep short.
+Mods.Uninstall,解除安裝,Button to uninstall a mod.
+Mods.Options,選項：,Header above available list of special options. Keep short.
+Mods.Dependencies,依賴項：,Header above available list of Dependencies. Keep short.
+Mods.InstalledVersion,已安裝版本：,Header above available list of InstalledVersion. Keep short.
+Mods.LiveVersion,最新版本：,Header above of Live version. Keep short.
+Mods.Newest,最新,Button to sort by newest.
+Mods.MostDownloaded,最多下載,Button to sort by amount of downloads.
+Mods.TopRated,最高評價,Button to sort by amount of likes.
+Mods.LastUpdated,最近更新,Button to sort by last update day.
+Mods.UpdateAllLabel,你有 {0} 個可用更新。,Label for informing how many mods have updates pending.
+Mods.UpdateAll,更新全部,Button for updating all updatable mods. Keep short
+Mods.Empty,,Empty string
+Mods.Update,更新,Button to update mod. Keep short
+Mods.Versions,可安裝版本, Label for versions of a mod that are available in mod.io
