@@ -20,7 +20,7 @@
 	  <PackageReference Include="Lib.Harmony" Version="2.2.2" />
 	  <PackageReference Include="System.Linq.Async" Version="6.0.1" />
 	  <PackageReference Include="TimberApi" Version="0.5.1" />
-	  <PackageReference Include="Timberborn.GameLibs" Version="0.4.0-r.0" />
+	  <PackageReference Include="Timberborn.GameLibs" Version="0.5.0-r.0" />
 	</ItemGroup>
 	
 	<ItemGroup>
