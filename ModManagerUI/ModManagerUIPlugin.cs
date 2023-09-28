@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace ModManagerUI
 {
-    [BepInPlugin("com.modmanagerui", "Mod Manager UI", "0.1.0")]
+    [BepInPlugin("com.modmanagerui", "Mod Manager UI", "MODMANAGER_VERSION")]
     public class ModManagerUIPlugin : BaseUnityPlugin
     {
         public static ManualLogSource Log;
@@ -18,7 +18,7 @@ namespace ModManagerUI
         {
             Log = Logger; 
 
-            ModManagerStartup.Run("b536c36219e73bcb334926ca887ddbed", options =>
+            ModManagerStartup.Run("MOD_IO_APIKEY", options =>
                 {
                     options.GameId = 3659;
                     options.GamePath = BepInEx.Paths.GameRootPath;
