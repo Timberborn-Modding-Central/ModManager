@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timberborn.CoreUI;
+using Timberborn.DropdownSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UIElements.Image;
@@ -41,7 +42,7 @@ namespace Timberborn.ModsSystemUI
 
         private Mod _currentMod;
         private Dropdown _versionsDropdown;
-        private readonly DropdownOptionsSetter _dropdownOptionsSetter;
+        private readonly DropdownItemsSetter _dropdownOptionsSetter;
 
         private AssetBundle _bundle;
 
@@ -49,7 +50,7 @@ namespace Timberborn.ModsSystemUI
                                      IAddonService addonService,
                                      VisualElementInitializer visualElementInitializer,
                                      InstalledAddonRepository installedAddonRepository,
-                                     DropdownOptionsSetter dropdownOptionsSetter)
+                                     DropdownItemsSetter dropdownOptionsSetter)
         {
             _dropdownOptionsSetter = dropdownOptionsSetter;
             _panelStack = panelStack;
@@ -76,7 +77,7 @@ namespace Timberborn.ModsSystemUI
             }
             Versions = foo.ToImmutableArray();
 
-            _dropdownOptionsSetter.SetOptions(
+            _dropdownOptionsSetter.SetItems(
                 dropdown,
                 Versions.Select(x => x.Version ?? ""),
                 () => CurrentFile.Version ?? "",
