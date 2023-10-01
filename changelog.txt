@@ -1,4 +1,8 @@
 ## Unreleased
+
+### Changes
+
+## 1.3.1
 Added scrollbar to tags list
 
 ### Changes
