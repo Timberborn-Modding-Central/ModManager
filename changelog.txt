@@ -1,6 +1,8 @@
 ## Unreleased
+Added scrollbar to tags list
 
 ### Changes
+- Added ScrollView to tags list so that it has a scrollbar when there's a lot of tags
 
 ## 1.3.0
 Updated gamelibs so manager works with game v0.5.0.0
