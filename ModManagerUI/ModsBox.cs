@@ -27,14 +27,12 @@ namespace Timberborn.ModsSystemUI
 {
     enum InstalledOptions
     {
-        All,
         Installed,
         Uninstalled,
         UpdateAvailable
     }
     enum EnabledOptions
     {
-        Both,
         Enabled,
         NotEnabled
     }
@@ -65,6 +63,9 @@ namespace Timberborn.ModsSystemUI
         private Label _error;
         private TextField _search;
         private RadioButtonGroup _tags;
+
+        private VisualElement _tagsWrapper;
+
         private RadioButtonGroup _installedOptions;
         private RadioButtonGroup _enabledOptions;
         private Button _showMore;
@@ -76,6 +77,10 @@ namespace Timberborn.ModsSystemUI
         private VisualElement _updateAllWrapper;
         private Button _updateAllButton;
         private List<string> _tagOptions = new();
+
+        private Dictionary<string, List<string>> _tagsOptions = new();
+        private Dictionary<string, int> _tagsLastValues = new();
+
         private List<string> _installedOptionsOptions = new();
         private List<string> _enabledOptionsOptions = new();
         private uint _page;
@@ -128,7 +133,7 @@ namespace Timberborn.ModsSystemUI
             _mods = root.Q<ScrollView>("Mods");
             _loading = root.Q<Label>("Loading");
             _error = root.Q<Label>("Error");
-            _tags = root.Q<RadioButtonGroup>("Tags");
+            _tagsWrapper = root.Q<VisualElement>("TagsWrapper");
             _installedOptions = root.Q<RadioButtonGroup>("Options");
             _enabledOptions = root.Q<RadioButtonGroup>("EnabledOptions");
             _showMore = root.Q<Button>("ShowMore");
@@ -206,8 +211,8 @@ namespace Timberborn.ModsSystemUI
 
         private void SetUpdateAllVisibility()
         {
-            bool updateAllVisible = _updateAvailable.Count > 0 
-                ? true 
+            bool updateAllVisible = _updateAvailable.Count > 0
+                ? true
                 : false;
             SetUpdateAllVisibility(updateAllVisible);
         }
@@ -295,7 +300,7 @@ namespace Timberborn.ModsSystemUI
             }
             catch (OperationCanceledException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning($"Async operation was cancelled: {ex.Message}");
+                ModManagerUIPlugin.Log.LogDebug($"Async operation was cancelled: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -343,11 +348,32 @@ namespace Timberborn.ModsSystemUI
                 _filter = _filter.And(ModFilter.FullText.Eq(_search.value));
             }
 
-            if (_tags.value > 0)
+            var radioButtonGroups = _tagsWrapper.Children()
+                                                .Where(a => a.GetType() == typeof(RadioButtonGroup) &&
+                                                            ((RadioButtonGroup)a).value != -1)
+                                                .ToList();
+
+            List<string> tagList = new();
+
+            foreach (RadioButtonGroup group in radioButtonGroups)
             {
-                _filter = _filter.And(ModFilter.Tags.Eq(_tagOptions[_tags.value]));
+                _tagsOptions.TryGetValue(group.name, out var groupTags);
+                //_filter = _filter.And(ModFilter.Tags.Eq(groupTags[group.value]));
+                tagList.Add(groupTags[group.value]);
             }
 
+            var checkedToggles = _tagsWrapper.Children()
+                                             .Where(x => x.GetType() == typeof(Toggle) &&
+                                                         ((Toggle)x).value == true)
+                                             .ToList();
+
+            foreach (Toggle toggle in checkedToggles)
+            {
+                //_filter = _filter.And(ModFilter.Tags.Eq(toggle.text));
+                tagList.Add(toggle.text);
+            }
+
+            _filter = _filter.And(ModFilter.Tags.In(tagList));
 
             if (_installedOptions.value >= 0)
             {
@@ -419,6 +445,12 @@ namespace Timberborn.ModsSystemUI
             _installedOptions.choices = _installedOptionsOptions;
 
             _installedOptions.RegisterValueChangedCallback(_ => UpdateMods());
+
+            foreach(RadioButton child in _installedOptions.Children())
+            {
+                child.RegisterCallback((ClickEvent @event) => ClickTagRadioButton(@event));
+            }
+            _tagsLastValues.Add(_installedOptions.name, -1);
         }
 
         private void PopulateEnabledOptions()
@@ -428,15 +460,112 @@ namespace Timberborn.ModsSystemUI
             _enabledOptions.choices = _enabledOptionsOptions;
 
             _enabledOptions.RegisterValueChangedCallback(_ => UpdateMods());
+
+            foreach (RadioButton child in _enabledOptions.Children())
+            {
+                child.RegisterCallback((ClickEvent @event) => ClickTagRadioButton(@event));
+            }
+            _tagsLastValues.Add(_enabledOptions.name, -1);
+        }
+
+        private void CreateRadiobuttonGroup(ref VisualElement element, TagOption tagOption)
+        {
+            var header = new Label();
+            header.name = $"{tagOption.Name}Header";
+            header.text = tagOption.Name;
+            header.AddToClassList("text--default");
+            header.AddToClassList("mods-box__tags-label");
+            element.Add(header);
+
+            var radioButtonGroup = new RadioButtonGroup();
+            radioButtonGroup.name = $"{tagOption.Name}RadioButtonGroup";
+            radioButtonGroup.value = -1;
+            radioButtonGroup.AddToClassList("mods-box__tags");
+
+            var options = new List<string>();
+            foreach (var tag in tagOption.Tags)
+            {
+                options.Add(tag);
+            }
+            radioButtonGroup.choices = options;
+            radioButtonGroup.RegisterValueChangedCallback(@event =>
+            {
+                UpdateMods();
+            });
+
+            foreach (RadioButton radioButton in radioButtonGroup.Children())
+            {
+                radioButton.RegisterCallback((ClickEvent @event) => ClickTagRadioButton(@event));
+            }
+
+            element.Add(radioButtonGroup);
+
+            _tagsOptions.Add(radioButtonGroup.name, options);
+            _tagsLastValues.Add(radioButtonGroup.name, -1);
+        }
+
+        private void ClickTagRadioButton(ClickEvent clickEvent)
+        {
+            if (clickEvent.currentTarget.GetType() != typeof(RadioButton))
+            {
+                return;
+            }
+
+            var target = (RadioButton)clickEvent.currentTarget;
+            // Hacky way to get parent RadioButtonGroup
+            var parent = target.parent;
+            var secondParent = parent.parent;
+            var thirdParent = (RadioButtonGroup)secondParent.parent;
+
+            if(_tagsLastValues[thirdParent.name] == thirdParent.value)
+            {
+                thirdParent.value = -1;
+                _tagsLastValues[thirdParent.name] = -1;
+                return;
+            }
+            _tagsLastValues[thirdParent.name] = thirdParent.value;
+        }
+
+        private void CreateCheckboxGroup(ref VisualElement element, TagOption tagOption)
+        {
+            var header = new Label();
+            header.name = $"{tagOption.Name}Header";
+            header.text = tagOption.Name;
+            header.AddToClassList("text--default");
+            header.AddToClassList("mods-box__tags-label");
+            element.Add(header);
+
+            foreach (var tag in tagOption.Tags)
+            {
+                var toggle = new Toggle();
+                toggle.name = $"{tagOption.Name}.{tag}";
+                toggle.text = tag;
+                toggle.AddToClassList("text--default");
+                toggle.AddToClassList("mods-box-toggle");
+                toggle.RegisterValueChangedCallback(_ => UpdateMods());
+                element.Add(toggle);
+            }
         }
 
         private void OnTagsRetrieved(IReadOnlyList<TagOption> task)
         {
-            _tagOptions.Clear();
-            _tagOptions.Add(_loc.T(AllLocKey));
-            _tagOptions.AddRange(task.SelectMany(tagGroup => tagGroup.Tags));
-            _tags.choices = _tagOptions;
-            _tags.RegisterValueChangedCallback(_ => UpdateMods());
+            _tagsOptions.Clear();
+            _tagsLastValues.Clear();
+            _tagsLastValues.Add(_installedOptions.name, -1);
+            _tagsLastValues.Add(_enabledOptions.name, -1);
+
+            foreach (var tag in task)
+            {
+                switch (tag.Type)
+                {
+                    case "dropdown":
+                        CreateRadiobuttonGroup(ref _tagsWrapper, tag);
+                        break;
+                    case "checkboxes":
+                        CreateCheckboxGroup(ref _tagsWrapper, tag);
+                        break;
+                }
+            }
         }
 
         private async Task OnModsRetrieved(IReadOnlyList<Mod> task)
