@@ -1,4 +1,8 @@
 ## Unreleased
+
+### Changes
+
+## 1.3.5
 Fixed crash upon leaving mod fullinfo page
 
 ### Changes
