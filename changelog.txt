@@ -1,6 +1,8 @@
 ## Unreleased
+Fixed crashing on bep update
 
 ### Changes
+- Shouldnt crash anymore when Bepinex is updated
 
 ## 1.3.3
 Added updated assetbundle that was missing from 1.3.2
