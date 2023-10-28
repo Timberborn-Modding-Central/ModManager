@@ -450,7 +450,7 @@ namespace Timberborn.ModsSystemUI
             {
                 child.RegisterCallback((ClickEvent @event) => ClickTagRadioButton(@event));
             }
-            _tagsLastValues.Add(_installedOptions.name, -1);
+            _tagsLastValues.TryAdd(_installedOptions.name, -1);
         }
 
         private void PopulateEnabledOptions()
@@ -465,7 +465,7 @@ namespace Timberborn.ModsSystemUI
             {
                 child.RegisterCallback((ClickEvent @event) => ClickTagRadioButton(@event));
             }
-            _tagsLastValues.Add(_enabledOptions.name, -1);
+            _tagsLastValues.TryAdd(_enabledOptions.name, -1);
         }
 
         private void CreateRadiobuttonGroup(ref VisualElement element, TagOption tagOption)
@@ -683,6 +683,7 @@ namespace Timberborn.ModsSystemUI
         private void ShowFullInfo(Mod mod)
         {
             _panelStack.HideAndPush(_modFullInfoController);
+            //_panelStack.PushOverlay(_modFullInfoController);
             _modFullInfoController.SetMod(mod);
         }
 
