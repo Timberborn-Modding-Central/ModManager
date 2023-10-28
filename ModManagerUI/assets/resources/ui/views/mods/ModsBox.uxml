@@ -14,8 +14,8 @@
                         <ui:Button name="SearchButton" class="mods-box__search-button" />
                     </ui:VisualElement>
                     <ui:ScrollView name="TagsScrollView" class="mods-box__mods scroll--green-decorated">
-						<Timberborn.CoreUI.LocalizableLabel text="Tags:" name="TagsLabel" text-loc-key="Mods.Tags" class="text--big mods-box__tags-label" />
-						<ui:RadioButtonGroup name="Tags" value="-1" class="mods-box__tags" />
+						<Timberborn.CoreUI.LocalizableLabel text="Tags:" name="TagsLabel" text-loc-key="Mods.Tags" class="text--big mods-box__tags-label" style="width:100%"/>
+						<ui:VisualElement name="TagsWrapper" class="mods-box__tags" />
 						<Timberborn.CoreUI.LocalizableLabel text="Options:" name="OptionsLabel" text-loc-key="Mods.Options" class="text--big mods-box__tags-label" style="width:100%"/>
 						<ui:RadioButtonGroup name="Options" value="-1" class="mods-box__tags"/>
 						<ui:RadioButtonGroup name="EnabledOptions" value="-1" class="mods-box__tags" style="margin-top:10px;"/>
