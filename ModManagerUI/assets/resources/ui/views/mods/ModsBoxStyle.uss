@@ -210,3 +210,17 @@
 .mods-box-full-item__dropdown {
     flex-grow: 1;
 }
+
+    
+
+.config_files__wrapper {
+    flex-wrap: wrap;
+    flex-direction: column;
+	flex-grow: 1;
+}
+
+.test {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+}
