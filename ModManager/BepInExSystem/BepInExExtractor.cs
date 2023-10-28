@@ -24,22 +24,38 @@ namespace ModManager.BepInExSystem
             {
                 return false;
             }
-
-            ZipFile.ExtractToDirectory(addonZipLocation, Paths.GameRoot, true);
-
-            string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
-            ClearOldModFiles(modInfo, modFolderName);
-
             extractLocation = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}");
             if (!Directory.Exists(extractLocation))
             {
                 Directory.CreateDirectory(extractLocation);
             }
-
             System.IO.File.Delete(addonZipLocation);
 
             return true;
         }
+        //public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
+        //{
+        //    extractLocation = "";
+        //    if (modInfo.Name != _bepInExPackName)
+        //    {
+        //        return false;
+        //    }
+
+        //    //ZipFile.ExtractToDirectory(addonZipLocation, Paths.GameRoot, true);
+
+        //    string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
+        //    ClearOldModFiles(modInfo, modFolderName);
+
+        //    extractLocation = Path.Combine(Paths.GameRoot, "BepInEx", "plugins", $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}");
+        //    if (!Directory.Exists(extractLocation))
+        //    {
+        //        Directory.CreateDirectory(extractLocation);
+        //    }
+
+        //    System.IO.File.Delete(addonZipLocation);
+
+        //    return true;
+        //}
         private void ClearOldModFiles(Mod modInfo, string modFolderName)
         {
             if (TryGetExistingModFolder(modInfo, out string dirs))
