@@ -1,3 +1,4 @@
+using Modio;
 using Modio.Filters;
 using Modio.Models;
 using ModManager;
@@ -16,7 +17,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Timberborn.Core;
 using Timberborn.CoreUI;
+using Timberborn.ExperimentalModeSystem;
 using Timberborn.Localization;
+using Timberborn.TooltipSystem;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
@@ -51,12 +54,17 @@ namespace Timberborn.ModsSystemUI
 
         private static readonly string AllLocKey = "Mods.Tags.All";
         private static readonly uint ModsPerPage = 25;
+        public static bool CheckForHighestInsteadOfLive = false;
+        private bool _firstLoadDone = false;
+
         private readonly VisualElementLoader _visualElementLoader;
         private readonly PanelStack _panelStack;
         private readonly IAddonService _addonService;
         private readonly ModFullInfoController _modFullInfoController;
         private readonly ILoc _loc;
         private readonly VisualElementInitializer _visualElementInitializer;
+        private readonly ExperimentalMode _experimentalMode;
+
         private VisualElement _mods;
         private Filter _filter = ModFilter.Downloads.Desc();
         private Label _loading;
@@ -77,6 +85,8 @@ namespace Timberborn.ModsSystemUI
         private VisualElement _updateAllWrapper;
         private Button _updateAllButton;
         private List<string> _tagOptions = new();
+        private Toggle _updateBehaviour;
+        private Image _updateBehaviourInfo;
 
         private Dictionary<string, List<string>> _tagsOptions = new();
         private Dictionary<string, int> _tagsLastValues = new();
@@ -86,6 +96,7 @@ namespace Timberborn.ModsSystemUI
         private uint _page;
         private readonly InstalledAddonRepository _installedAddonRepository;
         private readonly DialogBoxShower _dialogBoxShower;
+        private readonly ITooltipRegistrar _tooltipRegistrar;
 
         private Dictionary<uint, Mod> _updateAvailable = new();
 
@@ -106,7 +117,9 @@ namespace Timberborn.ModsSystemUI
                        ModFullInfoController modFullInfoController,
                        ILoc loc,
                        InstalledAddonRepository installedAddonRepository,
-                       DialogBoxShower dialogBoxShower)
+                       DialogBoxShower dialogBoxShower,
+                       ITooltipRegistrar tooltipRegistrar,
+                       ExperimentalMode experimentalMode)
         {
             _visualElementLoader = visualElementLoader;
             _panelStack = panelStack;
@@ -117,6 +130,8 @@ namespace Timberborn.ModsSystemUI
             _loc = loc;
             _installedAddonRepository = installedAddonRepository;
             _dialogBoxShower = dialogBoxShower;
+            _tooltipRegistrar = tooltipRegistrar;
+            _experimentalMode = experimentalMode;
 
             if (_bundle == null)
             {
@@ -126,6 +141,11 @@ namespace Timberborn.ModsSystemUI
 
         public VisualElement GetPanel()
         {
+            if(!_firstLoadDone)
+            {
+                _firstLoadDone = true;
+                CheckForHighestInsteadOfLive = _experimentalMode.IsExperimental;
+            }
             string assetName = "assets/resources/ui/views/mods/modsbox.uxml";
             var asset = _bundle.LoadAsset<VisualTreeAsset>(assetName);
             var root = LoadVisualElement(asset);
@@ -145,12 +165,18 @@ namespace Timberborn.ModsSystemUI
             _updateAllLabel = root.Q<Label>("UpdateAllLabel");
             _updateAllWrapper = root.Q<VisualElement>("UpdateAllWrapper");
             _updateAllButton = root.Q<Button>("UpdateAll");
+            _updateBehaviour = root.Q<Toggle>("UpdateBehaviour");
+            _updateBehaviour.SetValueWithoutNotify(CheckForHighestInsteadOfLive);
+            _updateBehaviourInfo = root.Q<Image>("UpdateBehaviourInfo");
+            _tooltipRegistrar.Register(_updateBehaviourInfo, _loc.T("Mods.UpdateBehaviourTooltip"));
 
             _newest.clicked += () => SetActiveSortButton("Newest");
             _mostDownloaded.clicked += () => SetActiveSortButton("MostDownloaded");
             _topRated.clicked += () => SetActiveSortButton("TopRated");
             _lastUpdated.clicked += () => SetActiveSortButton("LastUpdated");
             _updateAllButton.clicked += async () => await UpdateUpdatableMods();
+
+            _updateBehaviour.RegisterValueChangedCallback(UpdateBehaviourToggleChanged);
 
             SetUpdateAllVisibility(false);
 
@@ -169,6 +195,12 @@ namespace Timberborn.ModsSystemUI
             return root;
         }
 
+        private void UpdateBehaviourToggleChanged(ChangeEvent<bool> changeEvent)
+        {
+            CheckForHighestInsteadOfLive = changeEvent.newValue;
+            UpdateMods();
+        }
+
         private async void ShowTags()
         {
             Task<IReadOnlyList<TagOption>> getTagsTask = _addonService.GetTags().Get();
@@ -182,9 +214,10 @@ namespace Timberborn.ModsSystemUI
             var modList = new Dictionary<uint, Mod>(_updateAvailable);
             foreach (KeyValuePair<uint, Mod> updatableMod in modList)
             {
+                ModsWereChanged = true;
                 try
                 {
-                    (string location, Mod Mod) mod = await _addonService.DownloadLatest(updatableMod.Value);
+                    (string location, Mod Mod) mod = await _addonService.Download(updatableMod.Value, updatableMod.Value.Modfile);
                     TryInstall(mod);
                     _updateAvailable.Remove(updatableMod.Key);
                 }
@@ -236,6 +269,12 @@ namespace Timberborn.ModsSystemUI
                 try
                 {
                     mod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[manifest.ModId].Get();
+                    if (CheckForHighestInsteadOfLive)
+                    {
+                        FilesClient filesCLient = _addonService.GetFiles(mod);
+                        var versions = filesCLient.Search(FileFilter.Version.Desc()).ToEnumerable();
+                        mod.Modfile = await versions.FirstAsync();
+                    }
                 }
                 catch (Exception)
                 {
@@ -304,6 +343,8 @@ namespace Timberborn.ModsSystemUI
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 throw ex;
             }
         }
@@ -446,7 +487,7 @@ namespace Timberborn.ModsSystemUI
 
             _installedOptions.RegisterValueChangedCallback(_ => UpdateMods());
 
-            foreach(RadioButton child in _installedOptions.Children())
+            foreach (RadioButton child in _installedOptions.Children())
             {
                 child.RegisterCallback((ClickEvent @event) => ClickTagRadioButton(@event));
             }
@@ -517,7 +558,7 @@ namespace Timberborn.ModsSystemUI
             var secondParent = parent.parent;
             var thirdParent = (RadioButtonGroup)secondParent.parent;
 
-            if(_tagsLastValues[thirdParent.name] == thirdParent.value)
+            if (_tagsLastValues[thirdParent.name] == thirdParent.value)
             {
                 thirdParent.value = -1;
                 _tagsLastValues[thirdParent.name] = -1;
@@ -570,6 +611,7 @@ namespace Timberborn.ModsSystemUI
 
         private async Task OnModsRetrieved(IReadOnlyList<Mod> task)
         {
+            _cancellationTokenSource.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
             _token = _cancellationTokenSource.Token;
             try
@@ -586,6 +628,8 @@ namespace Timberborn.ModsSystemUI
             }
             catch (Exception e)
             {
+                ModManagerUIPlugin.Log.LogError(e.Message);
+                ModManagerUIPlugin.Log.LogError(e.StackTrace);
                 ShowError(e);
             }
         }
@@ -616,7 +660,21 @@ namespace Timberborn.ModsSystemUI
                 if (_installedAddonRepository.TryGet(mod.Id, out Manifest manifest))
                 {
                     modIsEnabled = manifest.Enabled;
-                    var latestVersion = mod.Modfile.Version;
+                    string latestVersion = "";
+                    if (CheckForHighestInsteadOfLive)
+                    {
+                        FilesClient filesCLient = _addonService.GetFiles(mod);
+                        var versions = filesCLient.Search(FileFilter.Version.Desc()).ToEnumerable();
+                        if (token.IsCancellationRequested)
+                        {
+                            token.ThrowIfCancellationRequested();
+                        }
+                        latestVersion = (await versions.FirstAsync()).Version;
+                    }
+                    else
+                    {
+                        latestVersion = mod.Modfile.Version;
+                    }
                     if (VersionComparer.IsVersionHigher(latestVersion, manifest.Version))
                     {
                         item.Q<Button>("Download").text = "Update";
@@ -715,9 +773,15 @@ namespace Timberborn.ModsSystemUI
             {
                 downloadButton.SetEnabled(false);
                 ModsWereChanged = true;
-                (string location, Mod Mod) mod = await _addonService.DownloadLatest(modInfo);
+                if(CheckForHighestInsteadOfLive)
+                {
+                    FilesClient filesCLient = _addonService.GetFiles(modInfo);
+                    var versions = filesCLient.Search(FileFilter.Version.Desc()).ToEnumerable();
+                    modInfo.Modfile = await versions.FirstAsync();
+                }
+                (string location, Mod Mod) mod = await _addonService.Download(modInfo, modInfo.Modfile);
                 TryInstall(mod, isInstalledToggle, isEnabledToggle, uninstallButton, downloadButton);
-                await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
+                await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo, CheckForHighestInsteadOfLive))
                 {
                     try
                     {
@@ -742,6 +806,7 @@ namespace Timberborn.ModsSystemUI
                     catch (IOException ex)
                     {
                         ModManagerUIPlugin.Log.LogError($"{ex.Message}");
+                        ModManagerUIPlugin.Log.LogWarning(ex.StackTrace);
                     }
                     catch (Exception)
                     {
@@ -807,14 +872,17 @@ namespace Timberborn.ModsSystemUI
             catch (MapException ex)
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                ModManagerUIPlugin.Log.LogWarning(ex.StackTrace);
             }
             catch (AddonException ex)
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                ModManagerUIPlugin.Log.LogWarning(ex.StackTrace);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModManagerUIPlugin.Log.LogError(ex.StackTrace);
+                throw ex;
             }
         }
 

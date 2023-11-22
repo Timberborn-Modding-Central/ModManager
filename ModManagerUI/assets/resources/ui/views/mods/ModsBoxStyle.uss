@@ -224,3 +224,12 @@
     --background-slice-scale: 0.5;
     --background-slice: 10;
 }
+
+.mods-box_update-behaviour-info {
+    height: 24px;
+    width: 24px;
+	margin-top: 5px;
+    margin-left: 4px;
+    margin-right: 4px;
+    background-image: resource('UI/Images/game/info');
+}
