@@ -1,4 +1,8 @@
 ## Unreleased
+
+### Changes
+
+## 1.3.6
 - New Toggle to check installed mod version against live/highest version
 - Update all now correctly shows correct dialog box when exiting mod manager
 
