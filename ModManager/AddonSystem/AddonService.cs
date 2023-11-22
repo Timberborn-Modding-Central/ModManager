@@ -130,11 +130,17 @@ namespace ModManager.AddonSystem
             }
         }
 
-        public async IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod)
+        public async IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod, bool downloadHighestInsteadOfLive)
         {
             await foreach (var dep in GetDependencies(mod))
             {
                 var depMod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[dep.ModId].Get();
+                if (downloadHighestInsteadOfLive)
+                {
+                    FilesClient filesCLient = GetFiles(depMod);
+                    var versions = filesCLient.Search(FileFilter.Version.Desc());
+                    depMod.Modfile = await versions.First();
+                }
                 (string location, Mod Mod) returnvalue = new();
                 try
                 {

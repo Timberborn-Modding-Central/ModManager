@@ -27,6 +27,8 @@
                         <Timberborn.CoreUI.LocalizableButton name="Newest" text="Newest" text-loc-key="Mods.Newest" class="menu-button" />
                         <Timberborn.CoreUI.LocalizableButton name="LastUpdated" text="LastUpdated" text-loc-key="Mods.LastUpdated" class="menu-button" />
                         <Timberborn.CoreUI.LocalizableButton name="TopRated" text="TopRated" text-loc-key="Mods.TopRated" class="menu-button" />
+						<Timberborn.CoreUI.LocalizableToggle name="UpdateBehaviour" text="Check for latest instead of live version" text-loc-key="Mods.UpdateBehaviour" class="text--big mods-box-toggle" />
+						<ui:Image name="UpdateBehaviourInfo" class="mods-box_update-behaviour-info" />
                     </ui:VisualElement>
                     <ui:VisualElement name="UpdateAllWrapper" class="mods-box__update-all">
                         <Timberborn.CoreUI.LocalizableLabel name="UpdateAllLabel" text-loc-key="Mods.Empty" class="text--big mods-box-full-item__update-all-label" />

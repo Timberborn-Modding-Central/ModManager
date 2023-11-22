@@ -25,7 +25,7 @@ namespace ModManager.AddonSystem
 
         Task<(string location, Mod Mod)> DownloadLatest(Mod mod);
 
-        IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod);
+        IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod, bool downloadHighestInsteadOfLive);
 
         Task<(string location, Mod Mod)> Download(Mod mod, File file);
 

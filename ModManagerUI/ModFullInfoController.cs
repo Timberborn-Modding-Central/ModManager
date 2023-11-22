@@ -258,7 +258,7 @@ namespace Timberborn.ModsSystemUI
             {
                 throw;
             }
-            await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo))
+            await foreach ((string location, Mod Mod) dependency in _addonService.DownloadDependencies(modInfo, ModsBox.CheckForHighestInsteadOfLive))
             {
                 try
                 {
