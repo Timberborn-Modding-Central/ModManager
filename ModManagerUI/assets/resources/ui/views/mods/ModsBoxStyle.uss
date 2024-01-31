@@ -22,7 +22,7 @@
     --background-slice-scale: 0.5;
     --background-slice: 10;
     width: 250px;
-    margin: 8px 8px 0 0;
+    /*margin: 8px 8px 0 0;*/
     padding: 8px;
     flex-shrink: 0;
 }
@@ -136,6 +136,29 @@
     background-image: url('/assets/resources/UI/Images/Mods/download.png');
 }
 
+.mods-box-item__version-status {
+    margin-left: auto;
+    margin-right: 4px;
+}
+
+.mods-box-item__status-unknown {
+    height: 24px;
+    width: 24px;
+    background-image: url('/assets/resources/UI/Images/Mods/status-unknown.png');
+}
+
+.mods-box-item__status-compatible {
+    height: 24px;
+    width: 24px;
+    background-image: url('/assets/resources/UI/Images/Mods/status-compatible.png');
+}
+
+.mods-box-item__status-incompatible {
+    height: 24px;
+    width: 24px;
+    background-image: url('/assets/resources/UI/Images/Mods/status-incompatible.png');
+}
+
 .mods-box-full-item {
     padding: 45px;
     margin: 45px;
@@ -219,10 +242,15 @@
 	flex-grow: 1;
 }
 
-.test {
-    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+.capsule-header__text {
+    --background-image: resource('UI/Images/Core/Header');
     --background-slice-scale: 0.5;
     --background-slice: 10;
+    -unity-text-align: middle-center;
+    width: 474px;
+    margin: 8px 8px 0 0;
+    padding: 16px;
+    flex-shrink: 0;
 }
 
 .mods-box_update-behaviour-info {

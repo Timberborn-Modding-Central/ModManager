@@ -3,7 +3,6 @@ using ModManager.ExtractorSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 
 namespace ModManager.BepInExSystem
@@ -33,6 +32,7 @@ namespace ModManager.BepInExSystem
 
             return true;
         }
+        
         //public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         //{
         //    extractLocation = "";
@@ -56,9 +56,10 @@ namespace ModManager.BepInExSystem
 
         //    return true;
         //}
+        
         private void ClearOldModFiles(Mod modInfo, string modFolderName)
         {
-            if (TryGetExistingModFolder(modInfo, out string dirs))
+            if (TryGetExistingModFolder(modInfo, out var dirs))
             {
                 var dirInfo = new DirectoryInfo(dirs);
                 if (dirInfo.Name.Equals(modFolderName))
@@ -96,7 +97,7 @@ namespace ModManager.BepInExSystem
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Mods, modFolderName));
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
                                           .Where(folder => !_foldersToIgnore.Contains(folder.FullName.Split(Path.DirectorySeparatorChar).Last()));
-            foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
+            foreach (var subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
                 TryDeleteFolder(subDirectory);
@@ -108,7 +109,7 @@ namespace ModManager.BepInExSystem
 
         private void DeleteFilesFromFolder(DirectoryInfo dir)
         {
-            foreach (FileInfo file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
+            foreach (var file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
             {
                 try
                 {

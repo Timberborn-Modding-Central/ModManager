@@ -32,7 +32,7 @@ namespace ModManager.PersistenceSystem
 
             if (recursive)
             {
-                foreach (string directoryPath in Directory.EnumerateDirectories(path))
+                foreach (var directoryPath in Directory.EnumerateDirectories(path))
                 {
                     TryDeleteEmptyDictionary(directoryPath);
                 }

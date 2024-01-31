@@ -1,5 +1,4 @@
 ﻿using ModManager.ExtractorSystem;
-using ModManager.MapSystem;
 using ModManager.StartupSystem;
 
 namespace ModManager.BepInExSystem

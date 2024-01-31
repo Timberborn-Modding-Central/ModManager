@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using ModManager.AddonSystem;
-using ModManager.ModSystem;
 
 namespace ModManager.AddonEnableSystem
 {
     public class AddonEnablerService : Singleton<AddonEnablerService>
     {
-        private readonly AddonEnablerRegistry _addonEnablerRegistry;
+        private readonly AddonEnablerRegistry _addonEnablerRegistry = AddonEnablerRegistry.Instance;
 
         public static readonly IEnumerable<string> IgnoreExtensions = new[]
         {
@@ -14,14 +13,9 @@ namespace ModManager.AddonEnableSystem
             Names.Extensions.Remove
         };
 
-        public AddonEnablerService()
-        {
-            _addonEnablerRegistry = AddonEnablerRegistry.Instance;
-        }
-
         public void Enable(Manifest manifest)
         {
-            foreach (IAddonEnabler enabler in _addonEnablerRegistry.GetAddonEnablers())
+            foreach (var enabler in _addonEnablerRegistry.GetAddonEnablers())
             {
                 if (enabler.Enable(manifest))
                 {
@@ -34,7 +28,7 @@ namespace ModManager.AddonEnableSystem
 
         public void Disable(Manifest manifest)
         {
-            foreach (IAddonEnabler enabler in _addonEnablerRegistry.GetAddonEnablers())
+            foreach (var enabler in _addonEnablerRegistry.GetAddonEnablers())
             {
                 if (enabler.Disable(manifest))
                 {

@@ -12,28 +12,17 @@ namespace ModManager.ModSystem
 {
     public class ModInstaller : IAddonInstaller
     {
-        private readonly PersistenceService _persistenceService;
-
-        private readonly InstalledAddonRepository _installedAddonRepository;
-
-        private readonly AddonExtractorService _extractor;
-
-        public ModInstaller()
-        {
-            _persistenceService = PersistenceService.Instance;
-            _installedAddonRepository = InstalledAddonRepository.Instance;
-            _extractor = AddonExtractorService.Instance;
-        }
+        private readonly InstalledAddonRepository _installedAddonRepository = InstalledAddonRepository.Instance;
+        private readonly AddonExtractorService _addonExtractorService = AddonExtractorService.Instance;
+        private readonly PersistenceService _persistenceService = PersistenceService.Instance;
 
         public bool Install(Mod mod, string zipLocation)
         {
             if (!mod.Tags.Any(x => x.Name == "Mod"))
-            {
                 return false;
-            }
-            string installLocation = _extractor.Extract(mod, zipLocation);
-            var manifest = new Manifest(mod, mod.Modfile, installLocation);
-            string modManifestPath = Path.Combine(installLocation, Manifest.FileName);
+            var installLocation = _addonExtractorService.Extract(mod, zipLocation);
+            var manifest = new Manifest(mod, mod.Modfile!, installLocation);
+            var modManifestPath = Path.Combine(installLocation, Manifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
             _installedAddonRepository.Add(manifest);
 
@@ -43,14 +32,12 @@ namespace ModManager.ModSystem
         public bool Uninstall(Manifest manifest)
         {
             if (manifest is not Manifest && manifest is MapManifest)
-            {
                 return false;
-            }
             _installedAddonRepository.Remove(manifest.ModId);
 
             var modDirInfo = new DirectoryInfo(Path.Combine(manifest.RootPath));
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories);
-            foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
+            foreach (var subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
                 TryDeleteFolder(subDirectory);
@@ -64,13 +51,11 @@ namespace ModManager.ModSystem
         public bool ChangeVersion(Mod mod, Modio.Models.File file, string zipLocation)
         {
             if (!mod.Tags.Any(x => x.Name == "Mod"))
-            {
                 return false;
-            }
             mod.Modfile= file;
-            string installLocation = _extractor.Extract(mod, zipLocation);
+            var installLocation = _addonExtractorService.Extract(mod, zipLocation);
             var manifest = new Manifest(mod, mod.Modfile, installLocation);
-            string modManifestPath = Path.Combine(installLocation, Manifest.FileName);
+            var modManifestPath = Path.Combine(installLocation, Manifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
 
             _installedAddonRepository.Remove(mod.Id);
@@ -82,7 +67,7 @@ namespace ModManager.ModSystem
 
         private void DeleteFilesFromFolder(DirectoryInfo dir)
         {
-            foreach (FileInfo file in dir.GetFiles())
+            foreach (var file in dir.GetFiles())
             {
                 try
                 {
@@ -101,20 +86,13 @@ namespace ModManager.ModSystem
 
         private void TryDeleteFolder(DirectoryInfo dir)
         {
-            try
+            if (dir.EnumerateDirectories().Any() == false && dir.EnumerateFiles().Any() == false)
             {
-                if (dir.EnumerateDirectories().Any() == false && dir.EnumerateFiles().Any() == false)
-                {
-                    dir.Delete();
-                }
-                else
-                {
-                    dir.MoveTo($"{dir.FullName}{Names.Extensions.Remove}");
-                }
+                dir.Delete();
             }
-            catch (Exception)
+            else
             {
-                throw;
+                dir.MoveTo($"{dir.FullName}{Names.Extensions.Remove}");
             }
         }
     }

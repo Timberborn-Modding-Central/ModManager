@@ -15,13 +15,13 @@ namespace ModManagerUI.LocalizationSystem
        /// <returns></returns>
         public static Dictionary<string, string> GetLocalization(string localizationKey)
         {
-            Dictionary<string, string> localizedRecords = GetLocalizationRecordsFromFiles(localizationKey, GetLocalizationFilePathsFromDependencies(localizationKey))
+            var localizedRecords = GetLocalizationRecordsFromFiles(localizationKey, GetLocalizationFilePathsFromDependencies(localizationKey))
                 .ToDictionary(record => record.Id, record => record.Text);
 
-            foreach (LocalizationRecord defaultRecord in GetDefaultLocalization())
+            foreach (var defaultRecord in GetDefaultLocalization())
             {
-                string id = defaultRecord.Id;
-                if (!localizedRecords.TryGetValue(id, out string text) || string.IsNullOrEmpty(text))
+                var id = defaultRecord.Id;
+                if (!localizedRecords.TryGetValue(id, out var text) || string.IsNullOrEmpty(text))
                 {
                     localizedRecords[id] = defaultRecord.Text;
                 }
@@ -39,7 +39,7 @@ namespace ModManagerUI.LocalizationSystem
         private static IEnumerable<LocalizationRecord> GetLocalizationRecordsFromFiles(string localization, IEnumerable<string> filePaths)
         {
             List<LocalizationRecord> records = new();
-            foreach (string path in filePaths)
+            foreach (var path in filePaths)
             {
                 records.AddRange(TryToReadRecords(localization, path));
             }
@@ -62,7 +62,7 @@ namespace ModManagerUI.LocalizationSystem
             }
             catch (Exception ex)
             {
-                string message = "Unable to parse file for " + localization + ".";
+                var message = "Unable to parse file for " + localization + ".";
                 if (ex is AggregatedException aggregatedException)
                 {
                     message = message + " First error: " + aggregatedException.m_InnerExceptionsList[0].Message;
@@ -94,9 +94,9 @@ namespace ModManagerUI.LocalizationSystem
         private static List<string> GetLocalizationFilePathsFromDependencies(string localizationKey)
         {
             List<string> localizationFilePaths = new();
-            string pluginLocalizationPath = UIPaths.ModManagerUI.Lang;
+            var pluginLocalizationPath = UIPaths.ModManagerUI.Lang;
 
-            (bool hasLocalization, string localizationName) = LocalizationNameOrDefault(pluginLocalizationPath, localizationKey);
+            (var hasLocalization, var localizationName) = LocalizationNameOrDefault(pluginLocalizationPath, localizationKey);
 
             if (!hasLocalization)
             {

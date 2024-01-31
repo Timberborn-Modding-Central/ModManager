@@ -25,7 +25,7 @@ namespace ModManager.MapSystem
 
         public IEnumerable<Manifest> Find()
         {
-            string manifestPath = Path.Combine(Paths.Maps, MapManifest.FileName);
+            var manifestPath = Path.Combine(Paths.Maps, MapManifest.FileName);
 
             if (!File.Exists(manifestPath))
             {
@@ -34,7 +34,7 @@ namespace ModManager.MapSystem
 
             try
             {
-                List<MapManifest> manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
+                var manifests = _persistenceService.LoadObject<List<MapManifest>>(manifestPath, false);
                 UpdateManifestInfo(manifests);
                 return manifests;
             }
@@ -56,7 +56,7 @@ namespace ModManager.MapSystem
 
         private void UpdateManifestInfo(List<MapManifest> manifests)
         {
-            foreach (MapManifest mapManifest in manifests)
+            foreach (var mapManifest in manifests)
             {
                 mapManifest.RootPath = Paths.Maps;
 

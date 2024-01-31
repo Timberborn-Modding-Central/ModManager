@@ -18,8 +18,14 @@ namespace ModManager.ModIoSystem
 
                 return _client;
             }
-            set => _client = value;
+            private set => _client = value;
         }
+
+        public static GameClient GameClient => Client.Games[ModIoGameInfo.GameId];
+
+        public static ModsClient ModsClient => GameClient.Mods;
+        
+        public static GameTagsClient GameTagsClient => GameClient.Tags;
 
         public static void InitializeClient(string apiKey)
         {

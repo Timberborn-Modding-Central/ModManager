@@ -1,7 +1,5 @@
 ﻿using ModManager.StartupSystem;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ModManager.AddonInstallerSystem
 {

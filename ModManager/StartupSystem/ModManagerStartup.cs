@@ -9,13 +9,9 @@ using ModManager.ModSystem;
 
 namespace ModManager.StartupSystem
 {
-    public class ModManagerStartup
+    public class ModManagerStartup : Singleton<ModManagerStartup>
     {
         public static bool IsLoaded;
-
-        private static ModManagerStartup? _instance;
-
-        private static ModManagerStartup Instance => _instance ??= new ModManagerStartup();
 
         private readonly IEnumerable<ILoadable> _loadableClasses = new List<ILoadable>
         {
@@ -45,7 +41,7 @@ namespace ModManager.StartupSystem
 
         private void LoadClasses(ModManagerStartupOptions startupOptions)
         {
-            foreach (ILoadable loadableClass in _loadableClasses)
+            foreach (var loadableClass in _loadableClasses)
             {
                 loadableClass.Load(startupOptions);
             }

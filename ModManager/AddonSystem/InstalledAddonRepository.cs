@@ -7,15 +7,9 @@ namespace ModManager.AddonSystem
 {
     public class InstalledAddonRepository : Singleton<InstalledAddonRepository>, ILoadable
     {
-        private Dictionary<uint, Manifest> _installedMods;
+        private Dictionary<uint, Manifest> _installedMods = new();
 
-        private readonly ManifestLocationFinderService _manifestLocationFinderService;
-
-        public InstalledAddonRepository()
-        {
-            _manifestLocationFinderService = ManifestLocationFinderService.Instance;
-            _installedMods = new Dictionary<uint, Manifest>();
-        }
+        private readonly ManifestLocationFinderService _manifestLocationFinderService = ManifestLocationFinderService.Instance;
 
         public bool TryGet(uint modId, out Manifest manifest)
         {
