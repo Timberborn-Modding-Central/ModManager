@@ -6,22 +6,16 @@ namespace ModManager.StartupSystem
 {
     public class RemoveFilesOnStartup : Singleton<RemoveFilesOnStartup>, ILoadable
     {
-        private readonly InstalledAddonRepository _addonRepository;
+        private readonly InstalledAddonRepository _addonRepository = InstalledAddonRepository.Instance;
 
-        private readonly PathRemovalService _removalService;
-
-        public RemoveFilesOnStartup()
-        {
-            _addonRepository = InstalledAddonRepository.Instance;
-            _removalService = PathRemovalService.Instance;
-        }
+        private readonly PathRemovalService _removalService = PathRemovalService.Instance;
 
         public void Load(ModManagerStartupOptions startupOptions)
         {
             DeleteRemoveTaggedFiles(Paths.GameRoot);
             DeleteRemoveTaggedDirectories(Paths.GameRoot);
 
-            foreach (Manifest manifest in _addonRepository.All())
+            foreach (var manifest in _addonRepository.All())
             {
                 DeleteRemoveTaggedFiles(manifest.RootPath);
                 _removalService.TryDeleteEmptyDictionary(manifest.RootPath);
@@ -30,7 +24,7 @@ namespace ModManager.StartupSystem
 
         private void DeleteRemoveTaggedFiles(string path)
         {
-            foreach (string removableFilePaths in Directory.GetFiles(path, $"*{Names.Extensions.Remove}", SearchOption.AllDirectories))
+            foreach (var removableFilePaths in Directory.GetFiles(path, $"*{Names.Extensions.Remove}", SearchOption.AllDirectories))
             {
                 _removalService.TryDeleteFile(removableFilePaths);
             }
@@ -38,7 +32,7 @@ namespace ModManager.StartupSystem
 
         private void DeleteRemoveTaggedDirectories(string path)
         {
-            foreach (string removableFilePaths in Directory.GetDirectories(path, $"*{Names.Extensions.Remove}", SearchOption.AllDirectories))
+            foreach (var removableFilePaths in Directory.GetDirectories(path, $"*{Names.Extensions.Remove}", SearchOption.AllDirectories))
             {
                 _removalService.TryDeleteEmptyDictionary(removableFilePaths);
             }

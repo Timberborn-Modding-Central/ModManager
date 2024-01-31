@@ -5,12 +5,7 @@ namespace ModManager.ManifestLocationFinderSystem
 {
     public class ManifestLocationFinderRegistry : Singleton<ManifestLocationFinderRegistry>
     {
-        private readonly List<KeyValuePair<string, IManifestLocationFinder>> _manifestLocationFinders;
-
-        public ManifestLocationFinderRegistry()
-        {
-            _manifestLocationFinders = new List<KeyValuePair<string, IManifestLocationFinder>>();
-        }
+        private readonly List<KeyValuePair<string, IManifestLocationFinder>> _manifestLocationFinders = new();
 
         public void Add(string manifestLocationFinderId, IManifestLocationFinder manifestLocationFinder)
         {

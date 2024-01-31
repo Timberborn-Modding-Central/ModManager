@@ -19,7 +19,7 @@ namespace ModManager.ModSystem
             {
                 return false;
             }
-            string modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
+            var modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
             ClearOldModFiles(modInfo, modFolderName);
             extractLocation = Path.Combine(Paths.Mods, modFolderName);
             ZipFile.ExtractToDirectory(addonZipLocation, extractLocation, overWrite);
@@ -30,7 +30,7 @@ namespace ModManager.ModSystem
 
         private void ClearOldModFiles(Mod modInfo, string modFolderName)
         {
-            if (TryGetExistingModFolder(modInfo, out string dirs))
+            if (TryGetExistingModFolder(modInfo, out var dirs))
             {
                 var dirInfo = new DirectoryInfo(dirs);
                 if (dirInfo.Name.Equals(modFolderName))
@@ -52,10 +52,7 @@ namespace ModManager.ModSystem
             {
                 throw new AddonExtractorException($"Found multiple folders for \"{modInfo.Name}\"");
             }
-            catch (Exception)
-            {
-                throw;
-            }
+
             if (dirs != null)
             {
                 return true;
@@ -63,12 +60,14 @@ namespace ModManager.ModSystem
 
             return false;
         }
+        
         private void DeleteModFiles(string modFolderName)
         {
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Mods, modFolderName));
-            var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories)
-                                          .Where(folder => !_foldersToIgnore.Contains(folder.FullName.Split(Path.DirectorySeparatorChar).Last()));
-            foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
+            var modSubFolders = modDirInfo
+                .GetDirectories("*", SearchOption.AllDirectories)
+                .Where(folder => !_foldersToIgnore.Contains(folder.FullName.Split(Path.DirectorySeparatorChar).Last()));
+            foreach (var subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
                 TryDeleteFolder(subDirectory);
@@ -80,7 +79,7 @@ namespace ModManager.ModSystem
 
         private void DeleteFilesFromFolder(DirectoryInfo dir)
         {
-            foreach (FileInfo file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
+            foreach (var file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
             {
                 try
                 {
@@ -99,16 +98,9 @@ namespace ModManager.ModSystem
 
         private void TryDeleteFolder(DirectoryInfo dir)
         {
-            try
+            if (dir.EnumerateDirectories().Any() == false && dir.EnumerateFiles().Any() == false)
             {
-                if (dir.EnumerateDirectories().Any() == false && dir.EnumerateFiles().Any() == false)
-                {
-                    dir.Delete();
-                }
-            }
-            catch (Exception)
-            {
-                throw;
+                dir.Delete();
             }
         }
     }

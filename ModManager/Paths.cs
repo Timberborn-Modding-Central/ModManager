@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net.Mime;
 using System.Runtime.InteropServices;
 using ModManager.StartupSystem;
 
