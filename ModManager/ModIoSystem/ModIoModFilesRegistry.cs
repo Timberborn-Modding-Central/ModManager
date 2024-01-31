@@ -9,39 +9,42 @@ namespace ModManager.ModIoSystem
 {
     public abstract class ModIoModFilesRegistry
     {
-        private static readonly Dictionary<uint, IEnumerable<File>> ModIoModFiles = new();
+        private static readonly Dictionary<uint, IReadOnlyList<File>> ModIoModFiles1 = new();
+        private static readonly object ModIoModFilesLock = new();
 
-        public static IEnumerable<File> Get(uint modId)
+        private static Dictionary<uint, IReadOnlyList<File>> ModIoModFiles
         {
-            lock (ModIoModFiles)
+            get
             {
-                return ModIoModFiles.GetOrAdd(modId, () => Task.Run(() => RetrieveFiles(modId)).Result);
-            }
-        }
-        
-        public static Task<IEnumerable<File>> GetAsync(uint modId)
-        {
-            lock (ModIoModFiles)
-            {
-                if (ModIoModFiles.TryGetValue(modId, out var files))
-                    return Task.FromResult(files);
-                ModIoModFiles.Add(modId, Task.Run(() => RetrieveFiles(modId)).Result);
-                return Task.FromResult(ModIoModFiles[modId]);
-            }
-        }
-        
-        public static Task<IEnumerable<File>> GetDescAsync(uint modId)
-        {
-            lock (ModIoModFiles)
-            {
-                if (ModIoModFiles.TryGetValue(modId, out var files))
-                    return Task.FromResult<IEnumerable<File>>(files.OrderByDescending(file => file.Id).ToList().AsReadOnly());
-                ModIoModFiles.Add(modId, Task.Run(() => RetrieveFiles(modId)).Result);
-                return Task.FromResult<IEnumerable<File>>(ModIoModFiles[modId].OrderByDescending(file => file.Id).ToList().AsReadOnly());
+                lock (ModIoModFilesLock)
+                {
+                    return ModIoModFiles1;
+                }
             }
         }
 
-        private static async Task<IEnumerable<File>> RetrieveFiles(uint modId)
+        public static IReadOnlyList<File> Get(uint modId)
+        {
+            return ModIoModFiles.GetOrAdd(modId, () => Task.Run(() => RetrieveFiles(modId)).Result);
+        }
+        
+        public static async Task<IReadOnlyList<File>> GetAsync(uint modId)
+        {
+            if (ModIoModFiles.TryGetValue(modId, out var files)) 
+                return files;
+            ModIoModFiles.Add(modId, await RetrieveFiles(modId));
+            return ModIoModFiles[modId];
+        }
+        
+        public static async Task<IReadOnlyList<File>> GetDescAsync(uint modId)
+        {
+            if (ModIoModFiles.TryGetValue(modId, out var files))
+                return files.OrderByDescending(file => file.Id).ToList().AsReadOnly();
+            ModIoModFiles.Add(modId, await RetrieveFiles(modId));
+            return ModIoModFiles[modId].OrderByDescending(file => file.Id).ToList().AsReadOnly();
+        }
+
+        private static async Task<IReadOnlyList<File>> RetrieveFiles(uint modId)
         {
             return await ModIo.ModsClient[modId].Files.Search(FileFilter.Id.Desc()).ToList();
         }

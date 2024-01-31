@@ -16,12 +16,10 @@ namespace ModManagerUI.UiSystem
         
         public static async Task DownloadAndExtract(Mod mod, File? file)
         {
-            var modCard = ModCardRegistry.Get(mod);
-            modCard?.ModActionStarted();
             try
             {
                 file ??= mod.Modfile!;
-                var downloadedMod = await AddonService.Download(mod, file);
+                var downloadedMod = await ModManager.AddonSystem.AddonService.Instance.Download(mod, file);
                 TryInstall(downloadedMod);
             }
             catch (MapException ex)
@@ -36,7 +34,6 @@ namespace ModManagerUI.UiSystem
             {
                 ModManagerUIPlugin.Log.LogError($"{ex.Message}");
             }
-            modCard?.ModActionStopped();
         }
         
         public static async Task DownloadAndExtractWithDependencies(Mod mod)
@@ -45,8 +42,6 @@ namespace ModManagerUI.UiSystem
             await DownloadAndExtract(mod, file);
             await foreach (var dependency in AddonService.GetDependencies(mod))
             {
-                if (dependency.IsInstalled())
-                    continue;
                 var dependencyFile = await AddonService.TryGetCompatibleVersion(dependency.ModId, ModManagerPanel.CheckForHighestInsteadOfLive);
                 var dependencyMod = ModIoModRegistry.Get(dependency.ModId);
                 await DownloadAndExtract(dependencyMod, dependencyFile);
@@ -62,10 +57,6 @@ namespace ModManagerUI.UiSystem
             {
                 AddonService.Uninstall(mod.Id);
             }
-            catch (IOException ex)
-            {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
-            }
             catch (AddonException ex)
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
@@ -76,6 +67,9 @@ namespace ModManagerUI.UiSystem
         
         private static void TryInstall((string location, Mod Mod) mod)
         {
+            var modCard = ModCardRegistry.Get(mod.Mod);
+            modCard?.ModActionStarted();
+            
             try
             {
                 if (InstalledAddonRepository.Instance.TryGet(mod.Mod.Id, out var manifest) && manifest.Version != mod.Mod.Modfile.Version)
@@ -102,6 +96,8 @@ namespace ModManagerUI.UiSystem
                 ModManagerUIPlugin.Log.LogError(ex.StackTrace);
                 throw ex;
             }
+            
+            modCard?.ModActionStopped();
         }
     }
 }

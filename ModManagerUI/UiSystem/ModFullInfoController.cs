@@ -31,7 +31,6 @@ namespace ModManagerUI.UiSystem
         
         private Mod? _currentMod;
         private Dropdown? _versionsDropdown;
-        private DownloadButton? _downloadButton;
         
         public File? CurrentFile;
 
@@ -96,19 +95,13 @@ namespace ModManagerUI.UiSystem
                 : "-";
             item.Q<Label>("LiveVersion").text = mod.Modfile?.Version ?? "";
 
-            _downloadButton = DownloadButton.Create(item.Q<Button>("Download"), mod, this);
+            var downloadButton = item.Q<Button>("Download");
+            downloadButton.clicked += () => Download(mod, downloadButton);
 
             LoadLogo(mod, item.Q<Image>("Logo"));
             SetNumbers(mod, item);
             AddImages(mod, item.Q<ScrollView>("Description"));
             _item.Add(item);
-            
-            Refresh();
-        }
-
-        public void Refresh()
-        {
-            _downloadButton?.Refresh();
         }
         
         private VisualElement LoadVisualElement(VisualTreeAsset visualTreeAsset)
@@ -126,6 +119,13 @@ namespace ModManagerUI.UiSystem
             var dropdownProvider = new VersionDropdownProvider(this, versionList.ToList());
             _dropdownOptionsSetter.SetItems(dropdown, dropdownProvider);
             _versionsDropdown?.RefreshContent();
+        }
+
+        private async void Download(Mod mod, Button downloadButton)
+        {
+            downloadButton.SetEnabled(false);
+            await InstallController.DownloadAndExtract(mod, CurrentFile);
+            downloadButton.SetEnabled(true);
         }
 
         private async void LoadLogo(Mod mod, Image root)
@@ -169,8 +169,6 @@ namespace ModManagerUI.UiSystem
             }
             else if (mod.Logo != null)
             {
-                if (mod.Logo == null || mod.Logo.Original == null)
-                    return;
                 await AddImage(mod.Logo.Original, root);
             }
         }
