@@ -33,6 +33,7 @@ namespace ModManagerUI.Components.ModFullInfo
         {
             var currFile = _versions.SingleOrDefault(x => (x.Version ?? "") == value);
             _infoController.CurrentFile = currFile;
+            _infoController.Refresh();
         }
 
         public string FormatDisplayText(string value)

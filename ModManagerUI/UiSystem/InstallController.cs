@@ -57,6 +57,10 @@ namespace ModManagerUI.UiSystem
             {
                 AddonService.Uninstall(mod.Id);
             }
+            catch (IOException ex)
+            {
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
             catch (AddonException ex)
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
