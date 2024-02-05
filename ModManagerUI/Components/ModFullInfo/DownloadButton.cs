@@ -1,5 +1,6 @@
 ﻿using Modio.Models;
 using ModManager.AddonSystem;
+using ModManager.ModIoSystem;
 using ModManager.VersionSystem;
 using ModManagerUI.UiSystem;
 using UnityEngine.UIElements;
@@ -41,7 +42,13 @@ namespace ModManagerUI.Components.ModFullInfo
                 _root.SetEnabled(false);
                 return;
             }
-            
+
+            if (!_mod.IsInstalled())
+            {
+                _root.SetEnabled(true);
+                return;
+            }
+
             _root.SetEnabled(!VersionComparer.IsSameVersion(_modFullInfoController.CurrentFile!.Version, _mod.Modfile.Version));
         }
 

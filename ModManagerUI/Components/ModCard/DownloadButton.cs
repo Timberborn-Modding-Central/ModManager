@@ -56,7 +56,6 @@ namespace ModManagerUI.Components.ModCard
             else
             {
                 _root.SetEnabled(true);
-                
             }
         }
 

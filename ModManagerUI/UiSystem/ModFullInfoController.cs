@@ -102,6 +102,8 @@ namespace ModManagerUI.UiSystem
             SetNumbers(mod, item);
             AddImages(mod, item.Q<ScrollView>("Description"));
             _item.Add(item);
+            
+            Refresh();
         }
 
         public void Refresh()
