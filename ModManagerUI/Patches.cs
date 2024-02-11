@@ -3,6 +3,7 @@ using HarmonyLib;
 using ModManager.AddonSystem;
 using ModManager.ExtractorSystem;
 using System;
+using Timberborn.CoreUI;
 using Timberborn.GameExitSystem;
 using Timberborn.MainMenuScene;
 using Timberborn.ModsSystemUI;
@@ -18,7 +19,7 @@ namespace ModManagerUI
         public static void MainMenuPanelPostfix(ref VisualElement __result)
         {
             VisualElement root = __result.Query("MainMenuPanel");
-            Button button = new Button() { classList = { "menu-button" } };
+            Button button = new LocalizableButton { classList = { "menu-button", "menu-button--stretched" } };
             button.text = "Mod manager";
             button.clicked += ModsBox.OpenOptionsDelegate;
             root.Insert(7, button);
