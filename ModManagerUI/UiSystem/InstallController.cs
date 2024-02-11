@@ -45,6 +45,8 @@ namespace ModManagerUI.UiSystem
             await DownloadAndExtract(mod, file);
             await foreach (var dependency in AddonService.GetDependencies(mod))
             {
+                if (dependency.IsInstalled())
+                    continue;
                 var dependencyFile = await AddonService.TryGetCompatibleVersion(dependency.ModId, ModManagerPanel.CheckForHighestInsteadOfLive);
                 var dependencyMod = ModIoModRegistry.Get(dependency.ModId);
                 await DownloadAndExtract(dependencyMod, dependencyFile);
