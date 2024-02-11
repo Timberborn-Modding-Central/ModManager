@@ -5,12 +5,7 @@ namespace ModManager.ManifestValidatorSystem
 {
     public class ManifestValidatorRegistry : Singleton<ManifestValidatorRegistry>
     {
-        private readonly List<KeyValuePair<string, IManifestValidator>> _manifestValidators;
-
-        public ManifestValidatorRegistry()
-        {
-            _manifestValidators = new List<KeyValuePair<string, IManifestValidator>>();
-        }
+        private readonly List<KeyValuePair<string, IManifestValidator>> _manifestValidators = new();
 
         public void Add(string validatorId, IManifestValidator manifestValidator)
         {

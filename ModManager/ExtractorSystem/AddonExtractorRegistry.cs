@@ -6,12 +6,7 @@ namespace ModManager.ExtractorSystem
 {
     public class AddonExtractorRegistry : Singleton<AddonExtractorRegistry>
     {
-        private readonly List<KeyValuePair<string, IAddonExtractor>> _addonExtractors;
-
-        public AddonExtractorRegistry()
-        {
-            _addonExtractors = new List<KeyValuePair<string, IAddonExtractor>>();
-        }
+        private readonly List<KeyValuePair<string, IAddonExtractor>> _addonExtractors = new();
 
         public void Add(string extractorId, IAddonExtractor addonExtractor)
         {

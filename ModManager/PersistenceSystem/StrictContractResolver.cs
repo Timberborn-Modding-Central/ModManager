@@ -8,7 +8,7 @@ namespace ModManager.PersistenceSystem
     {
         protected override JsonObjectContract CreateObjectContract(Type objectType)
         {
-            JsonObjectContract contract = base.CreateObjectContract(objectType);
+            var contract = base.CreateObjectContract(objectType);
             contract.ItemRequired = Required.Always;
             return contract;
         }

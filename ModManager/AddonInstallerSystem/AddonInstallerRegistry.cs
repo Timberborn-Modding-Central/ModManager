@@ -5,12 +5,7 @@ namespace ModManager.AddonInstallerSystem
 {
     public class AddonInstallerRegistry : Singleton<AddonInstallerRegistry>
     {
-        private readonly List<KeyValuePair<string, IAddonInstaller>> _addonInstallers;
-
-        public AddonInstallerRegistry()
-        {
-            _addonInstallers = new List<KeyValuePair<string, IAddonInstaller>>();
-        }
+        private readonly List<KeyValuePair<string, IAddonInstaller>> _addonInstallers = new();
 
         public void Add(string installerId, IAddonInstaller addonInstaller)
         {

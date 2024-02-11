@@ -1,40 +1,31 @@
-﻿using Modio;
-using Modio.Filters;
-using Modio.Models;
+﻿using Modio.Models;
 using ModManager.AddonEnableSystem;
 using ModManager.AddonInstallerSystem;
 using ModManager.ModIoSystem;
-using ModManager.ModSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ModManager.VersionSystem;
 using File = Modio.Models.File;
 
 namespace ModManager.AddonSystem
 {
     public class AddonService : Singleton<AddonService>, IAddonService
     {
-        private readonly InstalledAddonRepository _installedAddonRepository;
-
-        private readonly AddonInstallerService _addonInstallerService;
-
-        private readonly AddonEnablerService _addonEnablerService;
+        private readonly InstalledAddonRepository _installedAddonRepository = InstalledAddonRepository.Instance;
+        private readonly AddonInstallerService _addonInstallerService = AddonInstallerService.Instance;
+        private readonly AddonEnablerService _addonEnablerService = AddonEnablerService.Instance;
 
         private readonly Dictionary<Uri, byte[]> _imageCache = new();
 
-        public AddonService()
-        {
-            _addonEnablerService = AddonEnablerService.Instance;
-            _installedAddonRepository = InstalledAddonRepository.Instance;
-            _addonInstallerService = AddonInstallerService.Instance;
-        }
+        private readonly HttpClient _httpClient = new();
 
         public void Install(Mod mod, string zipLocation)
         {
-            if (_installedAddonRepository.Has(mod.Id))
+            if (mod.IsInstalled())
             {
                 throw new AddonException($"{mod.Name} is already installed. Use method `{nameof(ChangeVersion)}` to change the version of an installed mod.");
             }
@@ -44,7 +35,7 @@ namespace ModManager.AddonSystem
 
         public void Uninstall(uint modId)
         {
-            if (!_installedAddonRepository.TryGet(modId, out Manifest manifest))
+            if (!_installedAddonRepository.TryGet(modId, out var manifest))
             {
                 throw new AddonException($"Cannot uninstall modId: {modId}. Mod is not installed.");
             }
@@ -54,7 +45,7 @@ namespace ModManager.AddonSystem
 
         public void ChangeVersion(Mod mod, File file, string zipLocation)
         {
-            if (!_installedAddonRepository.Has(mod.Id))
+            if (!mod.IsInstalled())
             {
                 throw new AddonException($"Cannot change version of {mod.Name}. Mod is not installed.");
             }
@@ -68,7 +59,7 @@ namespace ModManager.AddonSystem
 
         public void Enable(uint modId)
         {
-            if (!_installedAddonRepository.TryGet(modId, out Manifest? manifest))
+            if (!_installedAddonRepository.TryGet(modId, out var manifest))
             {
                 throw new AddonException($"Cannot enable modId: {modId}. Mod is not installed.");
             }
@@ -78,91 +69,50 @@ namespace ModManager.AddonSystem
 
         public void Disable(uint modId)
         {
-            if (!_installedAddonRepository.TryGet(modId, out Manifest manifest))
+            if (!_installedAddonRepository.TryGet(modId, out var manifest))
             {
                 throw new AddonException($"Cannot disable modId: {modId}. Mod is not installed.");
             }
 
             _addonEnablerService.Disable(manifest);
         }
-
-        public ModsClient GetMods()
+        
+        public IAsyncEnumerable<Dependency> GetDependencies(Mod mod)
         {
-            return ModIo.Client.Games[ModIoGameInfo.GameId].Mods;
+            var list = new List<Mod>();
+
+            return GetUniqueDependencies(mod, list);
         }
-
-        public GameTagsClient GetTags()
+        
+        private static async IAsyncEnumerable<Dependency> GetUniqueDependencies(Mod mod, List<Mod> list)
         {
-            return ModIo.Client.Games[ModIoGameInfo.GameId].Tags;
-        }
+            list.Add(mod);
+            
+            var dependencies = ModIoModDependenciesRegistry.Get(mod);
 
-        public async Task<(string location, Mod Mod)> DownloadLatest(Mod mod)
-        {
-            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].IsInstalled() &&
-                !VersionComparer.IsVersionHigher(mod.Modfile.Version, _installedAddonRepository.Get(mod.Id).Version))
+            foreach (var dependency in dependencies)
             {
-                throw new AddonException($"Mod {mod.Name} is already installed.");
-            }
-
-            Directory.CreateDirectory($"{Paths.ModManager.Temp}");
-            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{mod.Id}_{mod.Modfile.Id}.zip");
-
-            await ModIo.Client.Download(ModIoGameInfo.GameId,
-                                        mod.Id,
-                                        new FileInfo(tempZipLocation));
-            (string, Mod) result = new(tempZipLocation, mod);
-            return result;
-        }
-
-        private async IAsyncEnumerable<Dependency> GetDependencies(Mod mod)
-        {
-            var deps = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Dependencies.Get();
-
-
-            foreach (var dep in deps)
-            {
-                yield return dep;
-                var depMod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[dep.ModId].Get();
-                await foreach (var dep2 in GetDependencies(depMod))
+                yield return dependency;
+                
+                var dependencyMod = ModIoModRegistry.Get(dependency);
+                if (list.Contains(dependencyMod))
+                    continue;
+                
+                await foreach (var dep2 in GetUniqueDependencies(dependencyMod, list))
                 {
                     yield return dep2;
                 }
             }
         }
 
-        public async IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod, bool downloadHighestInsteadOfLive)
-        {
-            await foreach (var dep in GetDependencies(mod))
-            {
-                var depMod = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[dep.ModId].Get();
-                if (downloadHighestInsteadOfLive)
-                {
-                    FilesClient filesCLient = GetFiles(depMod);
-                    var versions = filesCLient.Search(FileFilter.Version.Desc());
-                    depMod.Modfile = await versions.First();
-                }
-                (string location, Mod Mod) returnvalue = new();
-                try
-                {
-                    returnvalue = await DownloadLatest(depMod);
-                }
-                catch (AddonException ex)
-                {
-                    continue;
-                }
-                yield return returnvalue;
-            }
-        }
-
         public async Task<(string location, Mod Mod)> Download(Mod mod, File file)
         {
-            if (ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].IsInstalled())
+            if (file.IsModInstalled())
             {
-                if (!_installedAddonRepository.TryGet(mod.Id, out Manifest manifest))
+                if (!_installedAddonRepository.TryGet(mod.Id, out var manifest))
                 {
                     throw new AddonException($"Couldn't find installed mod'd manifest.");
                 }
-                file = await ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files[file.Id].Get();
                 if (manifest.Version == file.Version)
                 {
                     throw new AddonException($"Mod {mod.Name} is already installed with version {file.Version}.");
@@ -172,37 +122,41 @@ namespace ModManager.AddonSystem
             mod.Modfile = file;
 
             Directory.CreateDirectory($"{Paths.ModManager.Temp}");
-            string tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{mod.Id}_{file.Version}.zip");
+            var tempZipLocation = Path.Combine(Paths.ModManager.Temp, $"{mod.Id}_{file.Version}.zip");
 
-            await ModIo.Client.Download(ModIoGameInfo.GameId,
-                                   mod.Id,
-                                   file.Id,
-                                   new FileInfo(tempZipLocation));
+            await ModIo.Client.Download(ModIoGameInfo.GameId, mod.Id, file.Id, new FileInfo(tempZipLocation));
             (string, Mod) result = new(tempZipLocation, mod);
             return result;
         }
 
         public async Task<byte[]> GetImage(Uri uri)
         {
-            if (_imageCache.ContainsKey(uri))
+            if (_imageCache.TryGetValue(uri, out var imageBytes))
             {
-                return _imageCache[uri];
+                return imageBytes;
             }
 
-            using var client = new HttpClient();
-            var byteArray =  await client.GetByteArrayAsync(uri);
+            var byteArray = await _httpClient.GetByteArrayAsync(uri);
             _imageCache[uri] = byteArray;
             return byteArray;
         }
-
-        //public IAsyncEnumerable<File> GetFiles(Mod mod)
-        //{
-        //    var files = ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files.Search(filter).ToEnumerable();
-        //    return files;
-        //}
-        public FilesClient GetFiles(Mod mod)
+        
+        public async Task<File?> TryGetCompatibleVersion(uint modId, bool downloadHighestInsteadOfLive)
         {
-            return ModIo.Client.Games[ModIoGameInfo.GameId].Mods[mod.Id].Files;
+            var orderedFiles = await ModIoModFilesRegistry.GetDescAsync(modId);
+            var latestCompatibleFile = orderedFiles.FirstOrDefault(file => VersionStatusService.GetVersionStatus(file) == VersionStatus.Compatible);
+            if (latestCompatibleFile != null)
+            {
+                return latestCompatibleFile;
+            }
+
+            if (downloadHighestInsteadOfLive)
+            {
+                var latestUnknownFileOrNull = orderedFiles.FirstOrDefault(file => VersionStatusService.GetVersionStatus(file) == VersionStatus.Unknown);
+                return latestUnknownFileOrNull;
+            }
+            
+            return null;
         }
     }
 }

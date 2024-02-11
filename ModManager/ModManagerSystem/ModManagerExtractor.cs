@@ -29,9 +29,10 @@ namespace ModManager.ModManagerSystem
 
             return true;
         }
+        
         private void ClearOldModFiles(string modFolderName)
-        {
-                DeleteModFiles(modFolderName);
+        { 
+            DeleteModFiles(modFolderName);
         }
 
         private void DeleteModFiles(string modFolderName)
@@ -42,7 +43,7 @@ namespace ModManager.ModManagerSystem
                           .Where(folder => !_foldersToIgnore.Contains(folder.FullName
                                                             .Split(Path.DirectorySeparatorChar)
                                                             .Last()));
-            foreach (DirectoryInfo subDirectory in modSubFolders.Reverse())
+            foreach (var subDirectory in modSubFolders.Reverse())
             {
                 DeleteFilesFromFolder(subDirectory);
                 TryDeleteFolder(subDirectory);
@@ -54,7 +55,7 @@ namespace ModManager.ModManagerSystem
 
         private void DeleteFilesFromFolder(DirectoryInfo dir)
         {
-            foreach (FileInfo file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
+            foreach (var file in dir.GetFiles().Where(file => !file.Name.EndsWith(Names.Extensions.Remove)))
             {
                 try
                 {

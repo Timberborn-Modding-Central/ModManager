@@ -4,9 +4,9 @@
     <ui:VisualElement name="ModsBox" class="content-row-centered" picking-mode="Ignore">
         <Style src="/Assets/Resources/UI/Views/Mods/ModsBoxStyle.uss" />
         <Timberborn.CoreUI.NineSliceVisualElement class="mods-box sliced-border content-centered">
-            <ui:VisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered">
-                <Timberborn.CoreUI.LocalizableLabel text="Header" name="Header" text-loc-key="Menu.Mods" class="capsule-header__text" />
-            </ui:VisualElement>
+            <Timberborn.CoreUI.NineSliceVisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered capsule-header__text">
+                <Timberborn.CoreUI.LocalizableLabel text="Header" name="Header" text-loc-key="Menu.Mods" />
+            </Timberborn.CoreUI.NineSliceVisualElement>
             <ui:VisualElement name="ScrollViewWrapper" class="panel-list-view mods-box__wrapper">
                 <Timberborn.CoreUI.NineSliceVisualElement name="Navigation" class="mods-box__navigation">
                     <ui:VisualElement name="SearchWrapper" class="content-row-centered--no-grow">
@@ -17,8 +17,9 @@
 						<Timberborn.CoreUI.LocalizableLabel text="Tags:" name="TagsLabel" text-loc-key="Mods.Tags" class="text--big mods-box__tags-label" style="width:100%"/>
 						<ui:VisualElement name="TagsWrapper" class="mods-box__tags" />
 						<Timberborn.CoreUI.LocalizableLabel text="Options:" name="OptionsLabel" text-loc-key="Mods.Options" class="text--big mods-box__tags-label" style="width:100%"/>
-						<ui:RadioButtonGroup name="Options" value="-1" class="mods-box__tags"/>
-						<ui:RadioButtonGroup name="EnabledOptions" value="-1" class="mods-box__tags" style="margin-top:10px;"/>
+						<ui:RadioButtonGroup name="VersionStatusOptions" value="-1" class="mods-box__tags"/>
+                        <ui:RadioButtonGroup name="Options" value="-1" class="mods-box__tags" style="margin-top:10px;"/>
+                        <ui:RadioButtonGroup name="EnabledOptions" value="-1" class="mods-box__tags" style="margin-top:10px;"/>
 					</ui:ScrollView>
                 </Timberborn.CoreUI.NineSliceVisualElement>
                 <ui:VisualElement name="ModsWrapper">
