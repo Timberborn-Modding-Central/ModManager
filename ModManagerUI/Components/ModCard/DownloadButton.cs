@@ -24,7 +24,11 @@ namespace ModManagerUI.Components.ModCard
         public void Initialize()
         {
             _valueGetter = () => Task.Run(TextGetter).Result;
-            _root.clicked += async () => await InstallController.DownloadAndExtractWithDependencies(_mod);
+            _root.clicked += async () =>
+            {
+                Disable();
+                await InstallController.DownloadAndExtractWithDependencies(_mod);
+            };
             Refresh();
         }
         
