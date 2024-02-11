@@ -11,6 +11,7 @@ namespace ModManager.ModIoSystem
     {
         private static readonly Dictionary<uint, IReadOnlyList<File>> ModIoModFiles1 = new();
         private static readonly object ModIoModFilesLock = new();
+        private static readonly object ModIoModFilesGetterLock = new();
 
         private static Dictionary<uint, IReadOnlyList<File>> ModIoModFiles
         {
@@ -25,7 +26,12 @@ namespace ModManager.ModIoSystem
 
         public static IReadOnlyList<File> Get(uint modId)
         {
-            return ModIoModFiles.GetOrAdd(modId, () => Task.Run(() => RetrieveFiles(modId)).Result);
+            IReadOnlyList<File> list;
+            lock (ModIoModFilesGetterLock)
+            {
+                list = ModIoModFiles.GetOrAdd(modId, () => Task.Run(() => RetrieveFiles(modId)).Result);
+            }
+            return list;
         }
         
         public static async Task<IReadOnlyList<File>> GetAsync(uint modId)
