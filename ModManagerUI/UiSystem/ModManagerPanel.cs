@@ -106,10 +106,10 @@ namespace ModManagerUI.UiSystem
             // new VersionStatusRadioButtonGroup(root.Q<RadioButtonGroup>("VersionStatusOptions"), versionStatusTagOption, this).Initialize();
             
             var installedTagOption = RadioButtonTagOption.Create(typeof(InstalledOptions));
-            new InstalledRadioButtonGroup(_root.Q<RadioButtonGroup>("Options"), installedTagOption).Initialize();
+            new InstalledRadioButtonGroup(_root.Q<RadioButtonGroup>("Options"), installedTagOption).Initialize(true);
             
             var enabledTagOption = RadioButtonTagOption.Create(typeof(EnabledOptions));
-            new EnabledRadioButtonGroup(_root.Q<RadioButtonGroup>("EnabledOptions"), enabledTagOption).Initialize();
+            new EnabledRadioButtonGroup(_root.Q<RadioButtonGroup>("EnabledOptions"), enabledTagOption).Initialize(true);
 
             _showMoreButton = ShowMoreButton.Create(_root.Q<Button>("ShowMore"));
 
