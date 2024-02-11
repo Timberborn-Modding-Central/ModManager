@@ -16,6 +16,8 @@ namespace ModManagerUI.UiSystem
         
         public static async Task DownloadAndExtract(Mod mod, File? file)
         {
+            var modCard = ModCardRegistry.Get(mod);
+            modCard?.ModActionStarted();
             try
             {
                 file ??= mod.Modfile!;
@@ -34,6 +36,7 @@ namespace ModManagerUI.UiSystem
             {
                 ModManagerUIPlugin.Log.LogError($"{ex.Message}");
             }
+            modCard?.ModActionStopped();
         }
         
         public static async Task DownloadAndExtractWithDependencies(Mod mod)
@@ -71,9 +74,6 @@ namespace ModManagerUI.UiSystem
         
         private static void TryInstall((string location, Mod Mod) mod)
         {
-            var modCard = ModCardRegistry.Get(mod.Mod);
-            modCard?.ModActionStarted();
-            
             try
             {
                 if (InstalledAddonRepository.Instance.TryGet(mod.Mod.Id, out var manifest) && manifest.Version != mod.Mod.Modfile.Version)
@@ -100,8 +100,6 @@ namespace ModManagerUI.UiSystem
                 ModManagerUIPlugin.Log.LogError(ex.StackTrace);
                 throw ex;
             }
-            
-            modCard?.ModActionStopped();
         }
     }
 }
