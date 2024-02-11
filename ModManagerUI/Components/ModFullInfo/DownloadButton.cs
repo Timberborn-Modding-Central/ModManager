@@ -53,7 +53,13 @@ namespace ModManagerUI.Components.ModFullInfo
                 return;
             }
 
-            _root.SetEnabled(!VersionComparer.IsSameVersion(_modFullInfoController.CurrentFile!.Version, _mod.Modfile.Version));
+            if (_modFullInfoController.CurrentFile == null)
+            {
+                _root.SetEnabled(true);
+                return;
+            }
+            
+            _root.SetEnabled(!VersionComparer.IsSameVersion(_modFullInfoController.CurrentFile.Version, _mod.Modfile.Version));
         }
 
         private string TextGetter()
