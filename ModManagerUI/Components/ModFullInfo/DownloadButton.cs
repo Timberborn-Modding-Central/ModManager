@@ -23,7 +23,11 @@ namespace ModManagerUI.Components.ModFullInfo
         public static DownloadButton Create(Button root, Mod mod, ModFullInfoController modFullInfoController)
         {
             var downloadButton = new DownloadButton(root, mod, modFullInfoController);
-            root.clicked += () => downloadButton.Download();
+            root.clicked += () =>
+            {
+                root.SetEnabled(false);
+                downloadButton.Download();
+            };
             downloadButton.Refresh();
             return downloadButton;
         }
