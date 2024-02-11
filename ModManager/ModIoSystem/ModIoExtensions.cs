@@ -9,6 +9,11 @@ namespace ModManager.ModIoSystem
         {
             return InstalledAddonRepository.Instance.Has(mod.Id);
         }
+        
+        public static bool IsInstalled(this Dependency dependency)
+        {
+            return InstalledAddonRepository.Instance.Has(dependency.ModId);
+        }
 
         public static bool IsEnabled(this Mod mod)
         {
