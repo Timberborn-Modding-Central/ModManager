@@ -1,0 +1,35 @@
+ID,Text,Comment
+Menu.Mods,Karten und Mods,Öffnet ein Menü zum Herunterladen von Mods und Karten. Kurz halten.
+Mods.Download,Download,Lädt Mods herunter. Kurz halten.
+Mods.Info,Info,Zeigt weitere Informationen zu einer Mod. Kurz halten.
+Mods.Loading,Lädt...,Info-Text beim Laden von Mods.
+Mods.Tags,Tags:,Überschrift der Liste der verfügbaren Tags. Kurz halten.
+Mods.Author,Autor:,Label vor dem Autor der Mod.
+Mods.Downloads,Downloads:,Label vor der Anzahl der Downloads der Mod.
+Mods.ShowMore,Zeige mehr,Zeigt weitere Mods an. Kurz halten.
+Mods.Tags.All,All,Tag-Option zum Anzeigen aller Mods and Karten. Kurz halten. Ist Englisch weil alle anderen auch.
+Mods.Votes,Bewertung:,Label vor der Anzahl der Likes und Dislikes.
+Mods.ModsChanged,Änderungen an Mods werden erst nach einem Neustart wirksam,"Hinweis auf den Dialog für den Benutzer zum Neustart des Spiels, nachdem Änderungen an Mods vorgenommen wurden"
+Mods.Quit,Beenden,Beendet das Spiel
+Mods.Stay,Zurück,Zurück zum Hauptmenü
+Mods.Enabled,Aktiviert,Schalter zum aktivieren/deaktivieren von Mods. Kurz halten.
+Mods.Installed,Installiert,Schalter zum installieren/deinstallieren von Mods. Kurz halten.
+Mods.Uninstall,Deinstallieren,Deinstallieren von Mods.
+Mods.Options,Optionen:,Überschrift der Liste der verfügbaren Optionen. Kurz halten.
+Mods.Dependencies,Abhängigkeiten:,Überschrift der Liste der Abhängigkeiten. Kurz halten.
+Mods.InstalledVersion,Installierte Version:,Überschrift der Liste der installierten Version. Kurz halten.
+Mods.LiveVersion,Aktuelle Version:,Überschrift der Liste der aktuellen Version. Kurz halten.
+Mods.Newest,Neueste,Sortiert die neuesten hochgeladenen Mods zuerst.
+Mods.MostDownloaded,Meiste Downloads,Sortiert die am meisten heruntergeladenen Mods zuerst.
+Mods.TopRated,Top bewertet,Sortiert die am besten bewerteten Mods zuerst.
+Mods.LastUpdated,Zuletzt aktualisiert,Sortiert die als letztet aktualisierten Mods zuerst.
+Mods.UpdateAllLabel,Es sind {0} Aktualisierungen verfügbar.,Label zur Information für wie viele Mods Aktualisierungen verfügbar sind.
+Mods.UpdateAll,Alle aktualisieren,Aktualisiert alle Mods für die ein Update zur Verfügung steht. Kurz halten.
+Mods.Empty,,Leerer String
+Mods.Update,Aktualisieren,Aktualisiert die Mod. Kurz halten.
+Mods.Versions,Verfügbare Versionen,Label der Liste aller auf mod.io verfügbaren Versionen der Mod
+Mods.UpdateBehaviour,Suche nach der höchsten statt der aktuellen Version
+Mods.UpdateBehaviourTooltip,"Normalerweise ist die \u201Eaktuelle Version\u201C die Version, die im Stable-Branch funktioniert. Einige Modder pushen höhere Versionen, die normalerweise nur auf dem Experimental-Branch funktionieren."
+Mods.VersionUnknown,"Anhand der Mod-Dateien ist es derzeit unklar, ob die Mod mit der aktuellen Spielversion funktioniert.",-
+Mods.VersionCompatible,"Anhand der Mod-Dateien wurde eine Version gefunden, die mit der aktuellen Spielversion kompatibel ist.",-
+Mods.VersionIncompatible,"Anhand der Mod-Dateien wurden keine Versionen gefunden, die mit der aktuellen Spielversion kompatibel sind. Die Installation wird nicht empfohlen.",-

@@ -1,12 +1,8 @@
-﻿using ModManager.AddonSystem;
-using ModManager.ManifestValidatorSystem;
+﻿using ModManager.ManifestValidatorSystem;
 using ModManager.PersistenceSystem;
 using ModManager.StartupSystem;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace ModManager.MapSystem
 {
@@ -24,17 +20,17 @@ namespace ModManager.MapSystem
         public void ValidateManifests()
         {
             var mapManifests = _mapManifestFinder.Find().Select(a => (MapManifest)a).ToList();
-            int oldManifestCount = mapManifests.Count;
+            var oldManifestCount = mapManifests.Count;
 
-            foreach (MapManifest mapManifest in mapManifests.ToList())
+            foreach (var mapManifest in mapManifests.ToList())
             {
-                List<string> fileNames = 
+                var fileNames = 
                     mapManifest.MapFileNames
                                .Select(filename => Path.Combine(Paths.Maps, 
                                                          $"{filename}{Names.Extensions.TimberbornMap}"))
                                .ToList();
 
-                bool filesDontExist = true;
+                var filesDontExist = true;
 
 
                 foreach(var filename in fileNames)
@@ -49,11 +45,11 @@ namespace ModManager.MapSystem
                     mapManifests.Remove(mapManifest);
                 }
             }
-            int newManifestCount = mapManifests.Count;
+            var newManifestCount = mapManifests.Count;
 
             if(oldManifestCount != newManifestCount )
             {
-                string mapManifestPath = Path.Combine(Paths.Maps, MapManifest.FileName);
+                var mapManifestPath = Path.Combine(Paths.Maps, MapManifest.FileName);
                 _persistenceService.SaveObject(mapManifests, mapManifestPath);
             }
         }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using ModManager.AddonEnableSystem;
 using ModManager.AddonSystem;
@@ -15,11 +14,9 @@ namespace ModManager.MapSystem
                 return false;
             }
 
-            List<string> enabledFilePaths = mapManifest.MapFileNames
-                                                       .Select(mapfilename => Path.Combine(Paths.Maps, mapfilename + Names.Extensions.TimberbornMap))
-                                                       .ToList();
+            var enabledFilePaths = mapManifest.MapFileNames.Select(mapFileName => Path.Combine(Paths.Maps, mapFileName + Names.Extensions.TimberbornMap)).ToList();
 
-            foreach (string enabledFilePath in enabledFilePaths)
+            foreach (var enabledFilePath in enabledFilePaths)
             {
                 if (!File.Exists(enabledFilePath + Names.Extensions.Disabled))
                 {
@@ -39,11 +36,9 @@ namespace ModManager.MapSystem
                 return false;
             }
 
-            List<string> mapFilePaths = mapManifest.MapFileNames
-                                                   .Select(mapfilename => Path.Combine(Paths.Maps, mapfilename + Names.Extensions.TimberbornMap))
-                                                   .ToList();
+            var mapFilePaths = mapManifest.MapFileNames.Select(mapFileName => Path.Combine(Paths.Maps, mapFileName + Names.Extensions.TimberbornMap)).ToList();
 
-            foreach (string mapFilePath in mapFilePaths)
+            foreach (var mapFilePath in mapFilePaths)
             {
                 if (!File.Exists(mapFilePath))
                 {

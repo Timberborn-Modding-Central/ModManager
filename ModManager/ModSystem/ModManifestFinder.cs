@@ -24,7 +24,7 @@ namespace ModManager.ModSystem
         public IEnumerable<Manifest> Find()
         {
 
-            foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName, SearchOption.AllDirectories))
+            foreach (var enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName, SearchOption.AllDirectories))
             {
                 var manifest = LoadManifest(enabledManifest);
                 if (manifest == null)
@@ -35,7 +35,7 @@ namespace ModManager.ModSystem
 
             }
 
-            foreach (string disabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Disabled, SearchOption.AllDirectories))
+            foreach (var disabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Disabled, SearchOption.AllDirectories))
             {
                 var manifest = LoadManifest(disabledManifest);
                 if (manifest == null)
@@ -45,7 +45,7 @@ namespace ModManager.ModSystem
                 yield return manifest;
             }
 
-            foreach (string enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Remove, SearchOption.AllDirectories))
+            foreach (var enabledManifest in Directory.GetFiles(Paths.Mods, Manifest.FileName + Names.Extensions.Remove, SearchOption.AllDirectories))
             {
                 var manifest = LoadManifest(enabledManifest);
                 if (manifest == null)
@@ -61,7 +61,7 @@ namespace ModManager.ModSystem
             return new List<Manifest>();
         }
 
-        private Manifest LoadManifest(string manifestPath)
+        private Manifest? LoadManifest(string manifestPath)
         {
             try
             {

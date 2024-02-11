@@ -1,7 +1,5 @@
 ﻿using Modio.Models;
 using ModManager.ExtractorSystem;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -28,10 +26,10 @@ namespace ModManager.MapSystem
                     throw new MapException("Map zip does not contain an entry for a .timber file");
                 }
 
-                foreach (ZipArchiveEntry timberFile in timberFiles)
+                foreach (var timberFile in timberFiles)
                 {
                     var filename = timberFile.Name.Replace(Names.Extensions.TimberbornMap, "");
-                    string[] files = Directory.GetFiles(Paths.Maps, filename);
+                    var files = Directory.GetFiles(Paths.Maps, filename);
                     if (files.Length > 0)
                     {
                         filename += $"_{files.Length + 1}";

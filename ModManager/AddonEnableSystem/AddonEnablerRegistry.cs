@@ -5,12 +5,7 @@ namespace ModManager.AddonEnableSystem
 {
     public class AddonEnablerRegistry : Singleton<AddonEnablerRegistry>
     {
-        private readonly List<KeyValuePair<string, IAddonEnabler>> _addonEnablers;
-
-        public AddonEnablerRegistry()
-        {
-            _addonEnablers = new List<KeyValuePair<string, IAddonEnabler>>();
-        }
+        private readonly List<KeyValuePair<string, IAddonEnabler>> _addonEnablers = new();
 
         public void Add(string enablerId, IAddonEnabler enabler)
         {

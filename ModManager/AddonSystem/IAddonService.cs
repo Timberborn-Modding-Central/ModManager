@@ -1,6 +1,4 @@
-﻿using Modio;
-using Modio.Filters;
-using Modio.Models;
+﻿using Modio.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,18 +17,12 @@ namespace ModManager.AddonSystem
 
         void Disable(uint modId);
 
-        ModsClient GetMods();
-
-        GameTagsClient GetTags();
-
-        Task<(string location, Mod Mod)> DownloadLatest(Mod mod);
-
-        IAsyncEnumerable<(string location, Mod Mod)> DownloadDependencies(Mod mod, bool downloadHighestInsteadOfLive);
+        IAsyncEnumerable<Dependency> GetDependencies(Mod mod);
 
         Task<(string location, Mod Mod)> Download(Mod mod, File file);
 
         Task<byte[]> GetImage(Uri uri);
 
-        FilesClient GetFiles(Mod mod);
+        Task<File?> TryGetCompatibleVersion(uint modId, bool downloadHighestInsteadOfLive);
     }
 }

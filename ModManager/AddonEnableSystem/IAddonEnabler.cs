@@ -1,5 +1,4 @@
 ﻿using ModManager.AddonSystem;
-using ModManager.ModSystem;
 
 namespace ModManager.AddonEnableSystem
 {

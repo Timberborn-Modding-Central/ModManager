@@ -21,14 +21,14 @@ namespace ModManager.PersistenceSystem
 
         public void SaveObject(object obj, string path)
         {
-            string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
 
             File.WriteAllText(path, json);
         }
 
         public T LoadObject<T>(string path, bool strict = true)
         {
-            string json = File.ReadAllText(path);
+            var json = File.ReadAllText(path);
 
             var obj = JsonConvert.DeserializeObject<T>(json, strict ? _strictJsonSerializerSettings : _defaultJsonSerializerSettings);
 
