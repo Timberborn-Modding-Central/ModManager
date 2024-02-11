@@ -21,7 +21,7 @@ namespace ModManagerUI.UiSystem
             try
             {
                 file ??= mod.Modfile!;
-                var downloadedMod = await ModManager.AddonSystem.AddonService.Instance.Download(mod, file);
+                var downloadedMod = await AddonService.Download(mod, file);
                 TryInstall(downloadedMod);
             }
             catch (MapException ex)
