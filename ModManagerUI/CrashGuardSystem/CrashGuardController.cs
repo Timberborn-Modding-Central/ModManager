@@ -3,6 +3,7 @@ using ModManager.AddonEnableSystem;
 using ModManager.AddonSystem;
 using ModManager.LoggingSystem;
 using ModManager.MapSystem;
+using ModManagerUI.UiSystem;
 using Timberborn.CoreUI;
 using Timberborn.SceneLoading;
 using UnityEngine.SceneManagement;
@@ -56,6 +57,8 @@ namespace ModManagerUI.CrashGuardSystem
             foreach (var manifest in _installedAddonRepository.All())
             {
                 if (manifest is MapManifest)
+                    continue;
+                if (ModHelper.IsModManager(manifest))
                     continue;
                 _addonEnablerService.Disable(manifest);
             }
