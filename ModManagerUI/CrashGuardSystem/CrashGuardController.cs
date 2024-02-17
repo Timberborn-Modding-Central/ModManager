@@ -6,11 +6,12 @@ using ModManager.MapSystem;
 using ModManagerUI.UiSystem;
 using Timberborn.CoreUI;
 using Timberborn.SceneLoading;
+using Timberborn.SingletonSystem;
 using UnityEngine.SceneManagement;
 
 namespace ModManagerUI.CrashGuardSystem
 {
-    public class CrashGuardController
+    public class CrashGuardController : ILoadableSingleton
     {
         public static IModManagerLogger ModManagerLogger;
         
@@ -39,6 +40,13 @@ namespace ModManagerUI.CrashGuardSystem
             _sceneLoader.SceneLoaded += OnSceneLoaded;
         }
 
+        
+        public void Load()
+        {
+            // Test
+            // throw new Exception();
+        }
+        
         private void OnSceneLoaded(object sender, EventArgs e)
         {
             if (_hasPassedLoading || SceneManager.GetActiveScene().buildIndex != 2)
@@ -47,9 +55,10 @@ namespace ModManagerUI.CrashGuardSystem
                 return;
             }
 
+            if (!CrashGuardSystemConfig.CrashGuardEnabled.Value) 
+                return;
             _modManagerLogger.LogWarning("IMPORTANT: it seems the game crashed while trying to load into the game. All mods are being disabled.");
             DisableAllMods();
-            _sceneLoader.LoadScene(0, 0, null);
         }
         
         private void DisableAllMods()

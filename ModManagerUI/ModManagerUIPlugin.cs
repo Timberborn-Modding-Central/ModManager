@@ -34,6 +34,8 @@ namespace ModManagerUI
             var harmony = new Harmony("com.modmanagerui");
             harmony.PatchAll();
             LocalizationPatcher.Patch(harmony);
+            
+            CrashGuardSystem.CrashGuardSystemConfig.Initialize(Config);
         }
     }
 }
