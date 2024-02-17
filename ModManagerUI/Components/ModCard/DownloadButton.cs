@@ -45,8 +45,7 @@ namespace ModManagerUI.Components.ModCard
         public void Refresh()
         {
             _root.text = _valueGetter();
-            var isPopulatingModFile = _mod.Modfile == null;
-            if (isPopulatingModFile)
+            if (_mod.Modfile == null)
             {
                 _root.SetEnabled(false);
                 return;
@@ -54,7 +53,7 @@ namespace ModManagerUI.Components.ModCard
 
             if (InstalledAddonRepository.Instance.TryGet(_mod.Id, out var manifest))
             {
-                var isSameVersion = VersionComparer.IsSameVersion(manifest.Version, _mod.Modfile!.Version);
+                var isSameVersion = VersionComparer.IsSameVersion(manifest.Version, _mod.Modfile.Version);
                 _root.SetEnabled(!isSameVersion);
             }
             else
