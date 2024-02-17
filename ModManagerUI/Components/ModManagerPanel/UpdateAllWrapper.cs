@@ -68,9 +68,9 @@ namespace ModManagerUI.Components.ModManagerPanel
         private async Task UpdateUpdatableMods()
         {
             _updateAllButton.SetEnabled(false);
+            UiSystem.ModManagerPanel.ModsWereChanged = true;
             foreach (var updatableMod in _updateAvailableGetter().ToArray())
             {
-                UiSystem.ModManagerPanel.ModsWereChanged = true;
                 try
                 {
                     var mod = ModIoModRegistry.Get(updatableMod.Value.ModId);
