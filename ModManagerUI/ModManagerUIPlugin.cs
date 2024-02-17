@@ -12,10 +12,12 @@ namespace ModManagerUI
     [BepInPlugin("com.modmanagerui", "Mod Manager UI", "MODMANAGER_VERSION")]
     public class ModManagerUIPlugin : BaseUnityPlugin
     {
-        public static ManualLogSource Log;
+        public static PluginInfo PluginInfo = null!;
+        public static ManualLogSource Log = null!;
 
         public void Awake()
         {
+            PluginInfo = Info;
             Log = Logger; 
 
             ModManagerStartup.Run("MOD_IO_APIKEY", options =>

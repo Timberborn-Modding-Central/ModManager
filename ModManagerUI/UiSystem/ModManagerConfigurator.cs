@@ -16,6 +16,7 @@ namespace ModManagerUI.UiSystem
         [HarmonyPostfix]
         public static void ConfigurePostfix(IContainerDefinition containerDefinition)
         {
+            containerDefinition.Bind<ModManagerRegisterer>().AsSingleton();
             containerDefinition.Bind<IAddonService>().ToInstance(AddonService.Instance);
             containerDefinition.Bind<ModManagerPanel>().AsSingleton();
             containerDefinition.Bind<AddonExtractorService>().ToInstance(AddonExtractorService.Instance);

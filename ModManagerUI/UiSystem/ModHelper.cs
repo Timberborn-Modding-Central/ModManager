@@ -5,6 +5,8 @@ namespace ModManagerUI.UiSystem
 {
     public abstract class ModHelper
     {
+        public static uint ModManagerId => 2541476;
+        
         public static bool ContainsBepInEx(Mod mod)
         {
             return mod.Name!.ToLower().Contains("BepInEx".ToLower());
@@ -12,7 +14,7 @@ namespace ModManagerUI.UiSystem
 
         public static bool IsModManager(Mod mod)
         {
-            return mod.Id == 2541476;
+            return mod.Id == ModManagerId;
         }
         
         public static bool IsModManager(Manifest manifest)
