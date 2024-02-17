@@ -59,7 +59,15 @@ namespace ModManagerUI.Components.ModFullInfo
                 return;
             }
             
-            _root.SetEnabled(!VersionComparer.IsSameVersion(_modFullInfoController.CurrentFile.Version, _mod.Modfile.Version));
+            if (InstalledAddonRepository.Instance.TryGet(_mod.Id, out var manifest))
+            {
+                var isSameVersion = VersionComparer.IsSameVersion(manifest.Version, _modFullInfoController.CurrentFile.Version);
+                _root.SetEnabled(!isSameVersion);
+            }
+            else
+            {
+                _root.SetEnabled(true);
+            }
         }
 
         private string TextGetter()
