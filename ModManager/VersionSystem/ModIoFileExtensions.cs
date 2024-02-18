@@ -15,12 +15,10 @@ namespace ModManager.VersionSystem
         
         public static IEnumerable<string?> CompatibleGameVersions(this File file)
         {
-            if (string.IsNullOrEmpty(file.Changelog) || string.IsNullOrEmpty(file.MetadataBlob))
-                return new List<string?>();
-            
-            var compatibleVersionArrayResult = CompatibleVersionArrayRegex.Match(file.MetadataBlob).Groups[1].Value;
-            var versionMatches = CompatibleVersionRegex.Matches(compatibleVersionArrayResult);
-            return versionMatches.Select(match => match.Value.Replace("\"", ""));
+            var authorVersions = GetCompatibleGameVersions(file.Changelog);  
+            // TODO: Decide on how to do prioritise admins/authors
+            var adminVersions = GetCompatibleGameVersions(file.MetadataBlob);  
+            return adminVersions;
         }
         
         public static string? MinimumGameVersion(this File file)
@@ -43,6 +41,15 @@ namespace ModManager.VersionSystem
                 return null;
             
             return MaximumGameVersionLine.Groups[1].Value.Trim();
+        }
+
+        private static IEnumerable<string?> GetCompatibleGameVersions(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return new List<string?>();
+            var compatibleVersionArrayResult = CompatibleVersionArrayRegex.Match(text).Groups[1].Value;
+            var versionMatches = CompatibleVersionRegex.Matches(compatibleVersionArrayResult);
+            return versionMatches.Select(match => match.Value.Replace("\"", ""));
         }
     }
 }
