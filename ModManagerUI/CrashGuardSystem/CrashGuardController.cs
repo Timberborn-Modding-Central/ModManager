@@ -22,7 +22,7 @@ namespace ModManagerUI.CrashGuardSystem
         private readonly DialogBoxShower _dialogBoxShower;
         private readonly SceneLoader _sceneLoader;
 
-        private static bool _hasPassedLoading;
+        private static bool _active = true;
 
         private CrashGuardController(
             SceneLoader sceneLoader, 
@@ -38,24 +38,28 @@ namespace ModManagerUI.CrashGuardSystem
             ModManagerLogger = modManagerLogger;
             
             _sceneLoader.SceneLoaded += OnSceneLoaded;
+            
+            if (!CrashGuardSystemConfig.CrashGuardEnabled.Value) 
+                Disable();
         }
-
         
         public void Load()
         {
             // Test
             // throw new Exception();
         }
+
+        public static void Disable()
+        {
+            if (!_active)
+                return;
+            ModManagerLogger.LogInfo("Crash Guard System is now disabled.");
+            _active = false;
+        }
         
         private void OnSceneLoaded(object sender, EventArgs e)
         {
-            if (_hasPassedLoading || SceneManager.GetActiveScene().buildIndex != 2)
-            {
-                _hasPassedLoading = true;
-                return;
-            }
-
-            if (!CrashGuardSystemConfig.CrashGuardEnabled.Value) 
+            if (!_active || SceneManager.GetActiveScene().buildIndex != 2)
                 return;
             _modManagerLogger.LogWarning("IMPORTANT: it seems the game crashed while trying to load into the game. All mods are being disabled.");
             DisableAllMods();
