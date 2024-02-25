@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Modio.Filters;
 using Modio.Models;
+using ModManager.AddonSystem;
 using ModManager.ManifestValidatorSystem;
 using ModManager.ModIoSystem;
 using ModManagerUI.Components.ModManagerPanel;
 using ModManagerUI.EventSystem;
-using Timberborn.Core;
 using Timberborn.CoreUI;
 using Timberborn.ExperimentalModeSystem;
 using Timberborn.Localization;
@@ -116,6 +116,11 @@ namespace ModManagerUI.UiSystem
             SortingButtonsManager.AddNew(_root.Q<Button>("Newest"), "Newest", ModFilter.DateAdded.Desc());
             SortingButtonsManager.AddNew(_root.Q<Button>("TopRated"), "TopRated", ModFilter.Rating.Desc());
             SortingButtonsManager.AddNew(_root.Q<Button>("LastUpdated"), "LastUpdated", ModFilter.DateUpdated.Desc());
+
+            var enableAll = _root.Q<Button>("EnableAll");
+            enableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.Instance.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, true)));
+            var disableAll = _root.Q<Button>("DisableAll");
+            disableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.Instance.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, false)));
             
             _updateAll = UpdateAllWrapper.Create(_root.Q<VisualElement>("UpdateAllWrapper"), () => UpdateableModRegistry.UpdateAvailable!);
             

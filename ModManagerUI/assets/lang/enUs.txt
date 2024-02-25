@@ -37,6 +37,6 @@ Mods.VersionCompatible,"Based on the mod files, a version was found that is comp
 Mods.VersionIncompatible,"Based on the mod files, no versions were found that are compatible with the current Game Version. Installing is not advised.",-
 
 Mods.CrashInfo,"It seems the game crashed while trying to load into the game. Below you can select what mods to disable to try and prevent a crash the next time.",-
-Mods.EnableAll,Enable all,-
-Mods.DisableAll,Disable all,-
+Mods.EnableAll,Enable all mods,-
+Mods.DisableAll,Disable all mods,-
 Mods.GoToCrashReport,Go to Crash report,-
