@@ -9,7 +9,17 @@ namespace ModManagerUI.UiSystem
         
         public static bool ContainsBepInEx(Mod mod)
         {
-            return mod.Name!.ToLower().Contains("BepInEx".ToLower());
+            return !string.IsNullOrEmpty(mod.Name) && ContainsBepInEx(mod.Name);
+        }
+        
+        public static bool ContainsBepInEx(Manifest manifest)
+        {
+            return ContainsBepInEx(manifest.ModName);
+        }
+
+        private static bool ContainsBepInEx(string name)
+        {
+            return name.ToLower().Contains("BepInEx".ToLower());
         }
 
         public static bool IsModManager(Mod mod)

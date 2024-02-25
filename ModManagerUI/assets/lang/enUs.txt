@@ -11,6 +11,7 @@ Mods.Tags.All,All,Tag options to show all mods and maps. Keep short.
 Mods.Votes,Votes:,Label before count of mod likes and dislikes.
 Mods.ModsChanged,Changes to mods will take effect after a restart,Instruction on the dialog for the user to restart the game after changes to mods have been made
 Mods.Quit,Quit,Button to quit game
+Mods.Restart,Restart,Button to restart game
 Mods.Stay,Stay,Button to not quit the game immediately
 Mods.Enabled,Enabled,Toggle for if a mod is enabled or not. Keep short.
 Mods.Installed,Installed,Toggle for is a mod is installed or not. Keep short.
@@ -34,3 +35,8 @@ Mods.UpdateBehaviourTooltip,Usually "live" version is version that works on stab
 Mods.VersionUnknown,"Based on the mod files, it is currently unclear that the mod will work on the current Game version.",-
 Mods.VersionCompatible,"Based on the mod files, a version was found that is compatible with the current Game Version.",-
 Mods.VersionIncompatible,"Based on the mod files, no versions were found that are compatible with the current Game Version. Installing is not advised.",-
+
+Mods.CrashInfo,"It seems the game crashed while trying to load into the game. Below you can select what mods to disable to try and prevent a crash the next time.",-
+Mods.EnableAll,Enable all,-
+Mods.DisableAll,Disable all,-
+Mods.GoToCrashReport,Go to Crash report,-

@@ -53,8 +53,7 @@ namespace ModManagerUI.UiSystem
 
         public static readonly uint ModsPerPage = 25;
         public static ModManagerPanel Instance = null!;
-        
-        public Action? OpenOptionsDelegate { get; private set; }
+        public Action OpenOptionsDelegate { get; private set; } = null!;
 
         private IAsyncEnumerable<IReadOnlyList<Mod>>? _getModsTask;
         
@@ -177,7 +176,7 @@ namespace ModManagerUI.UiSystem
                 _dialogBoxShower
                     .Create()
                     .SetLocalizedMessage("Mods.ModsChanged")
-                    .SetConfirmButton(GameQuitter.Quit, Loc.T("Mods.Quit"))
+                    .SetConfirmButton(GameRestarter.QuitOrRestart, Loc.T(SteamChecker.IsRestartCompatible() ? "Mods.Restart" : "Mods.Quit"))
                     .SetCancelButton(() => PanelStack.Pop(this), Loc.T("Mods.Stay"))
                     .Show();
             }
