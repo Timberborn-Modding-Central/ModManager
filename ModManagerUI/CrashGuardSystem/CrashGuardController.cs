@@ -19,7 +19,7 @@ namespace ModManagerUI.CrashGuardSystem
         private readonly InstalledAddonRepository _installedAddonRepository = InstalledAddonRepository.Instance;
         private readonly SceneLoader _sceneLoader;
 
-        private static bool _active = true;
+        private static bool _crashGuardActive = true;
 
         private CrashGuardController(
             SceneLoader sceneLoader, 
@@ -41,16 +41,22 @@ namespace ModManagerUI.CrashGuardSystem
 
         public static void Disable()
         {
-            if (!_active)
+            if (!_crashGuardActive)
                 return;
             ModManagerUIPlugin.Log.LogInfo("Crash Guard System is now disabled.");
-            _active = false;
+            _crashGuardActive = false;
         }
         
         private void OnSceneLoaded(object sender, EventArgs e)
         {
-            if (!_active || SceneManager.GetActiveScene().buildIndex != 2)
+            if (SceneManager.GetActiveScene().buildIndex != 2)
                 return;
+
+            if (!_crashGuardActive)
+            {
+                CrashScreenPanelPatch.ShowCrashScreenPanel();
+                return;
+            }
 
             var obj = new GameObject();
             Object.Instantiate(obj);
