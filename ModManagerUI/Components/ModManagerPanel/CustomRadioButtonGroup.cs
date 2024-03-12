@@ -25,7 +25,7 @@ namespace ModManagerUI.Components.ModManagerPanel
             _tagOption = tagOption;
         }
         
-        public void Initialize()
+        public void Initialize(bool formatTags = false)
         {
             RadioButtonGroupRegistry.RadioButtonGroups.Add(this);
             
@@ -41,7 +41,7 @@ namespace ModManagerUI.Components.ModManagerPanel
             radioButtonGroup.value = -1;
             radioButtonGroup.AddToClassList("mods-box__tags");
             
-            radioButtonGroup.choices = _tagOption.Tags.Select(FormatTag);
+            radioButtonGroup.choices = formatTags ? _tagOption.Tags.Select(FormatTag) : _tagOption.Tags;
             radioButtonGroup.RegisterValueChangedCallback(_ => OnValueChanged());
 
             foreach (var radioButton in radioButtonGroup.Children())

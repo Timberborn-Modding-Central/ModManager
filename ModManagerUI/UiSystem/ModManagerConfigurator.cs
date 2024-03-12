@@ -6,6 +6,7 @@ using ModManager.LoggingSystem;
 using ModManagerUI.CrashGuardSystem;
 using Timberborn.GameExitSystem;
 using Timberborn.MainMenuScene;
+using Timberborn.SliderToggleSystem;
 
 namespace ModManagerUI.UiSystem
 {
@@ -16,12 +17,16 @@ namespace ModManagerUI.UiSystem
         [HarmonyPostfix]
         public static void ConfigurePostfix(IContainerDefinition containerDefinition)
         {
+            containerDefinition.Bind<ModManagerRegisterer>().AsSingleton();
             containerDefinition.Bind<IAddonService>().ToInstance(AddonService.Instance);
             containerDefinition.Bind<ModManagerPanel>().AsSingleton();
             containerDefinition.Bind<AddonExtractorService>().ToInstance(AddonExtractorService.Instance);
             containerDefinition.Bind<GoodbyeBoxFactory>().AsSingleton();
             containerDefinition.Bind<ModFullInfoController>().AsSingleton();
             containerDefinition.Bind<InstalledAddonRepository>().ToInstance(InstalledAddonRepository.Instance);
+            containerDefinition.Bind<StaticVisualElementLoader>().AsSingleton();
+            containerDefinition.Bind<SliderToggleButtonFactory>().AsSingleton();
+            containerDefinition.Bind<SliderToggleFactory>().AsSingleton();
             containerDefinition.Bind<CrashGuardController>().AsSingleton();
             containerDefinition.Bind<CrashScreenBox>().AsSingleton();
             containerDefinition.Bind<UpdateableModRegistry>().AsSingleton();

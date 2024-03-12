@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Modio.Filters;
 using Modio.Models;
+using ModManager.AddonSystem;
 using ModManager.ManifestValidatorSystem;
 using ModManager.ModIoSystem;
 using ModManagerUI.Components.ModManagerPanel;
 using ModManagerUI.EventSystem;
-using Timberborn.Core;
 using Timberborn.CoreUI;
 using Timberborn.ExperimentalModeSystem;
 using Timberborn.Localization;
@@ -53,8 +53,7 @@ namespace ModManagerUI.UiSystem
 
         public static readonly uint ModsPerPage = 25;
         public static ModManagerPanel Instance = null!;
-        
-        public Action? OpenOptionsDelegate { get; private set; }
+        public Action OpenOptionsDelegate { get; private set; } = null!;
 
         private IAsyncEnumerable<IReadOnlyList<Mod>>? _getModsTask;
         
@@ -106,10 +105,10 @@ namespace ModManagerUI.UiSystem
             // new VersionStatusRadioButtonGroup(root.Q<RadioButtonGroup>("VersionStatusOptions"), versionStatusTagOption, this).Initialize();
             
             var installedTagOption = RadioButtonTagOption.Create(typeof(InstalledOptions));
-            new InstalledRadioButtonGroup(_root.Q<RadioButtonGroup>("Options"), installedTagOption).Initialize();
+            new InstalledRadioButtonGroup(_root.Q<RadioButtonGroup>("Options"), installedTagOption).Initialize(true);
             
             var enabledTagOption = RadioButtonTagOption.Create(typeof(EnabledOptions));
-            new EnabledRadioButtonGroup(_root.Q<RadioButtonGroup>("EnabledOptions"), enabledTagOption).Initialize();
+            new EnabledRadioButtonGroup(_root.Q<RadioButtonGroup>("EnabledOptions"), enabledTagOption).Initialize(true);
 
             _showMoreButton = ShowMoreButton.Create(_root.Q<Button>("ShowMore"));
 
@@ -117,6 +116,11 @@ namespace ModManagerUI.UiSystem
             SortingButtonsManager.AddNew(_root.Q<Button>("Newest"), "Newest", ModFilter.DateAdded.Desc());
             SortingButtonsManager.AddNew(_root.Q<Button>("TopRated"), "TopRated", ModFilter.Rating.Desc());
             SortingButtonsManager.AddNew(_root.Q<Button>("LastUpdated"), "LastUpdated", ModFilter.DateUpdated.Desc());
+
+            var enableAll = _root.Q<Button>("EnableAll");
+            enableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.Instance.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, true)));
+            var disableAll = _root.Q<Button>("DisableAll");
+            disableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.Instance.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, false)));
             
             _updateAll = UpdateAllWrapper.Create(_root.Q<VisualElement>("UpdateAllWrapper"), () => UpdateableModRegistry.UpdateAvailable!);
             
@@ -177,7 +181,7 @@ namespace ModManagerUI.UiSystem
                 _dialogBoxShower
                     .Create()
                     .SetLocalizedMessage("Mods.ModsChanged")
-                    .SetConfirmButton(GameQuitter.Quit, Loc.T("Mods.Quit"))
+                    .SetConfirmButton(GameRestarter.QuitOrRestart, Loc.T(SteamChecker.IsRestartCompatible() ? "Mods.Restart" : "Mods.Quit"))
                     .SetCancelButton(() => PanelStack.Pop(this), Loc.T("Mods.Stay"))
                     .Show();
             }

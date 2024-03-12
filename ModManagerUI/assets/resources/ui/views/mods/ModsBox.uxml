@@ -31,6 +31,10 @@
 						<Timberborn.CoreUI.LocalizableToggle name="UpdateBehaviour" text="Check for latest instead of live version" text-loc-key="Mods.UpdateBehaviour" class="text--big mods-box-toggle" />
 						<ui:Image name="UpdateBehaviourInfo" class="mods-box_update-behaviour-info" />
                     </ui:VisualElement>
+                    <ui:VisualElement name="EnablingWrapper" class="mods-box__sorting">
+                        <Timberborn.CoreUI.LocalizableButton name="EnableAll" text-loc-key="Mods.EnableAll" class="menu-button" />
+                        <Timberborn.CoreUI.LocalizableButton name="DisableAll" text-loc-key="Mods.DisableAll" class="menu-button" />
+                    </ui:VisualElement>
                     <ui:VisualElement name="UpdateAllWrapper" class="mods-box__update-all">
                         <Timberborn.CoreUI.LocalizableLabel name="UpdateAllLabel" text-loc-key="Mods.Empty" class="text--big mods-box-full-item__update-all-label" />
                         <Timberborn.CoreUI.LocalizableButton name="UpdateAll" text="Update All" text-loc-key="Mods.UpdateAll" class="menu-button" />

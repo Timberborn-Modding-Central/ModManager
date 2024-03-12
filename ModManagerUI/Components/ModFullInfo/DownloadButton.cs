@@ -23,7 +23,11 @@ namespace ModManagerUI.Components.ModFullInfo
         public static DownloadButton Create(Button root, Mod mod, ModFullInfoController modFullInfoController)
         {
             var downloadButton = new DownloadButton(root, mod, modFullInfoController);
-            root.clicked += () => downloadButton.Download();
+            root.clicked += () =>
+            {
+                root.SetEnabled(false);
+                downloadButton.Download();
+            };
             downloadButton.Refresh();
             return downloadButton;
         }
@@ -49,7 +53,21 @@ namespace ModManagerUI.Components.ModFullInfo
                 return;
             }
 
-            _root.SetEnabled(!VersionComparer.IsSameVersion(_modFullInfoController.CurrentFile!.Version, _mod.Modfile.Version));
+            if (_modFullInfoController.CurrentFile == null)
+            {
+                _root.SetEnabled(true);
+                return;
+            }
+            
+            if (InstalledAddonRepository.Instance.TryGet(_mod.Id, out var manifest))
+            {
+                var isSameVersion = VersionComparer.IsSameVersion(manifest.Version, _modFullInfoController.CurrentFile.Version);
+                _root.SetEnabled(!isSameVersion);
+            }
+            else
+            {
+                _root.SetEnabled(true);
+            }
         }
 
         private string TextGetter()

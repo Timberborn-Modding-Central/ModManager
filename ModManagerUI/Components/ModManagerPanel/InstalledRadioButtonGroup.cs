@@ -29,6 +29,8 @@ namespace ModManagerUI.Components.ModManagerPanel
                     var uninstalledModNames = InstalledAddonRepository.Instance.All().Select(manifest => manifest.ModId).ToList();
                     return uninstalledModNames;
                 case InstalledOptions.UpdateAvailable:
+                    if (UpdateableModRegistry.UpdateAvailable == null)
+                        return new List<uint>();
                     var updateAvailableNames = UpdateableModRegistry.UpdateAvailable.Select(pair => pair.Value.ModId).ToList();
                     return updateAvailableNames;
                 default:
