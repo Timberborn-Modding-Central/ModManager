@@ -8,6 +8,7 @@ using Timberborn.DistributionSystemBatchControl;
 using Timberborn.Localization;
 using Timberborn.SliderToggleSystem;
 using Timberborn.StockpilePriorityUISystem;
+using Timberborn.TooltipSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,9 +30,11 @@ namespace ModManagerUI.CrashGuardSystem
 
         public CrashScreenBox(
             SliderToggleFactory sliderToggleFactory,
+            Tooltip tooltip,
             ILoc loc)
         {
             _sliderToggleFactory = sliderToggleFactory;
+            tooltip.Load();
             _loc = loc;
 
             Instance = this;
@@ -183,24 +186,22 @@ namespace ModManagerUI.CrashGuardSystem
             return new BoxBuilder(_loc, root);
         }
 
-        private VisualElement GetImportDisabledTooltip()
+        private static VisualElement GetImportDisabledTooltip()
         {
-            return GetTooltip(ImportToggleFactory.ImportDisabledLocKey,
-                ImportToggleFactory.ImportDisabledDescriptionLocKey, false);
+            return GetTooltip(ImportToggleFactory.ImportDisabledLocKey, ImportToggleFactory.ImportDisabledDescriptionLocKey, false);
         }
 
-        private VisualElement GetImportAutoTooltip()
+        private static VisualElement GetImportAutoTooltip()
         {
             return GetTooltip(ImportToggleFactory.ImportAutoLocKey, ImportToggleFactory.ImportAutoDescriptionLocKey, true);
         }
 
-        private VisualElement GetTooltip(string title, string description, bool withBalanceInfo)
+        private static VisualElement GetTooltip(string title, string description, bool withBalanceInfo)
         {
-            var e = StaticVisualElementLoader.LoadVisualElement("Game/ImportToggleTooltip");
-            e.Q<Label>("Title").text = _loc.T(title);
-            e.Q<Label>("Description").text =
-                withBalanceInfo ? _loc.T(description) + "\n" + _loc.T(ImportToggleFactory.BalanceInfoLocKey) : _loc.T(description);
-            return e;
+            var importToggleTooltip = StaticVisualElementLoader.LoadVisualElement("Game/ImportToggleTooltip");
+            importToggleTooltip.Q<Label>("Title").text = _loc.T(title);
+            importToggleTooltip.Q<Label>("Description").text = withBalanceInfo ? _loc.T(description) + "\n" + _loc.T(ImportToggleFactory.BalanceInfoLocKey) : _loc.T(description);
+            return importToggleTooltip;
         }
     }
 }
