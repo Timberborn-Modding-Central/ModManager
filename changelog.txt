@@ -1,4 +1,8 @@
 ## Unreleased
+
+### Changes
+
+## 2.1.0
 Added QoL changes to update 2.0
 
 ### Changes
